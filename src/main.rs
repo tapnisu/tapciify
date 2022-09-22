@@ -24,7 +24,7 @@ fn main() {
         &original_image,
         nwidth,
         nheight,
-        image::imageops::FilterType::Triangle,
+        image::imageops::FilterType::Lanczos3,
     );
 
     let rgb: Vec<u8> = img.into_raw();
