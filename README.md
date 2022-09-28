@@ -12,4 +12,4 @@
 
 Out file is `./target/release/tapciify` or `./target/release/tapciify.exe`.
 
-3. Run: `tapciify -f fileDir -w imageWeight`.
+3. Run: `./tapciify -f fileDir -w imageWeight`.
