@@ -6,10 +6,6 @@
 
 # How to use:
 
-1. Clone repo: `git clone https://github.com/tapnisu/tapciify.git`.
+1. Install via cargo from repo: `cargo install --git https://github.com/tapnisu/tapciify`
 
-2. Build: `cargo build -r`.
-
-Out file is `./target/release/tapciify` or `./target/release/tapciify.exe`.
-
-3. Run: `./tapciify -f fileDir -w imageWeight`.
+2. Run: `tapciify -f fileDir -w imageWeight`.
