@@ -6,6 +6,9 @@
 
 # How to use:
 
-1. Install via cargo from repo: `cargo install --git https://github.com/tapnisu/tapciify`
+1. Install via cargo from repo:
+   `cargo install --git https://github.com/tapnisu/tapciify`
 
 2. Run: `tapciify -f fileDir -w imageWeight`.
+
+3. Run: `tapciify -f fileDir -w imageWeight -r` for reversed colors.

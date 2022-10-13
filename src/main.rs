@@ -9,6 +9,8 @@ struct Arguments {
     file: String,
     #[clap(short, long, value_parser)]
     width: u32,
+    #[clap(long, short, action)]
+    reverse: bool,
 }
 
 fn main() {
@@ -33,11 +35,14 @@ fn main() {
     let mut x = 0;
 
     for i in (0..(rgb.len() - 1)).step_by(3) {
-        frame.push(utils::ascii_symbol(utils::get_brightness(
-            rgb[i as usize],
-            rgb[i as usize + 1],
-            rgb[i as usize + 2],
-        )));
+        frame.push(utils::ascii_symbol(
+            utils::get_brightness(rgb[i as usize], rgb[i as usize + 1], rgb[i as usize + 2]),
+            if args.reverse {
+                "@#S%?*+;:,. "
+            } else {
+                " .,:;+*?%S#@"
+            },
+        ));
 
         x += 1;
 
