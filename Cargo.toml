@@ -1,8 +1,9 @@
 [package]
 name = "tapciify"
-version = "0.1.1"
+version = "0.2.0"
 edition = "2021"
 
 [dependencies]
 clap = { version = "4.0.14", features = ["derive"] }
+crossterm = "0.25.0"
 image = "0.24.3"
