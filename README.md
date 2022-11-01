@@ -4,11 +4,22 @@
 
 <p align="center">CLI tool that can show images in your terminal.</p>
 
-# How to use:
+## How to use:
+
+### Images
 
 1. Install via cargo from repo:
    `cargo install --git https://github.com/tapnisu/tapciify`
 
-2. Run: `tapciify -f fileDir -w imageWeight`.
+2. Run: `tapciify -f imageDir -w imageWeight` for image.
 
-3. Run: `tapciify -f fileDir -w imageWeight -r` for reversed colors.
+3. Run: `tapciify -f imageDir -w imageWeight -r` for reversed colors.
+
+### Videos
+
+> Requires ffmpeg
+
+1. Make frames from video into dir:
+   `mkdir frames; ffmpeg -i badapple.mkv -r 24 frames/%04d.jpeg`.
+
+2. Run: `tapciify -i ./frames/ -d -w 32 -f 24` for reversed colors.
