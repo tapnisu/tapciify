@@ -1,11 +1,7 @@
 use clap::Parser;
 pub mod utils;
-use std::io::{stdout, Write};
-
-use crossterm::{
-    cursor::{DisableBlinking, EnableBlinking, MoveTo, RestorePosition, SavePosition},
-    execute, ExecutableCommand, Result,
-};
+use crossterm::{cursor::MoveTo, execute};
+use std::io::stdout;
 use std::{fs, thread, time};
 
 #[derive(Parser, Debug)]
@@ -63,7 +59,7 @@ fn main() {
                 for frame in frames {
                     println!("{}", utils::render_frame(frame, args.width, args.reverse));
 
-                    execute!(stdout(), MoveTo(0, 0));
+                    execute!(stdout(), MoveTo(0, 0)).expect("");
 
                     thread::sleep(time::Duration::from_millis(frametime));
                 }
@@ -75,7 +71,7 @@ fn main() {
                         utils::render_frame(image_path, args.width, args.reverse)
                     );
 
-                    execute!(stdout(), MoveTo(0, 0));
+                    execute!(stdout(), MoveTo(0, 0)).expect("");
 
                     thread::sleep(time::Duration::from_millis(frametime));
                 }

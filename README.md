@@ -20,6 +20,4 @@
 > Requires ffmpeg
 
 1. Make frames from video into dir:
-   `mkdir frames; ffmpeg -i badapple.mkv -r 24 frames/%04d.jpeg`.
-
-2. Run: `tapciify -i ./frames/ -d -w 32 -f 24` for reversed colors.
+   `mkdir frames; ffmpeg -i badapple.mkv -r 24 frames/%08d.jpeg`.
