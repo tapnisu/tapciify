@@ -1,8 +1,10 @@
-use clap::Parser;
 pub mod utils;
+
+use clap::Parser;
 use crossterm::{cursor::MoveTo, execute};
 use std::io::stdout;
 use std::{fs, thread, time};
+use utils::render_frame;
 
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
@@ -48,28 +50,22 @@ fn main() {
                 let mut frames: Vec<String> = Vec::new();
 
                 for image_path in image_paths {
-                    frames.push(utils::render_frame(
-                        image_path.clone(),
-                        args.width,
-                        args.reverse,
-                    ));
+                    frames.push(render_frame(image_path.clone(), args.width, args.reverse));
+
                     println!("Rendered {}", image_path);
                 }
 
                 for frame in frames {
-                    println!("{}", utils::render_frame(frame, args.width, args.reverse));
+                    println!("{}", render_frame(frame, args.width, args.reverse));
 
                     execute!(stdout(), MoveTo(0, 0)).expect("");
 
                     thread::sleep(time::Duration::from_millis(frametime));
                 }
             }
-            _ => {
+            false => {
                 for image_path in image_paths {
-                    println!(
-                        "{}",
-                        utils::render_frame(image_path, args.width, args.reverse)
-                    );
+                    println!("{}", render_frame(image_path, args.width, args.reverse));
 
                     execute!(stdout(), MoveTo(0, 0)).expect("");
 
@@ -78,9 +74,6 @@ fn main() {
             }
         }
     } else {
-        println!(
-            "{}",
-            utils::render_frame(args.input, args.width, args.reverse)
-        )
+        println!("{}", render_frame(args.input, args.width, args.reverse))
     }
 }
