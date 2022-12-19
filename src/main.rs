@@ -1,10 +1,11 @@
 pub mod utils;
 
 use clap::Parser;
-use crossterm::{cursor::MoveTo, execute};
+use crossterm::cursor::MoveUp;
+use crossterm::execute;
 use std::io::stdout;
 use std::{fs, thread, time};
-use utils::render_frame;
+use utils::{calc_new_height, render_frame};
 
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
@@ -52,31 +53,58 @@ fn main() {
 
         match args.prerender {
             true => {
+                let mut image;
+                let mut height: Option<u32> = None;
+
                 let mut frames: Vec<String> = Vec::new();
 
                 for image_path in image_paths {
-                    frames.push(render_frame(image_path.clone(), args.width, &ascii_string));
+                    image = image::open(image_path.clone()).unwrap().to_rgb8();
+                    frames.push(render_frame(
+                        image.clone(),
+                        args.width,
+                        calc_new_height(args.width, image.width(), image.height()),
+                        &ascii_string,
+                    ));
+
+                    height = Some(calc_new_height(args.width, image.width(), image.height()));
 
                     println!("Rendered {}", image_path);
                 }
 
                 for frame in frames {
-                    execute!(stdout(), MoveTo(0, 0)).expect("");
                     println!("{}", frame);
+                    if let Some(h) = height {
+                        execute!(stdout(), MoveUp(h as u16 + 1)).expect("");
+                    }
 
                     thread::sleep(time::Duration::from_millis(frametime));
                 }
             }
             false => {
+                let mut image;
+                let mut height;
+
                 for image_path in image_paths {
-                    execute!(stdout(), MoveTo(0, 0)).expect("");
-                    println!("{}", render_frame(image_path, args.width, &ascii_string));
+                    image = image::open(image_path).unwrap().to_rgb8();
+                    height = calc_new_height(args.width, image.width(), image.height());
+                    println!(
+                        "{}",
+                        render_frame(image.clone(), args.width, height, &ascii_string)
+                    );
+                    execute!(stdout(), MoveUp(height as u16 + 1)).expect("");
 
                     thread::sleep(time::Duration::from_millis(frametime));
                 }
             }
         }
     } else {
-        println!("{}", render_frame(args.input, args.width, &ascii_string))
+        let image = image::open(args.input).unwrap().to_rgb8();
+        let height = calc_new_height(args.width, image.width(), image.height());
+
+        println!(
+            "{}",
+            render_frame(image.clone(), args.width, height, &ascii_string)
+        )
     }
 }
