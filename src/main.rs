@@ -25,6 +25,11 @@ struct Arguments {
 
 fn main() {
     let args = Arguments::parse();
+    let mut ascii_string = " .,:;+*?%S#@".to_string();
+
+    if args.reverse {
+        ascii_string = ascii_string.chars().rev().collect::<String>().to_owned();
+    }
 
     if args.dir {
         let mut image_paths: Vec<String> = Vec::new();
@@ -50,13 +55,13 @@ fn main() {
                 let mut frames: Vec<String> = Vec::new();
 
                 for image_path in image_paths {
-                    frames.push(render_frame(image_path.clone(), args.width, args.reverse));
+                    frames.push(render_frame(image_path.clone(), args.width, &ascii_string));
 
                     println!("Rendered {}", image_path);
                 }
 
                 for frame in frames {
-                    println!("{}", render_frame(frame, args.width, args.reverse));
+                    println!("{}", render_frame(frame, args.width, &ascii_string));
 
                     execute!(stdout(), MoveTo(0, 0)).expect("");
 
@@ -65,7 +70,7 @@ fn main() {
             }
             false => {
                 for image_path in image_paths {
-                    println!("{}", render_frame(image_path, args.width, args.reverse));
+                    println!("{}", render_frame(image_path, args.width, &ascii_string));
 
                     execute!(stdout(), MoveTo(0, 0)).expect("");
 
@@ -74,6 +79,6 @@ fn main() {
             }
         }
     } else {
-        println!("{}", render_frame(args.input, args.width, args.reverse))
+        println!("{}", render_frame(args.input, args.width, &ascii_string))
     }
 }

@@ -13,7 +13,7 @@ pub fn ascii_symbol(brightness: f32, ascii_string: &str) -> char {
     ascii_string.chars().nth(index).unwrap()
 }
 
-pub fn render_frame(dir: String, width: u32, reverse: bool) -> String {
+pub fn render_frame(dir: String, width: u32, ascii_string: &str) -> String {
     let original_image = image::open(dir).unwrap().to_rgb8();
 
     let new_width = width;
@@ -36,11 +36,7 @@ pub fn render_frame(dir: String, width: u32, reverse: bool) -> String {
     for i in (0..(rgb.len() - 1)).step_by(3) {
         frame.push(ascii_symbol(
             get_brightness(rgb[i as usize], rgb[i as usize + 1], rgb[i as usize + 2]),
-            if reverse {
-                "@#S%?*+;:,. "
-            } else {
-                " .,:;+*?%S#@"
-            },
+            ascii_string,
         ));
 
         x += 1;
