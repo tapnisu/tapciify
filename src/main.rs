@@ -61,18 +61,16 @@ fn main() {
                 }
 
                 for frame in frames {
-                    println!("{}", render_frame(frame, args.width, &ascii_string));
-
                     execute!(stdout(), MoveTo(0, 0)).expect("");
+                    println!("{}", frame);
 
                     thread::sleep(time::Duration::from_millis(frametime));
                 }
             }
             false => {
                 for image_path in image_paths {
-                    println!("{}", render_frame(image_path, args.width, &ascii_string));
-
                     execute!(stdout(), MoveTo(0, 0)).expect("");
+                    println!("{}", render_frame(image_path, args.width, &ascii_string));
 
                     thread::sleep(time::Duration::from_millis(frametime));
                 }
