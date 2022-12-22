@@ -1,10 +1,10 @@
 use colored::Colorize;
 use image::RgbImage;
-use std::cmp;
+use std::cmp::{max, min};
 
 pub fn get_brightness(r: u8, g: u8, b: u8) -> f32 {
-    let max = cmp::max(cmp::max(r, g), b);
-    let min = cmp::min(cmp::min(r, g), b);
+    let max = max(max(r, g), b);
+    let min = min(min(r, g), b);
 
     return (max as f32 + min as f32) / 510f32;
 }
