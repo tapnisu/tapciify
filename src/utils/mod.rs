@@ -45,7 +45,12 @@ pub fn render_frame(image: RgbImage, width: u32, height: u32, ascii_string: &str
     frame
 }
 
-pub fn print_colored_frame(image: RgbImage, width: u32, height: u32, ascii_string: &str) -> String {
+pub fn render_colored_frame(
+    image: RgbImage,
+    width: u32,
+    height: u32,
+    ascii_string: &str,
+) -> String {
     let img = image::imageops::resize(&image, width, height, image::imageops::FilterType::Triangle);
 
     let rgb: Vec<u8> = img.into_raw();
@@ -75,4 +80,22 @@ pub fn print_colored_frame(image: RgbImage, width: u32, height: u32, ascii_strin
     }
 
     result
+}
+
+pub fn render_frame_case(image: RgbImage, width: u32, ascii_string: &str, colored: bool) -> String {
+    if colored {
+        render_colored_frame(
+            image.clone(),
+            width,
+            calc_new_height(width, image.width(), image.height()),
+            &ascii_string,
+        )
+    } else {
+        render_frame(
+            image.clone(),
+            width,
+            calc_new_height(width, image.width(), image.height()),
+            &ascii_string,
+        )
+    }
 }
