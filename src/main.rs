@@ -102,7 +102,7 @@ fn main() {
         }
     } else {
         let image = image::open(args.input).unwrap().to_rgb8();
-        
+
         println!(
             "{}",
             render_frame_case(image.clone(), args.width, &ascii_string, args.colored,)

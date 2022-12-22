@@ -3,7 +3,7 @@ use image::RgbImage;
 use std::cmp::{max, min};
 
 // Get brightness of pixel from 0.0 to 1.0 (calculated by HSL's lightness formula)
-pub fn get_brightness(r: u8, g: u8, b: u8) -> f32 {
+pub fn get_lightness(r: u8, g: u8, b: u8) -> f32 {
     let max = max(max(r, g), b);
     let min = min(min(r, g), b);
 
@@ -35,7 +35,7 @@ pub fn render_frame(image: RgbImage, width: u32, height: u32, ascii_string: &str
 
     for i in (0..(rgb.len() - 1)).step_by(3) {
         frame.push(ascii_symbol(
-            get_brightness(rgb[i as usize], rgb[i as usize + 1], rgb[i as usize + 2]),
+            get_lightness(rgb[i as usize], rgb[i as usize + 1], rgb[i as usize + 2]),
             ascii_string,
         ));
 
@@ -70,7 +70,7 @@ pub fn render_colored_frame(
             "{}{}",
             result,
             ascii_symbol(
-                get_brightness(rgb[i as usize], rgb[i as usize + 1], rgb[i as usize + 2]),
+                get_lightness(rgb[i as usize], rgb[i as usize + 1], rgb[i as usize + 2]),
                 ascii_string,
             )
             .to_string()
