@@ -5,9 +5,7 @@ use crossterm::cursor::MoveUp;
 use crossterm::execute;
 use std::io::stdout;
 use std::{fs, thread, time};
-use utils::{calc_new_height, render_frame};
-
-use crate::utils::print_colored_frame;
+use utils::{calc_new_height, render_frame, print_colored_frame};
 
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
@@ -62,7 +60,10 @@ fn main() {
             for image_path in image_paths {
                 image = image::open(image_path).unwrap().to_rgb8();
                 height = calc_new_height(args.width, image.width(), image.height());
-                print_colored_frame(image.clone(), args.width, height, &ascii_string);
+                println!(
+                    "{}",
+                    print_colored_frame(image.clone(), args.width, height, &ascii_string)
+                );
 
                 execute!(stdout(), MoveUp(height as u16 + 1)).expect("");
 
@@ -72,7 +73,10 @@ fn main() {
             let image = image::open(args.input).unwrap().to_rgb8();
             let height = calc_new_height(args.width, image.width(), image.height());
 
-            print_colored_frame(image.clone(), args.width, height, &ascii_string);
+            println!(
+                "{}",
+                print_colored_frame(image.clone(), args.width, height, &ascii_string)
+            );
         }
     } else {
         if args.dir {

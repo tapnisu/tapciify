@@ -45,16 +45,18 @@ pub fn render_frame(image: RgbImage, width: u32, height: u32, ascii_string: &str
     frame
 }
 
-pub fn print_colored_frame(image: RgbImage, width: u32, height: u32, ascii_string: &str) {
+pub fn print_colored_frame(image: RgbImage, width: u32, height: u32, ascii_string: &str) -> String {
     let img = image::imageops::resize(&image, width, height, image::imageops::FilterType::Triangle);
 
     let rgb: Vec<u8> = img.into_raw();
 
     let mut x = 0;
+    let mut result: String = "".to_string();
 
     for i in (0..(rgb.len() - 1)).step_by(3) {
-        print!(
-            "{}",
+        result = format!(
+            "{}{}",
+            result,
             ascii_symbol(
                 get_brightness(rgb[i as usize], rgb[i as usize + 1], rgb[i as usize + 2]),
                 ascii_string,
@@ -66,11 +68,11 @@ pub fn print_colored_frame(image: RgbImage, width: u32, height: u32, ascii_strin
         x += 1;
 
         if x == width {
-            print!("\n");
+            result = format!("{}{}", result, "\n");
 
             x = 0;
         }
     }
 
-    print!("\n");
+    result
 }
