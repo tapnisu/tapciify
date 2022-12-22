@@ -28,12 +28,15 @@ struct Arguments {
 
 fn main() {
     let args = Arguments::parse();
+
+    // String for pixel lightness
     let mut ascii_string = " .,:;+*?%S#@".to_string();
 
     if args.reverse {
         ascii_string = ascii_string.chars().rev().collect::<String>().to_owned();
     }
 
+    // Play frames from folder
     if args.dir {
         let mut image_paths: Vec<String> = Vec::new();
 
@@ -50,7 +53,7 @@ fn main() {
         if let Some(fps) = args.fps {
             frametime = (1f64 / fps * 1000f64) as u64;
         } else {
-            panic!("Frametime is None");
+            frametime = 0;
         }
 
         if args.prerender {
@@ -99,6 +102,7 @@ fn main() {
         }
     } else {
         let image = image::open(args.input).unwrap().to_rgb8();
+        
         println!(
             "{}",
             render_frame_case(image.clone(), args.width, &ascii_string, args.colored,)
