@@ -1,6 +1,6 @@
-use std::cmp;
-
+use colored::Colorize;
 use image::RgbImage;
+use std::cmp;
 
 pub fn get_brightness(r: u8, g: u8, b: u8) -> f32 {
     let max = cmp::max(cmp::max(r, g), b);
@@ -20,12 +20,7 @@ pub fn calc_new_height(new_width: u32, width: u32, height: u32) -> u32 {
 }
 
 pub fn render_frame(image: RgbImage, width: u32, height: u32, ascii_string: &str) -> String {
-    let img = image::imageops::resize(
-        &image,
-        width,
-        height,
-        image::imageops::FilterType::Triangle,
-    );
+    let img = image::imageops::resize(&image, width, height, image::imageops::FilterType::Triangle);
 
     let rgb: Vec<u8> = img.into_raw();
 
@@ -48,4 +43,34 @@ pub fn render_frame(image: RgbImage, width: u32, height: u32, ascii_string: &str
     }
 
     frame
+}
+
+pub fn print_colored_frame(image: RgbImage, width: u32, height: u32, ascii_string: &str) {
+    let img = image::imageops::resize(&image, width, height, image::imageops::FilterType::Triangle);
+
+    let rgb: Vec<u8> = img.into_raw();
+
+    let mut x = 0;
+
+    for i in (0..(rgb.len() - 1)).step_by(3) {
+        print!(
+            "{}",
+            ascii_symbol(
+                get_brightness(rgb[i as usize], rgb[i as usize + 1], rgb[i as usize + 2]),
+                ascii_string,
+            )
+            .to_string()
+            .truecolor(rgb[i as usize], rgb[i as usize + 1], rgb[i as usize + 2])
+        );
+
+        x += 1;
+
+        if x == width {
+            print!("\n");
+
+            x = 0;
+        }
+    }
+
+    print!("\n");
 }
