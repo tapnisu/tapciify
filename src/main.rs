@@ -42,9 +42,8 @@ fn main() {
 
         let images_paths = fs::read_dir(args.input).unwrap();
         for image_path in images_paths {
-            match image_path.unwrap().path().to_str() {
-                Some(x) => image_paths.push(x.to_string()),
-                None => println!(),
+            if let Some(path) = image_path.unwrap().path().to_str() {
+                image_paths.push(path.to_string());
             }
         }
 
