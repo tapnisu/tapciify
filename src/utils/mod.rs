@@ -10,7 +10,7 @@ pub fn get_lightness(r: u8, g: u8, b: u8) -> f32 {
     (max as f32 + min as f32) / 510f32
 }
 
-// Convert lightness of pixel to char
+// Convert lightness of pixel to symbol
 pub fn ascii_symbol(brightness: f32, ascii_string: &str) -> char {
     let index = ((ascii_string.chars().count() - 1) as f32 * brightness) as usize;
 
@@ -22,9 +22,9 @@ pub fn calc_new_height(new_width: u32, width: u32, height: u32) -> u32 {
     (new_width as f64 * (height as f64) / width as f64 * (11.0f64 / 24.0f64)) as u32
 }
 
-// Converts image to chars
+// Converts image to symbols
 pub fn render_frame(image: RgbImage, width: u32, height: u32, ascii_string: &str) -> String {
-    // Resize the image so the terminal can show it
+    // Resize the image, so the terminal can show it
     let img = image::imageops::resize(&image, width, height, image::imageops::FilterType::Triangle);
     let rgb: Vec<u8> = img.into_raw();
 
@@ -51,7 +51,7 @@ pub fn render_frame(image: RgbImage, width: u32, height: u32, ascii_string: &str
     frame
 }
 
-// Converts image to chars and adds colour
+// Converts image to symbols and adds colors
 pub fn render_colored_frame(
     image: RgbImage,
     width: u32,
@@ -89,7 +89,7 @@ pub fn render_colored_frame(
     result
 }
 
-// Run one of 2 functions depending on settings
+// Run one of 2 functions depending on arguments
 pub fn render_frame_case(image: RgbImage, width: u32, ascii_string: &str, colored: bool) -> String {
     if colored {
         render_colored_frame(
