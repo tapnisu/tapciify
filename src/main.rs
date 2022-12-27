@@ -32,11 +32,9 @@ fn main() {
     let args = Arguments::parse();
 
     // String for pixel lightness
-    let mut ascii_string = if let Some(ascii_string) = args.ascii_string {
-        ascii_string
-    } else {
-        " .,:;+*?%S#@".to_string()
-    };
+    let mut ascii_string = args
+        .ascii_string
+        .unwrap_or_else(|| " .,:;+*?%S#@".to_string());
 
     if args.reverse {
         ascii_string = ascii_string.chars().rev().collect::<String>().to_owned();
@@ -53,13 +51,7 @@ fn main() {
             }
         }
 
-        let frametime: u64;
-
-        if let Some(fps) = args.fps {
-            frametime = (1f64 / fps * 1000f64) as u64;
-        } else {
-            frametime = 0;
-        }
+        let frametime: u64 = (1f64 / args.fps.unwrap_or_else(|| 1f64) * 1000f64) as u64;
 
         if args.prerender {
             let mut image;
@@ -83,9 +75,8 @@ fn main() {
 
             for frame in frames {
                 println!("{}", frame);
-                if let Some(h) = height {
-                    execute!(stdout(), MoveUp(h as u16 + 1)).expect("");
-                }
+
+                execute!(stdout(), MoveUp(height.unwrap() as u16 + 1)).expect("");
 
                 thread::sleep(time::Duration::from_millis(frametime));
             }
