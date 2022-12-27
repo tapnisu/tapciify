@@ -24,13 +24,19 @@ struct Arguments {
     reverse: bool,
     #[clap(short, long, action)]
     colored: bool,
+    #[clap(short, long)]
+    ascii_string: Option<String>,
 }
 
 fn main() {
     let args = Arguments::parse();
 
     // String for pixel lightness
-    let mut ascii_string = " .,:;+*?%S#@".to_string();
+    let mut ascii_string = if let Some(ascii_string) = args.ascii_string {
+        ascii_string
+    } else {
+        " .,:;+*?%S#@".to_string()
+    };
 
     if args.reverse {
         ascii_string = ascii_string.chars().rev().collect::<String>().to_owned();
