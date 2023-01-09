@@ -6,14 +6,24 @@
 
 ## How to use:
 
-### Images
+### Install
 
-1. Install via cargo from repo:
+1. Install [rustup](https://rustup.rs/)
+
+2. Run:
+
+```bash
+rustup default stable 
+```
+
+2. Install via cargo from repo:
    `cargo install --git https://github.com/tapnisu/tapciify`
 
-2. Run: `tapciify -i imageDir -w imageWidth` for image.
+### Images
 
-3. Run: `tapciify -i imageDir -w imageWidth -r` for reversed colors.
+1. Run: `tapciify -i imageDir -w imageWidth` for image.
+
+2. Run: `tapciify -i imageDir -w imageWidth -r` for reversed colors.
 
 ### Videos
 
