@@ -17,7 +17,7 @@ rustup default stable
 ```
 
 2. Install via cargo from repo:
-   `cargo install --git https://github.com/tapnisu/tapciify`
+   `cargo install tapciify`
 
 3. Windows: Install Microsoft Visual Studio with C++ support.
 
