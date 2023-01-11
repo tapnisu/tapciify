@@ -89,9 +89,50 @@ pub fn render_colored_frame(
     result
 }
 
+pub fn render_edge_frame(image: RgbImage, width: u32, height: u32, ascii_string: &str) -> String {
+    // Resize the image, so the terminal can show it
+    let img = image::imageops::resize(&image, width, height, image::imageops::FilterType::Triangle);
+    let rgb: Vec<u8> = img.into_raw();
+
+    let mut frame = String::new();
+
+    // Counter for the end of the pixels row
+    let mut x = 0;
+
+    for i in (0..(rgb.len() - 1)).step_by(3) {
+        frame.push(ascii_symbol(
+            get_lightness(rgb[i as usize], rgb[i as usize + 1], rgb[i as usize + 2]),
+            ascii_string,
+        ));
+
+        x += 1;
+
+        if x == width {
+            frame.push('\n');
+
+            x = 0;
+        }
+    }
+
+    frame
+}
+
 // Run one of 2 functions depending on arguments
-pub fn render_frame_case(image: RgbImage, width: u32, ascii_string: &str, colored: bool) -> String {
-    if colored {
+pub fn render_frame_case(
+    image: RgbImage,
+    width: u32,
+    ascii_string: &str,
+    colored: bool,
+    edge: bool,
+) -> String {
+    if edge {
+        render_edge_frame(
+            image.clone(),
+            width,
+            calc_new_height(width, image.width(), image.height()),
+            &ascii_string,
+        )
+    } else if colored {
         render_colored_frame(
             image.clone(),
             width,

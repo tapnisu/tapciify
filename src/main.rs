@@ -24,6 +24,8 @@ struct Arguments {
     reverse: bool,
     #[clap(short, long, action)]
     colored: bool,
+    #[clap(short, long, action)]
+    edge: bool,
     #[clap(short, long)]
     ascii_string: Option<String>,
 }
@@ -66,6 +68,7 @@ fn main() {
                     args.width,
                     &ascii_string,
                     args.colored,
+                    args.edge,
                 ));
 
                 height = Some(calc_new_height(args.width, image.width(), image.height()));
@@ -89,7 +92,13 @@ fn main() {
                 height = calc_new_height(args.width, image.width(), image.height());
                 println!(
                     "{}",
-                    render_frame_case(image.clone(), args.width, &ascii_string, args.colored,)
+                    render_frame_case(
+                        image.clone(),
+                        args.width,
+                        &ascii_string,
+                        args.colored,
+                        args.edge
+                    )
                 );
                 execute!(stdout(), MoveUp(height as u16 + 1)).expect("");
 
@@ -101,7 +110,13 @@ fn main() {
 
         println!(
             "{}",
-            render_frame_case(image.clone(), args.width, &ascii_string, args.colored,)
+            render_frame_case(
+                image.clone(),
+                args.width,
+                &ascii_string,
+                args.colored,
+                args.edge
+            )
         )
     }
 }
