@@ -9,7 +9,7 @@ description = "CLI tool that can let you view images in terminal"
 license = "MIT"
 
 [dependencies]
-clap = { version = "4.0.30", features = ["derive"] }
+clap = { version = "4.0.32", features = ["derive"] }
 colored = "2.0.0"
 crossterm = "0.25.0"
 image = "0.24.5"
