@@ -4,7 +4,7 @@
 
 <p align="center">CLI tool that can show images in your terminal.</p>
 
-## How to use:
+## How to use
 
 ### Install
 
@@ -18,6 +18,10 @@ rustup default stable
 
 2. Install via cargo from repo:
    `cargo install --git https://github.com/tapnisu/tapciify`
+
+3. Windows: Install Microsoft Visual Studio with C++ support.
+
+3. Linux: Install cc-linker (Ubuntu) `apt install build-essential`
 
 ### Images
 
