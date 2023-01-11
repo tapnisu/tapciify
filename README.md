@@ -2,7 +2,7 @@
 
 <h1 align="center">Tapciify</h1>
 
-<p align="center">CLI tool that can show images in your terminal.</p>
+<p align="center">CLI tool that can let you view images in terminal</p>
 
 ## How to use
 
