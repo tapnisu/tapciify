@@ -5,6 +5,7 @@ edition = "2021"
 readme = "README.md"
 authors = ["Alexiy Rybin <alexiy.rybin@gmail.com>"]
 repository = "https://github.com/tapnisu/tapciify/"
+description = "CLI tool that can let you view images in terminal"
 license = "MIT"
 
 [dependencies]
