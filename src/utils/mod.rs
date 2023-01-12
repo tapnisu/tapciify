@@ -1,5 +1,5 @@
 use colored::Colorize;
-use image::RgbImage;
+use image::{RgbImage, ImageBuffer};
 use std::cmp::{max, min};
 
 // Get brightness of pixel from 0.0 to 1.0 (calculated by HSL's lightness formula)
@@ -89,9 +89,21 @@ pub fn render_colored_frame(
     result
 }
 
+// Get edges of image using Sobel Operator
+pub fn sobel_operator(image: RgbImage) -> ImageBuffer<image::Rgb<u8>, Vec<u8>> {
+    let sobel_operator_kernel_x: &[f32] = &[1f32, 0f32, -1f32, 2f32, 0f32, -2f32, 1f32, 0f32, -1f32];
+
+    let sobel_operator_kernel_y: &[f32] = &[1f32, 2f32, 1f32, 0f32, 0f32, 0f32, -1f32, -2f32, -1f32];
+
+    image::imageops::filter3x3(
+        &image::imageops::filter3x3(&image, sobel_operator_kernel_x),
+        sobel_operator_kernel_y,
+    )
+}
+
 pub fn render_edge_frame(image: RgbImage, width: u32, height: u32, ascii_string: &str) -> String {
     // Resize the image, so the terminal can show it
-    let img = image::imageops::resize(&image, width, height, image::imageops::FilterType::Triangle);
+    let img = image::imageops::resize(&sobel_operator(image), width, height, image::imageops::FilterType::Triangle);
     let rgb: Vec<u8> = img.into_raw();
 
     let mut frame = String::new();
