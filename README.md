@@ -39,3 +39,10 @@ rustup default stable
 2. Run: `tapciify -i dir -w videoWidth -d -f 24`
 
 `-f 24` - fps
+
+## Examples
+
+|Original|Ascii|Ascii colored|
+|-|-|-|
+|![Original Image](assets/original.png)|![Ascii image](assets/ascii.png)|![Ascii colored image](assets/ascii_colored.png)|
+|`Original image (Shima Rin from Laid-Back Camp manga)`|`tapciify -i ./assets/original.png -w 100`|`tapciify -i ./assets/original.png -w 100 -c`|
