@@ -60,7 +60,7 @@ fn main() {
             let mut frames: Vec<String> = Vec::new();
 
             for image_path in image_paths {
-                image = image::open(image_path.clone()).unwrap().to_rgb8();
+                image = image::open(image_path.clone()).unwrap().to_rgba8();
                 frames.push(render_frame_case(
                     image.clone(),
                     args.width,
@@ -85,7 +85,7 @@ fn main() {
             let mut height;
 
             for image_path in image_paths {
-                image = image::open(image_path).unwrap().to_rgb8();
+                image = image::open(image_path).unwrap().to_rgba8();
                 height = calc_new_height(args.width, image.width(), image.height());
                 println!(
                     "{}",
@@ -97,7 +97,7 @@ fn main() {
             }
         }
     } else {
-        let image = image::open(args.input).unwrap().to_rgb8();
+        let image = image::open(args.input).unwrap().to_rgba8();
 
         println!(
             "{}",

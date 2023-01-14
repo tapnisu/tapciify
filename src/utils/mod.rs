@@ -1,13 +1,13 @@
 use colored::Colorize;
-use image::RgbImage;
+use image::RgbaImage;
 use std::cmp::{max, min};
 
 // Get brightness of pixel from 0.0 to 1.0 (calculated by HSL's lightness formula)
-pub fn get_lightness(r: u8, g: u8, b: u8) -> f32 {
+pub fn get_lightness(r: u8, g: u8, b: u8, a: u8) -> f32 {
     let max = max(max(r, g), b);
     let min = min(min(r, g), b);
 
-    (max as f32 + min as f32) / 510f32
+    (max as f32 + min as f32) * a as f32 / 255f32 / 510f32
 }
 
 // Convert lightness of pixel to symbol
@@ -23,7 +23,7 @@ pub fn calc_new_height(new_width: u32, width: u32, height: u32) -> u32 {
 }
 
 // Converts image to symbols
-pub fn render_frame(image: RgbImage, width: u32, height: u32, ascii_string: &str) -> String {
+pub fn render_frame(image: RgbaImage, width: u32, height: u32, ascii_string: &str) -> String {
     // Resize the image, so the terminal can show it
     let img = image::imageops::resize(&image, width, height, image::imageops::FilterType::Triangle);
     let rgb: Vec<u8> = img.into_raw();
@@ -33,9 +33,14 @@ pub fn render_frame(image: RgbImage, width: u32, height: u32, ascii_string: &str
     // Counter for the end of the pixels row
     let mut x = 0;
 
-    for i in (0..(rgb.len() - 1)).step_by(3) {
+    for i in (0..(rgb.len() - 1)).step_by(4) {
         frame.push(ascii_symbol(
-            get_lightness(rgb[i as usize], rgb[i as usize + 1], rgb[i as usize + 2]),
+            get_lightness(
+                rgb[i as usize],
+                rgb[i as usize + 1],
+                rgb[i as usize + 2],
+                rgb[i as usize + 3],
+            ),
             ascii_string,
         ));
 
@@ -53,7 +58,7 @@ pub fn render_frame(image: RgbImage, width: u32, height: u32, ascii_string: &str
 
 // Converts image to symbols and adds colors
 pub fn render_colored_frame(
-    image: RgbImage,
+    image: RgbaImage,
     width: u32,
     height: u32,
     ascii_string: &str,
@@ -65,12 +70,17 @@ pub fn render_colored_frame(
     let mut x = 0;
     let mut result: String = "".to_string();
 
-    for i in (0..(rgb.len() - 1)).step_by(3) {
+    for i in (0..(rgb.len() - 1)).step_by(4) {
         result = format!(
             "{}{}",
             result,
             ascii_symbol(
-                get_lightness(rgb[i as usize], rgb[i as usize + 1], rgb[i as usize + 2]),
+                get_lightness(
+                    rgb[i as usize],
+                    rgb[i as usize + 1],
+                    rgb[i as usize + 2],
+                    rgb[i as usize + 3]
+                ),
                 ascii_string,
             )
             .to_string()
@@ -90,7 +100,12 @@ pub fn render_colored_frame(
 }
 
 // Run one of 2 functions depending on arguments
-pub fn render_frame_case(image: RgbImage, width: u32, ascii_string: &str, colored: bool) -> String {
+pub fn render_frame_case(
+    image: RgbaImage,
+    width: u32,
+    ascii_string: &str,
+    colored: bool,
+) -> String {
     if colored {
         render_colored_frame(
             image.clone(),
