@@ -7,25 +7,34 @@ use std::io::stdout;
 use std::{fs, thread, time};
 use utils::{calc_new_height, render_frame_case};
 
+/// CLI tool that can let you view images in terminal
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
 struct Arguments {
+    /// Input file or dir
     #[clap(short, short, value_parser)]
     input: String,
+    /// Width of output
     #[clap(short, short, value_parser)]
     width: u32,
+    /// Slideshow from folder
     #[clap(short, long, action)]
     dir: bool,
+    /// Renders before showing (works only for video)
     #[clap(short, long, action)]
     prerender: bool,
+    /// Speed of slideshow (video)
     #[clap(short, long)]
     fps: Option<f64>,
-    #[clap(short, long, action)]
-    reverse: bool,
-    #[clap(short, long, action)]
-    colored: bool,
+    /// String to represent lightness of pixels
     #[clap(short, long)]
     ascii_string: Option<String>,
+    /// Reverse the ascii string
+    #[clap(short, long, action)]
+    reverse: bool,
+    /// Makes frames colorful
+    #[clap(short, long, action)]
+    colored: bool,
 }
 
 fn main() {

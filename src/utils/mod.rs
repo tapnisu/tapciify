@@ -2,7 +2,7 @@ use colored::Colorize;
 use image::RgbaImage;
 use std::cmp::{max, min};
 
-// Get brightness of pixel from 0.0 to 1.0 (calculated by HSL's lightness formula)
+/// Get brightness of pixel from 0.0 to 1.0 (calculated by HSL's lightness formula)
 pub fn get_lightness(r: u8, g: u8, b: u8, a: u8) -> f32 {
     let max = max(max(r, g), b);
     let min = min(min(r, g), b);
@@ -10,19 +10,19 @@ pub fn get_lightness(r: u8, g: u8, b: u8, a: u8) -> f32 {
     (max as f32 + min as f32) * a as f32 / 255f32 / 510f32
 }
 
-// Convert lightness of pixel to symbol
+/// Convert lightness of pixel to symbol
 pub fn ascii_symbol(brightness: f32, ascii_string: &str) -> char {
     let index = ((ascii_string.chars().count() - 1) as f32 * brightness) as usize;
 
     ascii_string.chars().nth(index).unwrap()
 }
 
-// Calculate height by multiplying width by original aspect ratio
+// /Calculate height by multiplying width by original aspect ratio
 pub fn calc_new_height(new_width: u32, width: u32, height: u32) -> u32 {
     (new_width as f64 * (height as f64) / width as f64 * (11.0f64 / 24.0f64)) as u32
 }
 
-// Converts image to symbols
+/// Converts image to symbols
 pub fn render_frame(image: RgbaImage, width: u32, height: u32, ascii_string: &str) -> String {
     // Resize the image, so the terminal can show it
     let img = image::imageops::resize(&image, width, height, image::imageops::FilterType::Triangle);
@@ -56,7 +56,7 @@ pub fn render_frame(image: RgbaImage, width: u32, height: u32, ascii_string: &st
     frame
 }
 
-// Converts image to symbols and adds colors
+/// Converts image to symbols and adds colors
 pub fn render_colored_frame(
     image: RgbaImage,
     width: u32,
@@ -99,7 +99,7 @@ pub fn render_colored_frame(
     result
 }
 
-// Run one of 2 functions depending on arguments
+/// Run one of 2 functions depending on arguments
 pub fn render_frame_case(
     image: RgbaImage,
     width: u32,
