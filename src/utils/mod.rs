@@ -17,7 +17,7 @@ pub fn ascii_symbol(brightness: f32, ascii_string: &str) -> char {
     ascii_string.chars().nth(index).unwrap()
 }
 
-// /Calculate height by multiplying width by original aspect ratio
+/// Calculate height by multiplying width by original aspect ratio
 pub fn calc_new_height(new_width: u32, width: u32, height: u32) -> u32 {
     (new_width as f64 * (height as f64) / width as f64 * (11.0f64 / 24.0f64)) as u32
 }
