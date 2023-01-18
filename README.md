@@ -13,15 +13,22 @@
 2. Run:
 
 ```bash
-rustup default stable 
+rustup default stable
 ```
 
 2. Install via cargo from repo:
-   `cargo install tapciify`
+
+```bash
+cargo install tapciify
+```
 
 3. Windows: Install Microsoft Visual Studio with C++ support.
 
-3. Linux: Install cc-linker (Ubuntu) `apt install build-essential`
+4. Linux: Install cc-linker (Ubuntu)
+
+```bash
+apt install build-essential
+```
 
 ### Images
 
@@ -34,15 +41,23 @@ rustup default stable
 > Requires ffmpeg
 
 1. Make frames from video into dir:
-   `mkdir frames; ffmpeg -i badapple.mkv -r 24 frames/%08d.jpeg`.
 
-2. Run: `tapciify -i dir -w videoWidth -d -f 24`
+```bash
+mkdir frames; ffmpeg -i badapple.mkv -r 24 frames/%08d.jpeg
+```
 
-`-f 24` - fps
+2. Run:
+
+```bash
+tapciify -i dir -w videoWidth -d -f 24
+```
+
+- `-d` set mode to video
+- `-f 24` - set fps for video
 
 ## Examples
 
-|Original|Ascii|Ascii colored|
-|-|-|-|
-|![Original Image](assets/original.png)|![Ascii image](assets/ascii.png)|![Ascii colored image](assets/ascii_colored.png)|
-|`Original image (Shima Rin from Laid-Back Camp manga)`|`tapciify -i ./assets/original.png -w 100`|`tapciify -i ./assets/original.png -w 100 -c`|
+| Original                                               | Ascii                                      | Ascii colored                                    |
+| ------------------------------------------------------ | ------------------------------------------ | ------------------------------------------------ |
+| ![Original Image](assets/original.png)                 | ![Ascii image](assets/ascii.png)           | ![Ascii colored image](assets/ascii_colored.png) |
+| `Original image (Shima Rin from Laid-Back Camp manga)` | `tapciify -i ./assets/original.png -w 100` | `tapciify -i ./assets/original.png -w 100 -c`    |
