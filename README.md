@@ -16,13 +16,13 @@
 rustup default stable
 ```
 
-2. Install via cargo from repo:
+3. Install via cargo from crates.io:
 
 ```bash
 cargo install tapciify
 ```
 
-3. Windows: Install Microsoft Visual Studio with C++ support.
+4. Windows: Install Microsoft Visual Studio with C++ support.
 
 4. Linux: Install cc-linker (Ubuntu)
 
