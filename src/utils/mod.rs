@@ -90,7 +90,7 @@ pub fn render_colored_frame(
         x += 1;
 
         if x == width {
-            result = format!("{}{}", result, "\n");
+            result = format!("{}\n", result);
 
             x = 0;
         }
