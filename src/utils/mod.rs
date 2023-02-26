@@ -1,5 +1,5 @@
 use colored::Colorize;
-use image::RgbaImage;
+use image::{DynamicImage, RgbaImage};
 use std::cmp::{max, min};
 
 /// Get brightness of pixel from 0.0 to 1.0 (calculated by HSL's lightness formula)
@@ -121,4 +121,21 @@ pub fn render_frame_case(
             &ascii_string,
         )
     }
+}
+
+pub fn cut_image_by_amount(image: DynamicImage, amount: u32) -> Vec<DynamicImage> {
+    let mut parts: Vec<DynamicImage> = vec![];
+
+    for i in 0..amount {
+        let part_width = image.width() / amount;
+        let part_height = image.height() / amount;
+
+        parts.push(
+            image
+                .clone()
+                .crop(part_width * i, part_height * i, part_width, part_height),
+        );
+    }
+
+    parts
 }
