@@ -6,7 +6,8 @@ use crossterm::execute;
 use std::fs;
 use std::io::stdout;
 use std::time::Instant;
-use utils::{calc_new_height, render_frame_case};
+use tapciify::{render_full_frame, string_to_static_str};
+use utils::calc_new_height;
 
 /// CLI tool that can let you view images in terminal
 #[derive(Parser, Debug)]
@@ -38,17 +39,20 @@ struct Arguments {
     colored: bool,
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let args = Arguments::parse();
 
     // String for pixel lightness
     let mut ascii_string = args
         .ascii_string
-        .unwrap_or_else(|| " .,:;+*?%S#@".to_string());
+        .unwrap_or_else(|| " .,:;+*?%S#@".to_owned());
 
     if args.reverse {
         ascii_string = ascii_string.chars().rev().collect::<String>().to_owned();
     }
+
+    let static_ascii_string = string_to_static_str(ascii_string);
 
     // Play frames from folder
     if args.dir {
@@ -68,13 +72,11 @@ fn main() {
             let mut frames: Vec<String> = Vec::new();
 
             for image_path in image_paths {
-                let image = image::open(image_path.clone()).unwrap().to_rgba8();
-                frames.push(render_frame_case(
-                    image.clone(),
-                    args.width,
-                    &ascii_string,
-                    args.colored,
-                ));
+                let image = image::open(image_path.clone()).unwrap();
+                frames.push(
+                    render_full_frame(image.clone(), args.width, static_ascii_string, args.colored)
+                        .await,
+                );
 
                 height = Some(calc_new_height(args.width, image.width(), image.height()));
 
@@ -94,12 +96,13 @@ fn main() {
             for image_path in image_paths {
                 let start = Instant::now();
 
-                let image = image::open(image_path).unwrap().to_rgba8();
+                let image = image::open(image_path).unwrap();
                 let height = calc_new_height(args.width, image.width(), image.height());
 
                 println!(
                     "{}",
-                    render_frame_case(image.clone(), args.width, &ascii_string, args.colored)
+                    render_full_frame(image.clone(), args.width, static_ascii_string, args.colored)
+                        .await
                 );
 
                 execute!(stdout(), MoveUp(height as u16 + 1)).expect("");
@@ -108,11 +111,11 @@ fn main() {
             }
         }
     } else {
-        let image = image::open(args.input).unwrap().to_rgba8();
+        let image = image::open(args.input).unwrap();
 
         println!(
             "{}",
-            render_frame_case(image.clone(), args.width, &ascii_string, args.colored)
+            render_full_frame(image.clone(), args.width, static_ascii_string, args.colored).await
         )
     }
 }

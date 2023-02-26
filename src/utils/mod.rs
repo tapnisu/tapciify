@@ -139,3 +139,36 @@ pub fn cut_image_by_amount(image: DynamicImage, amount: u32) -> Vec<DynamicImage
 
     parts
 }
+
+pub fn merge_string_vec(str_ver: Vec<String>) -> String {
+    str_ver.join("")
+}
+
+pub async fn render_full_frame(
+    image: DynamicImage,
+    width: u32,
+    ascii_string: &'static str,
+    colored: bool,
+) -> String {
+    let image_parts = cut_image_by_amount(image, 4);
+
+    let mut tasks = Vec::with_capacity(image_parts.len());
+
+    for part in image_parts {
+        tasks.push(tokio::spawn(async move {
+            render_frame_case(part.to_rgba8(), width, ascii_string, colored)
+        }));
+    }
+
+    let mut outputs = Vec::with_capacity(tasks.len());
+
+    for task in tasks {
+        outputs.push(task.await.unwrap());
+    }
+
+    merge_string_vec(outputs)
+}
+
+pub fn string_to_static_str(s: String) -> &'static str {
+    Box::leak(s.into_boxed_str())
+}
