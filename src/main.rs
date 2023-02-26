@@ -3,9 +3,9 @@ pub mod utils;
 use clap::Parser;
 use crossterm::cursor::MoveUp;
 use crossterm::execute;
+use std::fs;
 use std::io::stdout;
 use std::time::Instant;
-use std::{fs, thread, time};
 use utils::{calc_new_height, render_frame_case};
 
 /// CLI tool that can let you view images in terminal
@@ -88,11 +88,7 @@ fn main() {
 
                 execute!(stdout(), MoveUp(height.unwrap() as u16 + 1)).expect("");
 
-                if frametime > start.elapsed().as_millis() as u64 {
-                    thread::sleep(time::Duration::from_millis(
-                        frametime - start.elapsed().as_millis() as u64,
-                    ));
-                }
+                while frametime > start.elapsed().as_millis() as u64 {}
             }
         } else {
             for image_path in image_paths {
@@ -103,16 +99,12 @@ fn main() {
 
                 println!(
                     "{}",
-                    render_frame_case(image.clone(), args.width, &ascii_string, args.colored,)
+                    render_frame_case(image.clone(), args.width, &ascii_string, args.colored)
                 );
 
                 execute!(stdout(), MoveUp(height as u16 + 1)).expect("");
 
-                if frametime > start.elapsed().as_millis() as u64 {
-                    thread::sleep(time::Duration::from_millis(
-                        frametime - start.elapsed().as_millis() as u64,
-                    ));
-                }
+                while frametime > start.elapsed().as_millis() as u64 {}
             }
         }
     } else {
@@ -120,7 +112,7 @@ fn main() {
 
         println!(
             "{}",
-            render_frame_case(image.clone(), args.width, &ascii_string, args.colored,)
+            render_frame_case(image.clone(), args.width, &ascii_string, args.colored)
         )
     }
 }
