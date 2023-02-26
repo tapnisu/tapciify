@@ -4,6 +4,7 @@ use clap::Parser;
 use crossterm::cursor::MoveUp;
 use crossterm::execute;
 use std::io::stdout;
+use std::time::Instant;
 use std::{fs, thread, time};
 use utils::{calc_new_height, render_frame_case};
 
@@ -63,13 +64,11 @@ fn main() {
         let frametime: u64 = (1f64 / args.fps.unwrap_or_else(|| 1f64) * 1000f64) as u64;
 
         if args.prerender {
-            let mut image;
             let mut height: Option<u32> = None;
-
             let mut frames: Vec<String> = Vec::new();
 
             for image_path in image_paths {
-                image = image::open(image_path.clone()).unwrap().to_rgba8();
+                let image = image::open(image_path.clone()).unwrap().to_rgba8();
                 frames.push(render_frame_case(
                     image.clone(),
                     args.width,
@@ -83,26 +82,37 @@ fn main() {
             }
 
             for frame in frames {
+                let start = Instant::now();
+
                 println!("{}", frame);
 
                 execute!(stdout(), MoveUp(height.unwrap() as u16 + 1)).expect("");
 
-                thread::sleep(time::Duration::from_millis(frametime));
+                if frametime > start.elapsed().as_millis() as u64 {
+                    thread::sleep(time::Duration::from_millis(
+                        frametime - start.elapsed().as_millis() as u64,
+                    ));
+                }
             }
         } else {
-            let mut image;
-            let mut height;
-
             for image_path in image_paths {
-                image = image::open(image_path).unwrap().to_rgba8();
-                height = calc_new_height(args.width, image.width(), image.height());
+                let start = Instant::now();
+
+                let image = image::open(image_path).unwrap().to_rgba8();
+                let height = calc_new_height(args.width, image.width(), image.height());
+
                 println!(
                     "{}",
                     render_frame_case(image.clone(), args.width, &ascii_string, args.colored,)
                 );
+
                 execute!(stdout(), MoveUp(height as u16 + 1)).expect("");
 
-                thread::sleep(time::Duration::from_millis(frametime));
+                if frametime > start.elapsed().as_millis() as u64 {
+                    thread::sleep(time::Duration::from_millis(
+                        frametime - start.elapsed().as_millis() as u64,
+                    ));
+                }
             }
         }
     } else {
