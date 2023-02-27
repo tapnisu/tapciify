@@ -149,7 +149,7 @@ pub async fn render_full_frame(
     ascii_string: &'static str,
     colored: bool,
 ) -> String {
-    let image_parts = cut_image_by_amount(image, 16);
+    let image_parts = cut_image_by_amount(image, 4);
 
     let mut tasks = Vec::with_capacity(image_parts.len());
 
