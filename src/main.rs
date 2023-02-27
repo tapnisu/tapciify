@@ -7,7 +7,6 @@ use std::fs;
 use std::io::stdout;
 use std::time::Instant;
 use tapciify::{render_full_frame, string_to_static_str};
-use utils::calc_new_height;
 
 /// CLI tool that can let you view images in terminal
 #[derive(Parser, Debug)]
@@ -68,17 +67,18 @@ async fn main() {
         let frametime: u64 = (1f64 / args.fps.unwrap_or_else(|| 1f64) * 1000f64) as u64;
 
         if args.prerender {
-            let mut height: Option<u32> = None;
+            let mut height: u32 = 0;
             let mut frames: Vec<String> = Vec::new();
 
             for image_path in image_paths {
                 let image = image::open(image_path.clone()).unwrap();
-                frames.push(
-                    render_full_frame(image.clone(), args.width, static_ascii_string, args.colored)
-                        .await,
-                );
 
-                height = Some(calc_new_height(args.width, image.width(), image.height()));
+                let result =
+                    render_full_frame(image.clone(), args.width, static_ascii_string, args.colored)
+                        .await;
+
+                frames.push(result.0);
+                height = result.1;
 
                 println!("Rendered {}", image_path);
             }
@@ -88,7 +88,7 @@ async fn main() {
 
                 println!("{}", frame);
 
-                execute!(stdout(), MoveUp(height.unwrap() as u16 + 1)).expect("");
+                execute!(stdout(), MoveUp(height as u16 - 1)).expect("");
 
                 while frametime > start.elapsed().as_millis() as u64 {}
             }
@@ -97,15 +97,14 @@ async fn main() {
                 let start = Instant::now();
 
                 let image = image::open(image_path).unwrap();
-                let height = calc_new_height(args.width, image.width(), image.height());
 
-                println!(
-                    "{}",
+                let (result, height) =
                     render_full_frame(image.clone(), args.width, static_ascii_string, args.colored)
-                        .await
-                );
+                        .await;
 
-                execute!(stdout(), MoveUp(height as u16 + 1)).expect("");
+                println!("{}", result);
+
+                execute!(stdout(), MoveUp(height as u16 - 1)).expect("");
 
                 while frametime > start.elapsed().as_millis() as u64 {}
             }
@@ -115,7 +114,9 @@ async fn main() {
 
         println!(
             "{}",
-            render_full_frame(image.clone(), args.width, static_ascii_string, args.colored).await
+            render_full_frame(image.clone(), args.width, static_ascii_string, args.colored)
+                .await
+                .0
         )
     }
 }
