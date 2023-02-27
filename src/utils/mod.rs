@@ -130,7 +130,7 @@ pub async fn render_full_frame(
     width: u32,
     ascii_string: &'static str,
     colored: bool,
-) -> (String, u32) {
+) -> String {
     let height = calc_new_height(width, img.width(), img.height());
     let img = resize_image(img, width, height);
     let image_parts = cut_image_by_amount(img, 4);
@@ -149,7 +149,7 @@ pub async fn render_full_frame(
         outputs.push(task.await.unwrap());
     }
 
-    (merge_string_vec(outputs), height)
+    merge_string_vec(outputs)
 }
 
 pub fn string_to_static_str(s: String) -> &'static str {

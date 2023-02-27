@@ -1,7 +1,7 @@
 pub mod utils;
 
 use clap::Parser;
-use crossterm::cursor::MoveUp;
+use crossterm::cursor::{Hide, RestorePosition, SavePosition};
 use crossterm::execute;
 use std::fs;
 use std::io::stdout;
@@ -67,44 +67,43 @@ async fn main() {
         let frametime: u64 = (1f64 / args.fps.unwrap_or_else(|| 1f64) * 1000f64) as u64;
 
         if args.prerender {
-            let mut height: u32 = 0;
             let mut frames: Vec<String> = Vec::new();
 
             for image_path in image_paths {
                 let image = image::open(image_path.clone()).unwrap();
 
-                let result =
+                frames.push(
                     render_full_frame(image.clone(), args.width, static_ascii_string, args.colored)
-                        .await;
-
-                frames.push(result.0);
-                height = result.1;
+                        .await,
+                );
 
                 println!("Rendered {}", image_path);
             }
 
+            execute!(stdout(), SavePosition, Hide).unwrap_or_default();
+
             for frame in frames {
                 let start = Instant::now();
 
+                execute!(stdout(), RestorePosition).expect("");
                 println!("{}", frame);
-
-                execute!(stdout(), MoveUp(height as u16 - 1)).expect("");
 
                 while frametime > start.elapsed().as_millis() as u64 {}
             }
         } else {
+            execute!(stdout(), SavePosition, Hide).unwrap_or_default();
+
             for image_path in image_paths {
                 let start = Instant::now();
-
                 let image = image::open(image_path).unwrap();
 
-                let (result, height) =
+                execute!(stdout(), RestorePosition).unwrap_or_default();
+
+                println!(
+                    "{}",
                     render_full_frame(image.clone(), args.width, static_ascii_string, args.colored)
-                        .await;
-
-                println!("{}", result);
-
-                execute!(stdout(), MoveUp(height as u16 - 1)).expect("");
+                        .await
+                );
 
                 while frametime > start.elapsed().as_millis() as u64 {}
             }
@@ -114,9 +113,7 @@ async fn main() {
 
         println!(
             "{}",
-            render_full_frame(image.clone(), args.width, static_ascii_string, args.colored)
-                .await
-                .0
+            render_full_frame(image.clone(), args.width, static_ascii_string, args.colored).await
         )
     }
 }
