@@ -1,7 +1,7 @@
 pub mod utils;
 
 use clap::Parser;
-use crossterm::cursor::{Hide, RestorePosition, SavePosition, Show};
+use crossterm::cursor::{RestorePosition, SavePosition};
 use crossterm::execute;
 use std::fs;
 use std::io::stdout;
@@ -80,7 +80,7 @@ async fn main() {
                 println!("Rendered {}", image_path);
             }
 
-            execute!(stdout(), SavePosition, Hide).unwrap_or_default();
+            execute!(stdout(), SavePosition).unwrap_or_default();
 
             for frame in frames {
                 let start = Instant::now();
@@ -90,10 +90,8 @@ async fn main() {
 
                 while frametime > start.elapsed().as_millis() as u64 {}
             }
-
-            execute!(stdout(), Show).unwrap_or_default();
         } else {
-            execute!(stdout(), SavePosition, Hide).unwrap_or_default();
+            execute!(stdout(), SavePosition).unwrap_or_default();
 
             for image_path in image_paths {
                 let start = Instant::now();
@@ -109,8 +107,6 @@ async fn main() {
 
                 while frametime > start.elapsed().as_millis() as u64 {}
             }
-
-            execute!(stdout(), Show).unwrap_or_default();
         }
     } else {
         let image = image::open(args.input).unwrap();
