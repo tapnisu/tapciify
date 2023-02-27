@@ -1,7 +1,7 @@
 pub mod utils;
 
 use clap::Parser;
-use crossterm::cursor::{Hide, RestorePosition, SavePosition};
+use crossterm::cursor::{Hide, RestorePosition, SavePosition, Show};
 use crossterm::execute;
 use std::fs;
 use std::io::stdout;
@@ -90,6 +90,8 @@ async fn main() {
 
                 while frametime > start.elapsed().as_millis() as u64 {}
             }
+
+            execute!(stdout(), Show).unwrap_or_default();
         } else {
             execute!(stdout(), SavePosition, Hide).unwrap_or_default();
 
@@ -107,6 +109,8 @@ async fn main() {
 
                 while frametime > start.elapsed().as_millis() as u64 {}
             }
+
+            execute!(stdout(), Show).unwrap_or_default();
         }
     } else {
         let image = image::open(args.input).unwrap();
