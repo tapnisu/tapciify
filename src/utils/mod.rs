@@ -131,9 +131,12 @@ pub async fn render_full_frame(
     ascii_string: &'static str,
     colored: bool,
 ) -> String {
-    let height = calc_new_height(width, img.width(), img.height());
-    let img = resize_image(img, width, height);
-    let image_parts = cut_image_by_amount(img, 4);
+    let img = resize_image(
+        img.clone(),
+        width,
+        calc_new_height(width, img.width(), img.height()),
+    );
+    let image_parts = cut_image_by_amount(img.clone(), img.height());
 
     let mut tasks = Vec::with_capacity(image_parts.len());
 
