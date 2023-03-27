@@ -1,7 +1,7 @@
 pub mod utils;
 
 use clap::Parser;
-use crossterm::cursor::{RestorePosition, SavePosition};
+use crossterm::cursor::MoveUp;
 use crossterm::execute;
 use indicatif::ProgressBar;
 use std::fs;
@@ -64,11 +64,12 @@ async fn main() {
                 image_paths.push(path.to_string());
             }
         }
+        let mut first_frame = false;
 
         let frametime: u64 = (1f64 / args.fps.unwrap_or_else(|| 1f64) * 1000f64) as u64;
 
         if args.prerender {
-            let mut frames: Vec<String> = Vec::new();
+            let mut frames: Vec<(String, u32)> = Vec::new();
 
             let pb = ProgressBar::new(image_paths.len() as u64);
 
@@ -83,31 +84,39 @@ async fn main() {
                 pb.inc(1);
             }
 
-            execute!(stdout(), SavePosition).unwrap_or_default();
             pb.finish_and_clear();
 
             for frame in frames {
                 let start = Instant::now();
 
-                execute!(stdout(), RestorePosition).expect("");
-                println!("{}", frame);
+                if !first_frame {
+                    execute!(stdout(), MoveUp((frame.1 + 1).try_into().unwrap()))
+                        .unwrap_or_default();
+                } else {
+                    first_frame = true;
+                }
+
+                println!("{}", frame.0);
 
                 while frametime > start.elapsed().as_millis() as u64 {}
             }
         } else {
-            execute!(stdout(), SavePosition).unwrap_or_default();
-
             for image_path in image_paths {
                 let start = Instant::now();
                 let image = image::open(image_path).unwrap();
 
-                execute!(stdout(), RestorePosition).unwrap_or_default();
-
-                println!(
-                    "{}",
+                let frame =
                     render_full_frame(image.clone(), args.width, static_ascii_string, args.colored)
-                        .await
-                );
+                        .await;
+
+                if !first_frame {
+                    execute!(stdout(), MoveUp((frame.1 + 1).try_into().unwrap()))
+                        .unwrap_or_default();
+                } else {
+                    first_frame = true;
+                }
+
+                println!("{}", frame.0);
 
                 while frametime > start.elapsed().as_millis() as u64 {}
             }
@@ -117,7 +126,9 @@ async fn main() {
 
         println!(
             "{}",
-            render_full_frame(image.clone(), args.width, static_ascii_string, args.colored).await
+            render_full_frame(image.clone(), args.width, static_ascii_string, args.colored)
+                .await
+                .0
         )
     }
 }
