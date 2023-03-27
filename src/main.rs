@@ -3,6 +3,7 @@ pub mod utils;
 use clap::Parser;
 use crossterm::cursor::MoveUp;
 use crossterm::execute;
+use indicatif::ProgressBar;
 use std::fs;
 use std::io::stdout;
 use std::time::Instant;
@@ -67,6 +68,8 @@ fn main() {
             let mut height: Option<u32> = None;
             let mut frames: Vec<String> = Vec::new();
 
+            let pb = ProgressBar::new(image_paths.len() as u64);
+
             for image_path in image_paths {
                 let image = image::open(image_path.clone()).unwrap().to_rgba8();
                 frames.push(render_frame_case(
@@ -78,8 +81,10 @@ fn main() {
 
                 height = Some(calc_new_height(args.width, image.width(), image.height()));
 
-                println!("Rendered {}", image_path);
+                pb.inc(1);
             }
+
+            pb.finish_and_clear();
 
             for frame in frames {
                 let start = Instant::now();
