@@ -89,7 +89,7 @@ async fn main() {
             for frame in frames {
                 let start = Instant::now();
 
-                if !first_frame {
+                if first_frame {
                     execute!(stdout(), MoveUp((frame.1 + 1).try_into().unwrap()))
                         .unwrap_or_default();
                 } else {
@@ -109,7 +109,7 @@ async fn main() {
                     render_full_frame(image.clone(), args.width, static_ascii_string, args.colored)
                         .await;
 
-                if !first_frame {
+                if first_frame {
                     execute!(stdout(), MoveUp((frame.1 + 1).try_into().unwrap()))
                         .unwrap_or_default();
                 } else {
