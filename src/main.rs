@@ -3,6 +3,7 @@ pub mod utils;
 use clap::Parser;
 use crossterm::cursor::{RestorePosition, SavePosition};
 use crossterm::execute;
+use indicatif::ProgressBar;
 use std::fs;
 use std::io::stdout;
 use std::time::Instant;
@@ -12,30 +13,30 @@ use tapciify::{render_full_frame, string_to_static_str};
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
 struct Arguments {
-    /// Input file or dir
-    #[clap(short, short, value_parser)]
-    input: String,
-    /// Width of output
-    #[clap(short, short, value_parser)]
-    width: u32,
-    /// Slideshow from folder
-    #[clap(short, long, action)]
-    dir: bool,
-    /// Renders before showing (works only for video)
-    #[clap(short, long, action)]
-    prerender: bool,
-    /// Speed of slideshow (video)
-    #[clap(short, long)]
-    fps: Option<f64>,
     /// String to represent lightness of pixels
     #[clap(short, long)]
     ascii_string: Option<String>,
-    /// Reverse the ascii string
-    #[clap(short, long, action)]
-    reverse: bool,
     /// Makes frames colorful
     #[clap(short, long, action)]
     colored: bool,
+    /// Slideshow from folder
+    #[clap(short, long, action)]
+    dir: bool,
+    /// Speed of slideshow (video)
+    #[clap(short, long)]
+    fps: Option<f64>,
+    /// Input file or dir
+    #[clap(short, short, value_parser)]
+    input: String,
+    /// Renders before showing (works only for video)
+    #[clap(short, long, action)]
+    prerender: bool,
+    /// Reverse the ascii string
+    #[clap(short, long, action)]
+    reverse: bool,
+    /// Width of output
+    #[clap(short, short, value_parser)]
+    width: u32,
 }
 
 #[tokio::main]
@@ -69,6 +70,8 @@ async fn main() {
         if args.prerender {
             let mut frames: Vec<String> = Vec::new();
 
+            let pb = ProgressBar::new(image_paths.len() as u64);
+
             for image_path in image_paths {
                 let image = image::open(image_path.clone()).unwrap();
 
@@ -77,10 +80,11 @@ async fn main() {
                         .await,
                 );
 
-                println!("Rendered {}", image_path);
+                pb.inc(1);
             }
 
             execute!(stdout(), SavePosition).unwrap_or_default();
+            pb.finish_and_clear();
 
             for frame in frames {
                 let start = Instant::now();
