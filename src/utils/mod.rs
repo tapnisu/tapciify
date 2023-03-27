@@ -1,5 +1,5 @@
 use colored::Colorize;
-use image::RgbaImage;
+use image::{DynamicImage, RgbaImage};
 use std::cmp::{max, min};
 
 /// Get brightness of pixel from 0.0 to 1.0 (calculated by HSL's lightness formula)
@@ -23,9 +23,8 @@ pub fn calc_new_height(new_width: u32, width: u32, height: u32) -> u32 {
 }
 
 /// Converts image to symbols
-pub fn render_frame(image: RgbaImage, width: u32, height: u32, ascii_string: &str) -> String {
+pub fn render_frame(img: RgbaImage, width: u32, ascii_string: &str) -> String {
     // Resize the image, so the terminal can show it
-    let img = image::imageops::resize(&image, width, height, image::imageops::FilterType::Triangle);
     let rgb: Vec<u8> = img.into_raw();
 
     let mut frame = String::new();
@@ -57,14 +56,7 @@ pub fn render_frame(image: RgbaImage, width: u32, height: u32, ascii_string: &st
 }
 
 /// Converts image to symbols and adds colors
-pub fn render_colored_frame(
-    image: RgbaImage,
-    width: u32,
-    height: u32,
-    ascii_string: &str,
-) -> String {
-    let img = image::imageops::resize(&image, width, height, image::imageops::FilterType::Triangle);
-
+pub fn render_colored_frame(img: RgbaImage, width: u32, ascii_string: &str) -> String {
     let rgb: Vec<u8> = img.into_raw();
 
     let mut x = 0;
@@ -107,18 +99,68 @@ pub fn render_frame_case(
     colored: bool,
 ) -> String {
     if colored {
-        render_colored_frame(
-            image.clone(),
-            width,
-            calc_new_height(width, image.width(), image.height()),
-            &ascii_string,
-        )
+        render_colored_frame(image.clone(), width, &ascii_string)
     } else {
-        render_frame(
-            image.clone(),
-            width,
-            calc_new_height(width, image.width(), image.height()),
-            &ascii_string,
-        )
+        render_frame(image.clone(), width, &ascii_string)
     }
+}
+
+pub fn cut_image_by_amount(image: DynamicImage, amount: u32) -> Vec<DynamicImage> {
+    let mut parts: Vec<DynamicImage> = vec![];
+
+    for i in 0..amount {
+        let part_height = image.height() / amount;
+
+        parts.push(
+            image
+                .clone()
+                .crop(0, part_height * i, image.width(), part_height),
+        );
+    }
+
+    parts
+}
+
+pub fn merge_string_vec(str_ver: Vec<String>) -> String {
+    str_ver.join("")
+}
+
+pub async fn render_full_frame(
+    img: DynamicImage,
+    width: u32,
+    ascii_string: &'static str,
+    colored: bool,
+) -> (String, u32) {
+    let height = calc_new_height(width, img.width(), img.height());
+    let img = resize_image(img, width, height);
+    let image_parts = cut_image_by_amount(img.clone(), img.height());
+
+    let mut tasks = Vec::with_capacity(image_parts.len());
+
+    for part in image_parts {
+        tasks.push(tokio::spawn(async move {
+            render_frame_case(part.to_rgba8(), width, ascii_string, colored)
+        }));
+    }
+
+    let mut outputs = Vec::with_capacity(tasks.len());
+
+    for task in tasks {
+        outputs.push(task.await.unwrap());
+    }
+
+    (merge_string_vec(outputs), height)
+}
+
+pub fn string_to_static_str(s: String) -> &'static str {
+    Box::leak(s.into_boxed_str())
+}
+
+pub fn resize_image(img: DynamicImage, new_width: u32, new_height: u32) -> DynamicImage {
+    image::DynamicImage::ImageRgba8(image::imageops::resize(
+        &img,
+        new_width,
+        new_height,
+        image::imageops::FilterType::Triangle,
+    ))
 }
