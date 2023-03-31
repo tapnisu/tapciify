@@ -60,18 +60,16 @@ async fn main() {
 
         let images_paths = fs::read_dir(args.input).unwrap();
         for image_path in images_paths {
-            if let Some(path) = image_path.unwrap().path().to_str() {
-                image_paths.push(path.to_string());
-            }
+            image_paths.push(image_path.unwrap().path().to_str().unwrap().to_string());
         }
         let mut first_frame = false;
 
-        let frametime: u64 = (1f64 / args.fps.unwrap_or_else(|| 1f64) * 1000f64) as u64;
+        let frametime = (1f64 / args.fps.unwrap_or_else(|| 1f64) * 1000f64) as u64;
 
         if args.prerender {
             let mut frames: Vec<(String, u32)> = Vec::new();
 
-            let pb = ProgressBar::new(image_paths.len() as u64);
+            let pb = ProgressBar::new(image_paths.len().try_into().unwrap());
 
             for image_path in image_paths {
                 let image = image::open(image_path.clone()).unwrap();
@@ -98,7 +96,7 @@ async fn main() {
 
                 println!("{}", frame.0);
 
-                while frametime > start.elapsed().as_millis() as u64 {}
+                while frametime > start.elapsed().as_millis().try_into().unwrap() {}
             }
         } else {
             for image_path in image_paths {
@@ -118,7 +116,7 @@ async fn main() {
 
                 println!("{}", frame.0);
 
-                while frametime > start.elapsed().as_millis() as u64 {}
+                while frametime > start.elapsed().as_millis().try_into().unwrap() {}
             }
         }
     } else {
