@@ -1,8 +1,7 @@
-use std::{fs, io::stdout};
-
 use crate::render_full_frame;
 use crossterm::{cursor::MoveUp, execute};
 use indicatif::ProgressBar;
+use std::{fs, io::stdout};
 use tokio::time::Instant;
 
 /// Reverse ascii string if true
