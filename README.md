@@ -16,10 +16,6 @@
 cargo install tapciify
 ```
 
-```bash
-apt install build-essential
-```
-
 ## View image
 
 1. Run: `tapciify -i imageDir -w imageWidth` for image.
