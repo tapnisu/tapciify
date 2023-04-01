@@ -4,39 +4,29 @@
 
 <p align="center">CLI tool that can let you view images in terminal</p>
 
-## How to use
+## Requirements
 
-### Install
+1. CC linker (Microsoft Visual Studio with C++ Support) (Linux - gcc)
 
-1. Install [rustup](https://rustup.rs/)
+2. [Rust](https://www.rust-lang.org/tools/install)
 
-2. Run:
-
-```bash
-rustup default stable
-```
-
-3. Install via cargo from crates.io:
+## Install
 
 ```bash
 cargo install tapciify
 ```
 
-4. Windows: Install Microsoft Visual Studio with C++ support.
-
-4. Linux: Install cc-linker (Ubuntu)
-
 ```bash
 apt install build-essential
 ```
 
-### Images
+## View image
 
 1. Run: `tapciify -i imageDir -w imageWidth` for image.
 
 2. Run: `tapciify -i imageDir -w imageWidth -r` for reversed colors.
 
-### Videos
+## View video
 
 > Requires ffmpeg
 
