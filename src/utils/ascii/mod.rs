@@ -7,14 +7,15 @@ pub fn get_lightness(r: u8, g: u8, b: u8, a: u8) -> f32 {
     let max = max(max(r, g), b);
     let min = min(min(r, g), b);
 
-    (max as f32 + min as f32) * a as f32 / 255f32 / 510f32
+    ((max as f32 + min as f32) * a as f32) / 130050f32 // 130050 - we need to divide by 512, and divide by 255 from alpha
 }
 
 /// Convert lightness of pixel to symbol
 pub fn ascii_symbol(brightness: f32, ascii_string: &str) -> char {
-    let index = ((ascii_string.chars().count() - 1) as f32 * brightness) as usize;
-
-    ascii_string.chars().nth(index).unwrap()
+    ascii_string
+        .chars()
+        .nth(((ascii_string.chars().count() - 1) as f32 * brightness) as usize)
+        .unwrap()
 }
 
 /// Calculate height by multiplying width by original aspect ratio
@@ -34,12 +35,7 @@ pub fn render_frame(img: RgbaImage, width: u32, ascii_string: &str) -> String {
 
     for i in (0..(rgb.len() - 1)).step_by(4) {
         frame.push(ascii_symbol(
-            get_lightness(
-                rgb[i as usize],
-                rgb[i as usize + 1],
-                rgb[i as usize + 2],
-                rgb[i as usize + 3],
-            ),
+            get_lightness(rgb[i], rgb[i + 1], rgb[i + 2], rgb[i + 3]),
             ascii_string,
         ));
 
@@ -67,16 +63,11 @@ pub fn render_colored_frame(img: RgbaImage, width: u32, ascii_string: &str) -> S
             "{}{}",
             result,
             ascii_symbol(
-                get_lightness(
-                    rgb[i as usize],
-                    rgb[i as usize + 1],
-                    rgb[i as usize + 2],
-                    rgb[i as usize + 3]
-                ),
+                get_lightness(rgb[i], rgb[i + 1], rgb[i + 2], rgb[i + 3]),
                 ascii_string,
             )
             .to_string()
-            .truecolor(rgb[i as usize], rgb[i as usize + 1], rgb[i as usize + 2])
+            .truecolor(rgb[i], rgb[i + 1], rgb[i + 2])
         );
 
         x += 1;
@@ -159,6 +150,6 @@ pub fn resize_image(img: DynamicImage, new_width: u32, new_height: u32) -> Dynam
         &img,
         new_width,
         new_height,
-        image::imageops::FilterType::Triangle,
+        image::imageops::FilterType::Lanczos3,
     ))
 }
