@@ -12,9 +12,9 @@ categories = ["command-line-utilities", "multimedia", "multimedia::images", "mul
 license = "MIT"
 
 [dependencies]
-clap = { version = "4.0.32", features = ["derive"] }
+clap = { version = "4.2.1", features = ["derive"] }
 colored = "2.0.0"
-crossterm = "0.26.0"
-image = "0.24.5"
-tokio = { version = "1.25.0", features = ["full"] }
+crossterm = "0.26.1"
+image = "0.24.6"
+tokio = { version = "1.27.0", features = ["full"] }
 indicatif = "0.17.3"
