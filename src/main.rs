@@ -1,36 +1,38 @@
 pub mod utils;
 
 use clap::Parser;
-use tapciify::{generate_ascii_string, play_dir, render_full_frame};
+use tapciify::{generate_ascii_string, play_from_directory, render_full_frame};
 
 /// CLI tool that can let you view images/videos in terminal as ASCII
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
 struct Arguments {
-    /// String to represent lightness of pixels
-    #[clap(short, long)]
-    ascii_string: Option<String>,
-    /// Makes frames colorful
-    #[clap(short, long, action)]
-    colored: bool,
+    /// Input file or directory
+    #[clap(short, short, value_parser)]
+    input: String,
+    // Width of output
+    #[clap(short, short, value_parser)]
+    width: u32,
+
     /// Show images from directory (play video)
     #[clap(short, long, action)]
-    dir: bool,
+    directory: bool,
     /// Fps of showing images from directory (video)
     #[clap(short, long)]
     fps: Option<f64>,
-    /// Input file or dir
-    #[clap(short, short, value_parser)]
-    input: String,
     /// Renders before showing (works only for video)
     #[clap(short, long, action)]
     prerender: bool,
+
+    /// Makes frames colorful
+    #[clap(short, long, action)]
+    colored: bool,
+    /// String to represent lightness of pixels
+    #[clap(short, long)]
+    ascii_string: Option<String>,
     /// Reverse the ascii string
     #[clap(short, long, action)]
     reverse: bool,
-    /// Width of output
-    #[clap(short, short, value_parser)]
-    width: u32,
 }
 
 #[tokio::main]
@@ -48,8 +50,8 @@ async fn main() {
     );
 
     // Play frames from folder
-    if args.dir {
-        play_dir(
+    if args.directory {
+        play_from_directory(
             args.input,
             args.width,
             ascii_string,

@@ -19,11 +19,10 @@ pub async fn play_normal_dir(
     ascii_string: &'static str,
     width: u32,
     colored: bool,
-    fps: Option<f64>,
+    frametime: u64,
 ) {
     let mut first_frame = false;
     // Calculate time to show frame
-    let frametime = (1f64 / fps.unwrap_or_else(|| 1f64) * 1000f64) as u64;
 
     for image_path in image_paths {
         let start = Instant::now();
@@ -49,12 +48,10 @@ pub async fn play_rerendered_dir(
     ascii_string: &'static str,
     width: u32,
     colored: bool,
-    fps: Option<f64>,
+    frametime: u64,
 ) {
     let mut frames: Vec<(String, u32)> = Vec::new();
     let mut first_frame = false;
-    // Calculate time to show frame
-    let frametime = (1f64 / fps.unwrap_or_else(|| 1f64) * 1000f64) as u64;
 
     let pb = ProgressBar::new(image_paths.len().try_into().unwrap());
 
@@ -84,7 +81,7 @@ pub async fn play_rerendered_dir(
 }
 
 /// Play frames from directory (switch between prerender and real time)
-pub async fn play_dir(
+pub async fn play_from_directory(
     input: String,
     width: u32,
     ascii_string: &'static str,
@@ -99,9 +96,18 @@ pub async fn play_dir(
         image_paths.push(image_path.unwrap().path().to_str().unwrap().to_string());
     }
 
-    if prerender {
-        return play_rerendered_dir(image_paths, ascii_string, width, colored, fps).await;
+    // Calculate time to show frame
+    let frametime: u64;
+
+    if let Some(fps) = fps {
+        frametime = (1000f64 / fps) as u64;
+    } else {
+        frametime = 0;
     }
 
-    play_normal_dir(image_paths, ascii_string, width, colored, fps).await
+    if prerender {
+        return play_rerendered_dir(image_paths, ascii_string, width, colored, frametime).await;
+    }
+
+    play_normal_dir(image_paths, ascii_string, width, colored, frametime).await
 }
