@@ -1,11 +1,11 @@
 use std::{fs, io::stdout};
 
+use crate::render_full_frame;
 use crossterm::{cursor::MoveUp, execute};
 use indicatif::ProgressBar;
 use tokio::time::Instant;
 
-use crate::render_full_frame;
-
+/// Reverse ascii string if true
 pub fn generate_ascii_string(ascii_string: String, reversed: bool) -> String {
     if reversed {
         return ascii_string.chars().rev().collect::<String>().to_owned();
@@ -14,6 +14,7 @@ pub fn generate_ascii_string(ascii_string: String, reversed: bool) -> String {
     ascii_string
 }
 
+/// Play frames from directory in real time
 pub async fn play_normal_dir(
     image_paths: Vec<String>,
     ascii_string: &'static str,
@@ -43,6 +44,7 @@ pub async fn play_normal_dir(
     }
 }
 
+/// Render frames from directory, and then play them
 pub async fn play_rerendered_dir(
     image_paths: Vec<String>,
     ascii_string: &'static str,
@@ -82,6 +84,7 @@ pub async fn play_rerendered_dir(
     }
 }
 
+/// Play frames from directory (switch between prerender and real time)
 pub async fn play_dir(
     input: String,
     width: u32,
@@ -91,7 +94,6 @@ pub async fn play_dir(
     prerender: bool,
 ) {
     let mut image_paths: Vec<String> = Vec::new();
-
     let images_paths = fs::read_dir(input).unwrap();
 
     for image_path in images_paths {
