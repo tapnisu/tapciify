@@ -3,7 +3,7 @@ pub mod utils;
 use clap::Parser;
 use tapciify::{generate_ascii_string, play_dir, render_full_frame};
 
-/// CLI tool that can let you view images in terminal
+/// CLI tool that can let you view images/videos in terminal as ASCII
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
 struct Arguments {
@@ -13,10 +13,10 @@ struct Arguments {
     /// Makes frames colorful
     #[clap(short, long, action)]
     colored: bool,
-    /// Slideshow from folder
+    /// Show images from directory (play video)
     #[clap(short, long, action)]
     dir: bool,
-    /// Speed of slideshow (video)
+    /// Fps of showing images from directory (video)
     #[clap(short, long)]
     fps: Option<f64>,
     /// Input file or dir

@@ -2,7 +2,7 @@
 
 <h1 align="center">Tapciify</h1>
 
-<p align="center">CLI tool that can let you view images in terminal</p>
+<p align="center">CLI tool that can let you view images/videos in terminal as ASCII</p>
 
 ## Requirements
 
@@ -43,7 +43,7 @@ tapciify -i dir -w videoWidth -d -f 24
 
 ## Examples
 
-| Original                                               | Ascii                                      | Ascii colored                                    |
+| Original                                               | ASCII                                      | ASCII colored                                    |
 | ------------------------------------------------------ | ------------------------------------------ | ------------------------------------------------ |
 | ![Original Image](assets/original.png)                 | ![Ascii image](assets/ascii.png)           | ![Ascii colored image](assets/ascii_colored.png) |
 | `Original image (Shima Rin from Laid-Back Camp manga)` | `tapciify -i ./assets/original.png -w 100` | `tapciify -i ./assets/original.png -w 100 -c`    |
