@@ -10,7 +10,7 @@ struct Arguments {
     /// Input file or directory
     #[clap(short, short, value_parser)]
     input: String,
-    // Width of output
+    /// Width of output
     #[clap(short, short, value_parser)]
     width: u32,
 
