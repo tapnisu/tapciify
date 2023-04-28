@@ -87,7 +87,7 @@ pub fn render_colored_frame(img: RgbaImage, width: u32, ascii_string: &str) -> S
 pub fn render_frame_case(
     image: RgbaImage,
     width: u32,
-    ascii_string: &str,
+    ascii_string: String,
     colored: bool,
 ) -> String {
     if colored {
@@ -118,7 +118,7 @@ pub fn cut_image_by_amount(image: DynamicImage, amount: u32) -> Vec<DynamicImage
 pub fn render_full_frame(
     img: DynamicImage,
     width: u32,
-    ascii_string: &'static str,
+    ascii_string: String,
     colored: bool,
 ) -> (String, u32) {
     // Resize image
@@ -130,7 +130,7 @@ pub fn render_full_frame(
 
     let outputs: Vec<String> = image_parts
         .par_iter()
-        .map(|part| render_frame_case(part.to_rgba8(), width, ascii_string, colored))
+        .map(|part| render_frame_case(part.to_rgba8(), width, ascii_string.clone(), colored))
         .collect();
 
     (outputs.join(""), height)

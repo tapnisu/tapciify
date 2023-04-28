@@ -15,7 +15,7 @@ pub fn generate_ascii_string(ascii_string: String, reversed: bool) -> String {
 /// Play frames from directory in real time
 pub fn play_normal_dir(
     image_paths: Vec<String>,
-    ascii_string: &'static str,
+    ascii_string: String,
     width: u32,
     colored: bool,
     frametime: u64,
@@ -27,7 +27,7 @@ pub fn play_normal_dir(
         let start = Instant::now();
         let image = image::open(image_path).unwrap();
 
-        let frame = render_full_frame(image.clone(), width, ascii_string, colored);
+        let frame = render_full_frame(image.clone(), width, ascii_string.clone(), colored);
 
         if first_frame {
             execute!(stdout(), MoveUp((frame.1 + 1).try_into().unwrap())).unwrap_or_default();
@@ -44,7 +44,7 @@ pub fn play_normal_dir(
 /// Render frames from directory, and then play them
 pub fn play_rerendered_dir(
     image_paths: Vec<String>,
-    ascii_string: &'static str,
+    ascii_string: String,
     width: u32,
     colored: bool,
     frametime: u64,
@@ -60,7 +60,7 @@ pub fn play_rerendered_dir(
         frames.push(render_full_frame(
             image.clone(),
             width,
-            ascii_string,
+            ascii_string.clone(),
             colored,
         ));
 
@@ -88,7 +88,7 @@ pub fn play_rerendered_dir(
 pub fn play_from_directory(
     input: String,
     width: u32,
-    ascii_string: &'static str,
+    ascii_string: String,
     colored: bool,
     fps: Option<f64>,
     prerender: bool,

@@ -39,13 +39,10 @@ fn main() {
     let args = Arguments::parse();
 
     // String for pixel lightness
-    let ascii_string = Box::leak(
-        generate_ascii_string(
-            args.ascii_string
-                .unwrap_or_else(|| " .,:;+*?%S#@".to_owned()),
-            args.reverse,
-        )
-        .into_boxed_str(),
+    let ascii_string = generate_ascii_string(
+        args.ascii_string
+            .unwrap_or_else(|| " .,:;+*?%S#@".to_owned()),
+        args.reverse,
     );
 
     // Play frames from folder
