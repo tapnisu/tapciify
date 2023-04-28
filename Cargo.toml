@@ -1,6 +1,6 @@
 [package]
 name = "tapciify"
-version = "0.5.1"
+version = "0.6.0"
 
 edition = "2021"
 readme = "README.md"
@@ -24,4 +24,3 @@ crossterm = "0.26.1"
 image = "0.24.6"
 indicatif = "0.17.3"
 rayon = "1.7.0"
-tokio = { version = "1.27.0", features = ["full"] }

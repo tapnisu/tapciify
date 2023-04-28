@@ -1,8 +1,7 @@
 use crate::render_full_frame;
 use crossterm::{cursor::MoveUp, execute};
 use indicatif::ProgressBar;
-use std::{fs, io::stdout};
-use tokio::time::Instant;
+use std::{fs, io::stdout, time::Instant};
 
 /// Reverse ascii string if true
 pub fn generate_ascii_string(ascii_string: String, reversed: bool) -> String {
@@ -14,7 +13,7 @@ pub fn generate_ascii_string(ascii_string: String, reversed: bool) -> String {
 }
 
 /// Play frames from directory in real time
-pub async fn play_normal_dir(
+pub fn play_normal_dir(
     image_paths: Vec<String>,
     ascii_string: &'static str,
     width: u32,
@@ -28,7 +27,7 @@ pub async fn play_normal_dir(
         let start = Instant::now();
         let image = image::open(image_path).unwrap();
 
-        let frame = render_full_frame(image.clone(), width, ascii_string, colored).await;
+        let frame = render_full_frame(image.clone(), width, ascii_string, colored);
 
         if first_frame {
             execute!(stdout(), MoveUp((frame.1 + 1).try_into().unwrap())).unwrap_or_default();
@@ -43,7 +42,7 @@ pub async fn play_normal_dir(
 }
 
 /// Render frames from directory, and then play them
-pub async fn play_rerendered_dir(
+pub fn play_rerendered_dir(
     image_paths: Vec<String>,
     ascii_string: &'static str,
     width: u32,
@@ -58,7 +57,12 @@ pub async fn play_rerendered_dir(
     for image_path in image_paths {
         let image = image::open(image_path.clone()).unwrap();
 
-        frames.push(render_full_frame(image.clone(), width, ascii_string, colored).await);
+        frames.push(render_full_frame(
+            image.clone(),
+            width,
+            ascii_string,
+            colored,
+        ));
 
         pb.inc(1);
     }
@@ -81,7 +85,7 @@ pub async fn play_rerendered_dir(
 }
 
 /// Play frames from directory (switch between prerender and real time)
-pub async fn play_from_directory(
+pub fn play_from_directory(
     input: String,
     width: u32,
     ascii_string: &'static str,
@@ -106,8 +110,8 @@ pub async fn play_from_directory(
     }
 
     if prerender {
-        return play_rerendered_dir(image_paths, ascii_string, width, colored, frametime).await;
+        return play_rerendered_dir(image_paths, ascii_string, width, colored, frametime);
     }
 
-    play_normal_dir(image_paths, ascii_string, width, colored, frametime).await
+    play_normal_dir(image_paths, ascii_string, width, colored, frametime)
 }

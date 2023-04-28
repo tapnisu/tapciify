@@ -1,5 +1,6 @@
 use colored::Colorize;
 use image::{DynamicImage, RgbaImage};
+use rayon::prelude::*;
 use std::cmp::{max, min};
 
 /// Get brightness of pixel from 0.0 to 1.0 (calculated by HSL's lightness formula)
@@ -114,7 +115,7 @@ pub fn cut_image_by_amount(image: DynamicImage, amount: u32) -> Vec<DynamicImage
 }
 
 /// Render image by parts, and return String
-pub async fn render_full_frame(
+pub fn render_full_frame(
     img: DynamicImage,
     width: u32,
     ascii_string: &'static str,
@@ -127,19 +128,10 @@ pub async fn render_full_frame(
     // Split into parts, and render them
     let image_parts = cut_image_by_amount(img.clone(), img.height());
 
-    let mut tasks = Vec::with_capacity(image_parts.len());
-
-    for part in image_parts {
-        tasks.push(tokio::spawn(async move {
-            render_frame_case(part.to_rgba8(), width, ascii_string, colored)
-        }));
-    }
-
-    let mut outputs = Vec::with_capacity(tasks.len());
-
-    for task in tasks {
-        outputs.push(task.await.unwrap());
-    }
+    let outputs: Vec<String> = image_parts
+        .par_iter()
+        .map(|part| render_frame_case(part.to_rgba8(), width, ascii_string, colored))
+        .collect();
 
     (outputs.join(""), height)
 }
