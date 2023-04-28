@@ -42,7 +42,7 @@ pub fn play_normal_dir(
 }
 
 /// Render frames from directory, and then play them
-pub fn play_rerendered_dir(
+pub fn play_pre_rendered_dir(
     image_paths: Vec<String>,
     ascii_string: String,
     width: u32,
@@ -84,14 +84,14 @@ pub fn play_rerendered_dir(
     }
 }
 
-/// Play frames from directory (switch between prerender and real time)
+/// Play frames from directory (switch between pre_render and real time)
 pub fn play_from_directory(
     input: String,
     width: u32,
     ascii_string: String,
     colored: bool,
     fps: Option<f64>,
-    prerender: bool,
+    pre_render: bool,
 ) {
     let mut image_paths: Vec<String> = Vec::new();
     let images_paths = fs::read_dir(input).unwrap();
@@ -109,8 +109,8 @@ pub fn play_from_directory(
         frametime = 0;
     }
 
-    if prerender {
-        return play_rerendered_dir(image_paths, ascii_string, width, colored, frametime);
+    if pre_render {
+        return play_pre_rendered_dir(image_paths, ascii_string, width, colored, frametime);
     }
 
     play_normal_dir(image_paths, ascii_string, width, colored, frametime)

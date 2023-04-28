@@ -22,7 +22,7 @@ struct Arguments {
     fps: Option<f64>,
     /// Renders before showing (works only for video)
     #[clap(short, long, action)]
-    prerender: bool,
+    pre_render: bool,
 
     /// Makes frames colorful
     #[clap(short, long, action)]
@@ -53,7 +53,7 @@ fn main() {
             ascii_string,
             args.colored,
             args.fps,
-            args.prerender,
+            args.pre_render,
         )
     } else {
         let image = image::open(args.input).unwrap();
