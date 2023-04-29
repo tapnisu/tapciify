@@ -49,39 +49,37 @@ pub fn play_pre_rendered_dir(
     colored: bool,
     frame_time: u64,
 ) {
-    let mut frames: Vec<(String, u32)> = Vec::new();
     let mut first_frame = false;
 
     let pb = ProgressBar::new(image_paths.len().try_into().unwrap());
 
-    for image_path in image_paths {
-        let image = image::open(image_path.clone()).unwrap();
+    image_paths
+        .into_iter()
+        .map(|path| {
+            let image = render_full_frame(
+                image::open(path).unwrap(),
+                width,
+                ascii_string.clone(),
+                colored,
+            );
 
-        frames.push(render_full_frame(
-            image.clone(),
-            width,
-            ascii_string.clone(),
-            colored,
-        ));
+            pb.inc(1);
 
-        pb.inc(1);
-    }
+            return image;
+        })
+        .for_each(|frame| {
+            let start = Instant::now();
 
-    pb.finish_and_clear();
+            if first_frame {
+                execute!(stdout(), MoveUp((frame.1 + 1).try_into().unwrap())).unwrap_or_default();
+            } else {
+                first_frame = true;
+            }
 
-    for frame in frames {
-        let start = Instant::now();
+            println!("{}", frame.0);
 
-        if first_frame {
-            execute!(stdout(), MoveUp((frame.1 + 1).try_into().unwrap())).unwrap_or_default();
-        } else {
-            first_frame = true;
-        }
-
-        println!("{}", frame.0);
-
-        while frame_time > start.elapsed().as_millis().try_into().unwrap() {}
-    }
+            while frame_time > start.elapsed().as_millis().try_into().unwrap() {}
+        });
 }
 
 /// Play frames from directory (switch between pre_render and real time)
@@ -93,12 +91,11 @@ pub fn play_from_directory(
     fps: Option<f64>,
     pre_render: bool,
 ) {
-    let mut image_paths: Vec<String> = Vec::new();
-    let images_paths = fs::read_dir(input).unwrap();
-
-    for image_path in images_paths {
-        image_paths.push(image_path.unwrap().path().to_str().unwrap().to_string());
-    }
+    let image_paths = fs::read_dir(input)
+        .unwrap()
+        .into_iter()
+        .map(|path| path.unwrap().path().to_str().unwrap().to_string())
+        .collect();
 
     // Calculate time to show frame
     let frame_time: u64;
