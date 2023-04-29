@@ -1,4 +1,4 @@
-use crate::render_full_frame;
+use crate::par_render_frame;
 use crossterm::{cursor::MoveUp, execute};
 use indicatif::ProgressBar;
 use std::{fs, io::stdout, time::Instant};
@@ -27,7 +27,7 @@ pub fn play_normal_dir(
         let start = Instant::now();
         let image = image::open(image_path).unwrap();
 
-        let frame = render_full_frame(image.clone(), width, ascii_string.clone(), colored);
+        let frame = par_render_frame(image.clone(), width, ascii_string.clone(), colored);
 
         if first_frame {
             execute!(stdout(), MoveUp((frame.1 + 1).try_into().unwrap())).unwrap_or_default();
@@ -56,7 +56,7 @@ pub fn play_pre_rendered_dir(
     image_paths
         .into_iter()
         .map(|path| {
-            let image = render_full_frame(
+            let image = par_render_frame(
                 image::open(path).unwrap(),
                 width,
                 ascii_string.clone(),

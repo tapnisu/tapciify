@@ -115,7 +115,7 @@ pub fn cut_image_by_amount(image: DynamicImage, amount: u32) -> Vec<DynamicImage
 }
 
 /// Render image by parts, and return String
-pub fn render_full_frame(
+pub fn par_render_frame(
     img: DynamicImage,
     width: u32,
     ascii_string: String,
