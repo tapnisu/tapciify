@@ -56,11 +56,11 @@ fn main() {
             args.pre_render,
         )
     } else {
-        let image = image::open(args.input).unwrap();
+        let img = image::open(args.input).unwrap();
 
         println!(
             "{}",
-            par_render_frame(image.clone(), args.width, ascii_string, args.colored).0
+            par_render_frame(img.clone(), args.width, ascii_string, args.colored).0
         )
     }
 }

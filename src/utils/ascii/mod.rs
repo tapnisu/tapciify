@@ -85,29 +85,29 @@ pub fn render_colored_frame(img: RgbaImage, width: u32, ascii_string: &str) -> S
 
 /// Run one of 2 functions depending on arguments
 pub fn render_frame_case(
-    image: RgbaImage,
+    img: RgbaImage,
     width: u32,
     ascii_string: String,
     colored: bool,
 ) -> String {
     if colored {
-        render_colored_frame(image.clone(), width, &ascii_string)
+        render_colored_frame(img.clone(), width, &ascii_string)
     } else {
-        render_frame(image.clone(), width, &ascii_string)
+        render_frame(img.clone(), width, &ascii_string)
     }
 }
 
 /// Cut image into parts by amount
-pub fn cut_image_by_amount(image: DynamicImage, amount: u32) -> Vec<DynamicImage> {
+pub fn cut_image_by_amount(img: DynamicImage, amount: u32) -> Vec<DynamicImage> {
     let mut parts: Vec<DynamicImage> = vec![];
 
     for i in 0..amount {
-        let part_height = image.height() / amount;
+        let part_height = img.height() / amount;
 
         parts.push(
-            image
+            img
                 .clone()
-                .crop(0, part_height * i, image.width(), part_height),
+                .crop(0, part_height * i, img.width(), part_height),
         );
     }
 

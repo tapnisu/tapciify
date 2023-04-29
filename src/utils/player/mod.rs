@@ -25,9 +25,9 @@ pub fn play_normal_dir(
 
     for image_path in image_paths {
         let start = Instant::now();
-        let image = image::open(image_path).unwrap();
+        let img = image::open(image_path).unwrap();
 
-        let frame = par_render_frame(image.clone(), width, ascii_string.clone(), colored);
+        let frame = par_render_frame(img.clone(), width, ascii_string.clone(), colored);
 
         if first_frame {
             execute!(stdout(), MoveUp((frame.1 + 1).try_into().unwrap())).unwrap_or_default();
@@ -56,7 +56,7 @@ pub fn play_pre_rendered_dir(
     image_paths
         .into_iter()
         .map(|path| {
-            let image = par_render_frame(
+            let img = par_render_frame(
                 image::open(path).unwrap(),
                 width,
                 ascii_string.clone(),
@@ -65,7 +65,7 @@ pub fn play_pre_rendered_dir(
 
             pb.inc(1);
 
-            return image;
+            return img;
         })
         .for_each(|frame| {
             let start = Instant::now();
