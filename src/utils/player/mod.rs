@@ -18,7 +18,7 @@ pub fn play_normal_dir(
     ascii_string: String,
     width: u32,
     colored: bool,
-    frametime: u64,
+    frame_time: u64,
 ) {
     let mut first_frame = false;
     // Calculate time to show frame
@@ -37,7 +37,7 @@ pub fn play_normal_dir(
 
         println!("{}", frame.0);
 
-        while frametime > start.elapsed().as_millis().try_into().unwrap() {}
+        while frame_time > start.elapsed().as_millis().try_into().unwrap() {}
     }
 }
 
@@ -47,7 +47,7 @@ pub fn play_pre_rendered_dir(
     ascii_string: String,
     width: u32,
     colored: bool,
-    frametime: u64,
+    frame_time: u64,
 ) {
     let mut frames: Vec<(String, u32)> = Vec::new();
     let mut first_frame = false;
@@ -80,7 +80,7 @@ pub fn play_pre_rendered_dir(
 
         println!("{}", frame.0);
 
-        while frametime > start.elapsed().as_millis().try_into().unwrap() {}
+        while frame_time > start.elapsed().as_millis().try_into().unwrap() {}
     }
 }
 
@@ -101,17 +101,17 @@ pub fn play_from_directory(
     }
 
     // Calculate time to show frame
-    let frametime: u64;
+    let frame_time: u64;
 
     if let Some(fps) = fps {
-        frametime = (1000f64 / fps) as u64;
+        frame_time = (1000f64 / fps) as u64;
     } else {
-        frametime = 0;
+        frame_time = 0;
     }
 
     if pre_render {
-        return play_pre_rendered_dir(image_paths, ascii_string, width, colored, frametime);
+        return play_pre_rendered_dir(image_paths, ascii_string, width, colored, frame_time);
     }
 
-    play_normal_dir(image_paths, ascii_string, width, colored, frametime)
+    play_normal_dir(image_paths, ascii_string, width, colored, frame_time)
 }
