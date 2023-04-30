@@ -1,7 +1,8 @@
 use crate::par_render_frame;
 use crossterm::{cursor::MoveUp, execute};
+use glob::glob;
 use indicatif::ProgressBar;
-use std::{fs, io::stdout, time::Instant};
+use std::{io::stdout, time::Instant};
 
 /// Reverse ascii string if true
 pub fn generate_ascii_string(ascii_string: String, reversed: bool) -> String {
@@ -91,10 +92,10 @@ pub fn play_from_directory(
     fps: Option<f64>,
     pre_render: bool,
 ) {
-    let image_paths = fs::read_dir(input)
-        .unwrap()
+    let image_paths = glob(&input)
+        .expect("Failed to read glob pattern")
         .into_iter()
-        .map(|path| path.unwrap().path().to_str().unwrap().to_string())
+        .map(|path| path.unwrap().display().to_string())
         .collect();
 
     // Calculate time to show frame

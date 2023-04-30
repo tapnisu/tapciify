@@ -21,6 +21,7 @@ license = "MIT"
 clap = { version = "4.2.1", features = ["derive"] }
 colored = "2.0.0"
 crossterm = "0.26.1"
+glob = "0.3.1"
 image = "0.24.6"
 indicatif = "0.17.3"
 rayon = "1.7.0"

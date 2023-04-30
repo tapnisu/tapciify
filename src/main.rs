@@ -1,6 +1,6 @@
 pub mod utils;
 
-use crate::utils::{generate_ascii_string, play_from_directory, par_render_frame};
+use crate::utils::{generate_ascii_string, par_render_frame, play_from_directory};
 use clap::Parser;
 
 /// CLI tool that can let you view images/videos in terminal as ASCII
@@ -14,9 +14,6 @@ struct Arguments {
     #[clap(short, short, value_parser)]
     width: u32,
 
-    /// Show images from directory (play video)
-    #[clap(short, long, action)]
-    directory: bool,
     /// Fps of showing images from directory (video)
     #[clap(short, long)]
     fps: Option<f64>,
@@ -45,22 +42,12 @@ fn main() {
         args.reverse,
     );
 
-    // Play frames from folder
-    if args.directory {
-        play_from_directory(
-            args.input,
-            args.width,
-            ascii_string,
-            args.colored,
-            args.fps,
-            args.pre_render,
-        )
-    } else {
-        let img = image::open(args.input).unwrap();
-
-        println!(
-            "{}",
-            par_render_frame(img.clone(), args.width, ascii_string, args.colored).0
-        )
-    }
+    play_from_directory(
+        args.input,
+        args.width,
+        ascii_string,
+        args.colored,
+        args.fps,
+        args.pre_render,
+    )
 }
