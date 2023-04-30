@@ -26,7 +26,6 @@ pub fn calc_new_height(new_width: u32, width: u32, height: u32) -> u32 {
 
 /// Converts image to symbols
 pub fn render_frame(img: RgbaImage, width: u32, ascii_string: &str) -> String {
-    // Resize the image, so the terminal can show it
     let rgb: Vec<u8> = img.into_raw();
 
     let mut frame = String::new();
@@ -105,8 +104,7 @@ pub fn cut_image_by_amount(img: DynamicImage, amount: u32) -> Vec<DynamicImage> 
         let part_height = img.height() / amount;
 
         parts.push(
-            img
-                .clone()
+            img.clone()
                 .crop(0, part_height * i, img.width(), part_height),
         );
     }
