@@ -1,6 +1,6 @@
 pub mod utils;
 
-use crate::utils::{generate_ascii_string, par_render_frame, play_from_directory};
+use crate::utils::{generate_ascii_string, par_render_frame, play_frames};
 use clap::Parser;
 
 /// CLI tool that can let you view images/videos in terminal as ASCII
@@ -42,7 +42,7 @@ fn main() {
         args.reverse,
     );
 
-    play_from_directory(
+    play_frames(
         args.input,
         args.width,
         ascii_string,

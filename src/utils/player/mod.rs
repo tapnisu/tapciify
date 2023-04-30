@@ -14,7 +14,7 @@ pub fn generate_ascii_string(ascii_string: String, reversed: bool) -> String {
 }
 
 /// Play frames from directory in real time
-pub fn play_normal_dir(
+pub fn render_frames(
     image_paths: Vec<String>,
     ascii_string: String,
     width: u32,
@@ -44,7 +44,7 @@ pub fn play_normal_dir(
 }
 
 /// Render frames from directory, and then play them
-pub fn play_pre_rendered_dir(
+pub fn play_pre_rendered_frames(
     image_paths: Vec<String>,
     ascii_string: String,
     width: u32,
@@ -85,7 +85,7 @@ pub fn play_pre_rendered_dir(
 }
 
 /// Play frames from directory (switch between pre_render and real time)
-pub fn play_from_directory(
+pub fn play_frames(
     input: String,
     width: u32,
     ascii_string: String,
@@ -109,8 +109,8 @@ pub fn play_from_directory(
     }
 
     if pre_render {
-        return play_pre_rendered_dir(image_paths, ascii_string, width, colored, frame_time);
+        return play_pre_rendered_frames(image_paths, ascii_string, width, colored, frame_time);
     }
 
-    play_normal_dir(image_paths, ascii_string, width, colored, frame_time)
+    render_frames(image_paths, ascii_string, width, colored, frame_time)
 }
