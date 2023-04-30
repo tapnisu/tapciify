@@ -26,7 +26,8 @@ pub fn play_normal_dir(
 
     for image_path in image_paths {
         let start = Instant::now();
-        let img = image::open(image_path).unwrap();
+        let img = image::open(image_path.clone())
+            .expect(format!("Failed to read file: {}", image_path).as_str());
 
         let frame = par_render_frame(img.clone(), width, ascii_string.clone(), colored);
 
