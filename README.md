@@ -18,11 +18,13 @@ cargo install tapciify
 
 ## View image
 
-1. Run: `tapciify -i imageDir -w imageWidth` for image.
+1. Run: `tapciify -i imagePath -w imageWidth` for image.
 
-2. Run: `tapciify -i imageDir -w imageWidth -r` for reversed colors.
+2. Run: `tapciify -i imagePath -w imageWidth -r` for reversed colors.
 
 ## View video
+
+In this example I set framerate to 24 (but you can use any another)
 
 > Requires ffmpeg
 
@@ -35,11 +37,8 @@ mkdir frames; ffmpeg -i badapple.mkv -r 24 frames/%08d.jpeg
 2. Run:
 
 ```bash
-tapciify -i dir -w videoWidth -d -f 24
+tapciify -i frames/* -w videoWidth -f 24
 ```
-
-- `-d` set mode to video
-- `-f 24` - set fps for video
 
 ## Examples
 
