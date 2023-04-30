@@ -1,5 +1,5 @@
 use colored::Colorize;
-use image::{DynamicImage, RgbaImage};
+use image::DynamicImage;
 use rayon::prelude::*;
 use std::cmp::{max, min};
 
@@ -25,17 +25,15 @@ pub fn calc_new_height(new_width: u32, width: u32, height: u32) -> u32 {
 }
 
 /// Converts image to symbols
-pub fn render_frame(img: RgbaImage, width: u32, ascii_string: &str) -> String {
-    let rgb: Vec<u8> = img.into_raw();
-
+pub fn render_frame(img_raw: Vec<u8>, width: u32, ascii_string: &str) -> String {
     let mut frame = String::new();
 
     // Counter for the end of the pixels row
     let mut x = 0;
 
-    for i in (0..(rgb.len() - 1)).step_by(4) {
+    for i in (0..(img_raw.len() - 1)).step_by(4) {
         frame.push(ascii_symbol(
-            get_lightness(rgb[i], rgb[i + 1], rgb[i + 2], rgb[i + 3]),
+            get_lightness(img_raw[i], img_raw[i + 1], img_raw[i + 2], img_raw[i + 3]),
             ascii_string,
         ));
 
@@ -52,22 +50,20 @@ pub fn render_frame(img: RgbaImage, width: u32, ascii_string: &str) -> String {
 }
 
 /// Converts image to symbols and adds colors
-pub fn render_colored_frame(img: RgbaImage, width: u32, ascii_string: &str) -> String {
-    let rgb: Vec<u8> = img.into_raw();
-
+pub fn render_colored_frame(img_raw: Vec<u8>, width: u32, ascii_string: &str) -> String {
     let mut x = 0;
     let mut result: String = "".to_string();
 
-    for i in (0..(rgb.len() - 1)).step_by(4) {
+    for i in (0..(img_raw.len() - 1)).step_by(4) {
         result = format!(
             "{}{}",
             result,
             ascii_symbol(
-                get_lightness(rgb[i], rgb[i + 1], rgb[i + 2], rgb[i + 3]),
+                get_lightness(img_raw[i], img_raw[i + 1], img_raw[i + 2], img_raw[i + 3]),
                 ascii_string,
             )
             .to_string()
-            .truecolor(rgb[i], rgb[i + 1], rgb[i + 2])
+            .truecolor(img_raw[i], img_raw[i + 1], img_raw[i + 2])
         );
 
         x += 1;
@@ -84,15 +80,15 @@ pub fn render_colored_frame(img: RgbaImage, width: u32, ascii_string: &str) -> S
 
 /// Run one of 2 functions depending on arguments
 pub fn render_frame_case(
-    img: RgbaImage,
+    img_raw: Vec<u8>,
     width: u32,
     ascii_string: String,
     colored: bool,
 ) -> String {
     if colored {
-        render_colored_frame(img.clone(), width, &ascii_string)
+        render_colored_frame(img_raw, width, &ascii_string)
     } else {
-        render_frame(img.clone(), width, &ascii_string)
+        render_frame(img_raw, width, &ascii_string)
     }
 }
 
@@ -128,7 +124,14 @@ pub fn par_render_frame(
 
     let outputs: Vec<String> = image_parts
         .par_iter()
-        .map(|part| render_frame_case(part.to_rgba8(), width, ascii_string.clone(), colored))
+        .map(|part| {
+            render_frame_case(
+                part.to_rgba8().as_raw().to_vec(),
+                width,
+                ascii_string.clone(),
+                colored,
+            )
+        })
         .collect();
 
     (outputs.join(""), height)
