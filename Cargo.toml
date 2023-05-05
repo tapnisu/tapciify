@@ -18,7 +18,7 @@ categories = [
 license = "MIT"
 
 [dependencies]
-clap = { version = "4.2.5", features = ["derive"] }
+clap = { version = "4.2.7", features = ["derive"] }
 colored = "2.0.0"
 crossterm = "0.26.1"
 glob = "0.3.1"
