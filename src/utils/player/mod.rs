@@ -26,10 +26,10 @@ pub fn render_frames(
 
     for image_path in image_paths {
         let start = Instant::now();
-        let img = image::open(image_path.clone())
+        let img = image::open(&image_path)
             .expect(format!("Failed to read file: {}", image_path).as_str());
 
-        let frame = par_render_frame(img.clone(), width, ascii_string.clone(), colored);
+        let frame = par_render_frame(img, width, ascii_string.clone(), colored);
 
         if first_frame {
             execute!(stdout(), MoveUp((frame.1 + 1).try_into().unwrap())).unwrap_or_default();

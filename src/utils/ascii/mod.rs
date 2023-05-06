@@ -93,16 +93,13 @@ pub fn render_frame_case(
 }
 
 /// Cut image into parts by amount
-pub fn cut_image_by_amount(img: DynamicImage, amount: u32) -> Vec<DynamicImage> {
+pub fn cut_image_by_amount(mut img: DynamicImage, amount: u32) -> Vec<DynamicImage> {
     let mut parts: Vec<DynamicImage> = vec![];
 
     for i in 0..amount {
         let part_height = img.height() / amount;
 
-        parts.push(
-            img.clone()
-                .crop(0, part_height * i, img.width(), part_height),
-        );
+        parts.push(img.crop(0, part_height * i, img.width(), part_height));
     }
 
     parts
