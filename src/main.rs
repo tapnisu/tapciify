@@ -6,17 +6,17 @@ use clap::Parser;
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
 struct Arguments {
-    /// Input file or directory
-    #[clap(short, short, value_parser, num_args = 1..)]
+    /// Input files to convert to ascii
+    #[clap(short, short, num_args = 1..)]
     input: Vec<String>,
     /// Width of output
     #[clap(short, short, value_parser)]
     width: u32,
 
-    /// Fps of showing images from directory (video)
+    /// Fps for showing images
     #[clap(short, long)]
     fps: Option<f64>,
-    /// Renders before showing (works only for video)
+    /// Render, and then show
     #[clap(short, long, action)]
     pre_render: bool,
 
