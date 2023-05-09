@@ -24,8 +24,8 @@ struct Arguments {
     #[clap(short, long, action)]
     colored: bool,
     /// String to represent lightness of pixels
-    #[clap(short, long)]
-    ascii_string: Option<String>,
+    #[clap(short, long, default_value_t = String::from(" .,:;+*?%S#@"))]
+    ascii_string: String,
     /// Reverse the ascii string
     #[clap(short, long, action)]
     reverse: bool,
@@ -35,11 +35,7 @@ fn main() {
     let args = Arguments::parse();
 
     // String for pixel lightness
-    let ascii_string = generate_ascii_string(
-        args.ascii_string
-            .unwrap_or_else(|| " .,:;+*?%S#@".to_owned()),
-        args.reverse,
-    );
+    let ascii_string = generate_ascii_string(args.ascii_string, args.reverse);
 
     play_frames(
         args.input,
