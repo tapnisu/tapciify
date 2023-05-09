@@ -7,8 +7,8 @@ use clap::Parser;
 #[clap(author, version, about, long_about = None)]
 struct Arguments {
     /// Input file or directory
-    #[clap(short, short, value_parser)]
-    input: String,
+    #[clap(short, short, value_parser, num_args = 1..)]
+    input: Vec<String>,
     /// Width of output
     #[clap(short, short, value_parser)]
     width: u32,

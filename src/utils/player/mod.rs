@@ -1,8 +1,10 @@
 use crate::par_render_frame;
 use crossterm::{cursor::MoveUp, execute};
-use glob::glob;
 use indicatif::ProgressBar;
 use std::{io::stdout, time::Instant};
+
+#[cfg(target_family = "windows")]
+use glob::glob;
 
 /// Reverse ascii string if true
 pub fn generate_ascii_string(ascii_string: String, reversed: bool) -> String {
@@ -84,20 +86,36 @@ pub fn play_pre_rendered_frames(
         });
 }
 
+/// Use glob on windows
+#[cfg(target_family = "windows")]
+pub fn get_paths(input: Vec<String>) -> Vec<String> {
+    input
+        .into_iter()
+        .map(|string| {
+            glob(&string)
+                .expect("Failed to read glob pattern")
+                .map(|path| path.unwrap().display().to_string())
+        })
+        .flatten()
+        .collect()
+}
+
+/// Use glob on windows
+#[cfg(not(target_family = "windows"))]
+pub fn get_paths(input: Vec<String>) -> Vec<String> {
+    input
+}
+
 /// Play frames from directory (switch between pre_render and real time)
 pub fn play_frames(
-    input: String,
+    input: Vec<String>,
     width: u32,
     ascii_string: String,
     colored: bool,
     fps: Option<f64>,
     pre_render: bool,
 ) {
-    let image_paths = glob(&input)
-        .expect("Failed to read glob pattern")
-        .into_iter()
-        .map(|path| path.unwrap().display().to_string())
-        .collect();
+    let image_paths = get_paths(input);
 
     // Calculate time to show frame
     let frame_time: u64;
