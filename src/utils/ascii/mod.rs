@@ -93,6 +93,7 @@ pub fn render_frame_case(
 }
 
 /// Cut image into parts by amount
+#[deprecated(since = "1.1.0", note = "please use `split_image_by_height` instead")]
 pub fn cut_image_by_amount(mut img: DynamicImage, amount: u32) -> Vec<DynamicImage> {
     let mut parts: Vec<DynamicImage> = vec![];
 
@@ -100,6 +101,17 @@ pub fn cut_image_by_amount(mut img: DynamicImage, amount: u32) -> Vec<DynamicIma
         let part_height = img.height() / amount;
 
         parts.push(img.crop(0, part_height * i, img.width(), part_height));
+    }
+
+    parts
+}
+
+/// Splits image by its height
+pub fn split_image_by_height(mut img: DynamicImage) -> Vec<DynamicImage> {
+    let mut parts: Vec<DynamicImage> = vec![];
+
+    for i in 0..img.height() {
+        parts.push(img.crop(0, i, img.width(), 1));
     }
 
     parts
@@ -117,9 +129,7 @@ pub fn par_render_frame(
     let img = resize_image(img, width, height);
 
     // Split into parts, and render them
-    let image_parts = cut_image_by_amount(img.clone(), img.height());
-
-    let outputs: Vec<String> = image_parts
+    let outputs: Vec<String> = split_image_by_height(img.clone())
         .par_iter()
         .map(|part| {
             render_frame_case(
