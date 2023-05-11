@@ -55,21 +55,20 @@ pub fn render_colored_frame(img_raw: Vec<u8>, width: u32, ascii_string: &str) ->
     let mut result: String = "".to_string();
 
     for i in (0..(img_raw.len() - 1)).step_by(4) {
-        result = format!(
-            "{}{}",
-            result,
-            ascii_symbol(
+        result.push_str(
+            &ascii_symbol(
                 get_lightness(img_raw[i], img_raw[i + 1], img_raw[i + 2], img_raw[i + 3]),
                 ascii_string,
             )
             .to_string()
             .truecolor(img_raw[i], img_raw[i + 1], img_raw[i + 2])
+            .to_string(),
         );
 
         x += 1;
 
         if x == width {
-            result = format!("{}\n", result);
+            result.push('\n');
 
             x = 0;
         }
