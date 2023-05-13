@@ -143,12 +143,12 @@ pub fn par_render_frame(
     (outputs.join(""), height)
 }
 
-/// Resize image
+/// Resize image using triangle filter
 pub fn resize_image(img: DynamicImage, new_width: u32, new_height: u32) -> DynamicImage {
     image::DynamicImage::ImageRgba8(image::imageops::resize(
         &img,
         new_width,
         new_height,
-        image::imageops::FilterType::Lanczos3,
+        image::imageops::FilterType::Triangle,
     ))
 }
