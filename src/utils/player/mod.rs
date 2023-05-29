@@ -9,7 +9,7 @@ use glob::glob;
 /// Reverse ascii string if true
 pub fn generate_ascii_string(ascii_string: String, reversed: bool) -> String {
     if reversed {
-        return ascii_string.chars().rev().collect::<String>().to_owned();
+        return ascii_string.chars().rev().collect::<String>();
     }
 
     ascii_string
@@ -29,7 +29,7 @@ pub fn render_frames(
     for image_path in image_paths {
         let start = Instant::now();
         let img = image::open(&image_path)
-            .expect(format!("Failed to read file: {}", image_path).as_str());
+            .unwrap_or_else(|_| panic!("Failed to read file: {}", image_path));
 
         let frame = par_render_frame(img, width, ascii_string.clone(), colored);
 
@@ -69,7 +69,7 @@ pub fn play_pre_rendered_frames(
 
             pb.inc(1);
 
-            return img;
+            img
         })
         .for_each(|frame| {
             let start = Instant::now();
@@ -91,12 +91,11 @@ pub fn play_pre_rendered_frames(
 pub fn get_paths(input: Vec<String>) -> Vec<String> {
     input
         .into_iter()
-        .map(|string| {
+        .flat_map(|string| {
             glob(&string)
                 .expect("Failed to read glob pattern")
                 .map(|path| path.unwrap().display().to_string())
         })
-        .flatten()
         .collect()
 }
 

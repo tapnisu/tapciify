@@ -19,9 +19,11 @@ pub fn ascii_symbol(brightness: f32, ascii_string: &str) -> char {
         .unwrap()
 }
 
+pub const FONT_RATIO: f64 = 11.0f64 / 24.0f64;
+
 /// Calculate height by multiplying width by original aspect ratio
 pub fn calc_new_height(new_width: u32, width: u32, height: u32) -> u32 {
-    (new_width as f64 * (height as f64) / width as f64 * (11.0f64 / 24.0f64)) as u32
+    (new_width as f64 * (height as f64) / width as f64 * FONT_RATIO) as u32
 }
 
 /// Converts image to symbols
@@ -61,8 +63,7 @@ pub fn render_colored_frame(img_raw: Vec<u8>, width: u32, ascii_string: &str) ->
                 ascii_string,
             )
             .to_string()
-            .truecolor(img_raw[i], img_raw[i + 1], img_raw[i + 2])
-            .to_string(),
+            .truecolor(img_raw[i], img_raw[i + 1], img_raw[i + 2]),
         );
 
         x += 1;
@@ -128,7 +129,7 @@ pub fn par_render_frame(
     let img = resize_image(img, width, height);
 
     // Split into parts, and render them
-    let outputs: Vec<String> = split_image_by_height(img.clone())
+    let outputs: Vec<String> = split_image_by_height(img)
         .par_iter()
         .map(|part| {
             render_frame_case(
