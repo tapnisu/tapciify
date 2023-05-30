@@ -52,18 +52,18 @@ pub fn render_frame(img_raw: Vec<u8>, width: u32, ascii_string: &str) -> String 
 }
 
 /// Converts image to symbols and adds colors
-pub fn render_colored_frame(img_raw: Vec<u8>, width: u32, ascii_string: &str) -> String {
+pub fn render_colored_frame(raw: Vec<u8>, width: u32, ascii_string: &str) -> String {
     let mut x = 0;
     let mut result: String = "".to_string();
 
-    for i in (0..(img_raw.len() - 1)).step_by(4) {
+    for i in (0..(raw.len() - 1)).step_by(4) {
         result.push_str(
             &ascii_symbol(
-                get_lightness(img_raw[i], img_raw[i + 1], img_raw[i + 2], img_raw[i + 3]),
+                get_lightness(raw[i], raw[i + 1], raw[i + 2], raw[i + 3]),
                 ascii_string,
             )
             .to_string()
-            .truecolor(img_raw[i], img_raw[i + 1], img_raw[i + 2]),
+            .truecolor(raw[i], raw[i + 1], raw[i + 2]),
         );
 
         x += 1;
@@ -92,31 +92,6 @@ pub fn render_frame_case(
     }
 }
 
-/// Cut image into parts by amount
-#[deprecated(since = "1.1.0", note = "please use `split_image_by_height` instead")]
-pub fn cut_image_by_amount(mut img: DynamicImage, amount: u32) -> Vec<DynamicImage> {
-    let mut parts: Vec<DynamicImage> = vec![];
-
-    for i in 0..amount {
-        let part_height = img.height() / amount;
-
-        parts.push(img.crop(0, part_height * i, img.width(), part_height));
-    }
-
-    parts
-}
-
-/// Splits image by its height
-pub fn split_image_by_height(mut img: DynamicImage) -> Vec<DynamicImage> {
-    let mut parts: Vec<DynamicImage> = vec![];
-
-    for i in 0..img.height() {
-        parts.push(img.crop(0, i, img.width(), 1));
-    }
-
-    parts
-}
-
 /// Render image by parts, and return String
 pub fn par_render_frame(
     img: DynamicImage,
@@ -124,24 +99,40 @@ pub fn par_render_frame(
     ascii_string: String,
     colored: bool,
 ) -> (String, u32) {
-    // Resize image
     let height = calc_new_height(width, img.width(), img.height());
     let img = resize_image(img, width, height);
 
-    // Split into parts, and render them
-    let outputs: Vec<String> = split_image_by_height(img)
-        .par_iter()
-        .map(|part| {
-            render_frame_case(
-                part.to_rgba8().as_raw().to_vec(),
-                width,
-                ascii_string.clone(),
-                colored,
-            )
-        })
-        .collect();
+    // TODO: Rewrite this magic code
+    let ascii = if colored {
+        img.to_rgba8()
+            .as_raw()
+            .to_vec()
+            .par_chunks(4)
+            .map(|raw| {
+                ascii_symbol(get_lightness(raw[0], raw[1], raw[2], raw[3]), &ascii_string)
+                    .to_string()
+                    .truecolor(raw[0], raw[1], raw[2])
+                    .to_string()
+            })
+            .collect::<Vec<String>>()
+            .par_chunks(width.try_into().unwrap())
+            .map(|line| line.join(""))
+            .collect::<Vec<String>>()
+            .join("\n")
+    } else {
+        img.to_rgba8()
+            .as_raw()
+            .to_vec()
+            .par_chunks(4)
+            .map(|raw| ascii_symbol(get_lightness(raw[0], raw[1], raw[2], raw[3]), &ascii_string))
+            .collect::<Vec<char>>()
+            .par_chunks(width.try_into().unwrap())
+            .map(|line| line.to_vec().iter().collect::<String>())
+            .collect::<Vec<String>>()
+            .join("\n")
+    };
 
-    (outputs.join(""), height)
+    (ascii, height)
 }
 
 /// Resize image using triangle filter

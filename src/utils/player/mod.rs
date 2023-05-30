@@ -24,7 +24,6 @@ pub fn render_frames(
     frame_time: u64,
 ) {
     let mut first_frame = false;
-    // Calculate time to show frame
 
     for image_path in image_paths {
         let start = Instant::now();
@@ -34,7 +33,7 @@ pub fn render_frames(
         let frame = par_render_frame(img, width, ascii_string.clone(), colored);
 
         if first_frame {
-            execute!(stdout(), MoveUp((frame.1 + 1).try_into().unwrap())).unwrap_or_default();
+            execute!(stdout(), MoveUp((frame.1).try_into().unwrap())).unwrap_or_default();
         } else {
             first_frame = true;
         }
@@ -75,7 +74,7 @@ pub fn play_pre_rendered_frames(
             let start = Instant::now();
 
             if first_frame {
-                execute!(stdout(), MoveUp((frame.1 + 1).try_into().unwrap())).unwrap_or_default();
+                execute!(stdout(), MoveUp((frame.1).try_into().unwrap())).unwrap_or_default();
             } else {
                 first_frame = true;
             }
