@@ -106,7 +106,6 @@ pub fn par_render_frame(
     let ascii = if colored {
         img.to_rgba8()
             .as_raw()
-            .to_vec()
             .par_chunks(4)
             .map(|raw| {
                 ascii_symbol(get_lightness(raw[0], raw[1], raw[2], raw[3]), &ascii_string)
@@ -122,7 +121,6 @@ pub fn par_render_frame(
     } else {
         img.to_rgba8()
             .as_raw()
-            .to_vec()
             .par_chunks(4)
             .map(|raw| ascii_symbol(get_lightness(raw[0], raw[1], raw[2], raw[3]), &ascii_string))
             .collect::<Vec<char>>()
