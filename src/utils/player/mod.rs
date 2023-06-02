@@ -1,6 +1,7 @@
 use crate::par_render_frame;
 use crossterm::{cursor::MoveUp, execute};
 use indicatif::ProgressBar;
+use rayon::prelude::*;
 use std::{io::stdout, time::Instant};
 
 #[cfg(target_family = "windows")]
@@ -57,7 +58,7 @@ pub fn play_pre_rendered_frames(
     let pb = ProgressBar::new(image_paths.len().try_into().unwrap());
 
     image_paths
-        .into_iter()
+        .par_iter()
         .map(|path| {
             let img = par_render_frame(
                 image::open(path).unwrap(),
@@ -70,6 +71,8 @@ pub fn play_pre_rendered_frames(
 
             img
         })
+        .collect::<Vec<(String, u32)>>()
+        .iter()
         .for_each(|frame| {
             let start = Instant::now();
 
@@ -89,9 +92,9 @@ pub fn play_pre_rendered_frames(
 #[cfg(target_family = "windows")]
 pub fn get_paths(input: Vec<String>) -> Vec<String> {
     input
-        .into_iter()
+        .iter()
         .flat_map(|string| {
-            glob(&string)
+            glob(string)
                 .expect("Failed to read glob pattern")
                 .map(|path| path.unwrap().display().to_string())
         })
