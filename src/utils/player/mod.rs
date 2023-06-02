@@ -115,7 +115,7 @@ pub fn play_frames(
 ) {
     let image_paths = get_paths(input);
 
-    // Calculate time to show frame
+    // Calculate frame time (1 / framerate)
     let frame_time: u64;
 
     if let Some(fps) = fps {

@@ -13,9 +13,9 @@ struct Arguments {
     #[clap(short, short, value_parser)]
     width: u32,
 
-    /// Fps for showing images
+    /// Framerate for showing images
     #[clap(short, long)]
-    fps: Option<f64>,
+    framerate: Option<f64>,
     /// Render, and then show
     #[clap(short, long, action)]
     pre_render: bool,
@@ -42,7 +42,7 @@ fn main() {
         args.width,
         ascii_string,
         args.colored,
-        args.fps,
+        args.framerate,
         args.pre_render,
     )
 }
