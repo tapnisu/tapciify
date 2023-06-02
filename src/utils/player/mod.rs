@@ -92,11 +92,12 @@ pub fn play_pre_rendered_frames(
 #[cfg(target_family = "windows")]
 pub fn get_paths(input: Vec<String>) -> Vec<String> {
     input
-        .iter()
-        .flat_map(|string| {
-            glob(string)
+        .par_iter()
+        .flat_map(|glob_p| {
+            glob(glob_p)
                 .expect("Failed to read glob pattern")
                 .map(|path| path.unwrap().display().to_string())
+                .collect::<Vec<String>>()
         })
         .collect()
 }
