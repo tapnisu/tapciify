@@ -6,7 +6,7 @@
 
 ## Requirements
 
-1. CC linker (Microsoft Visual Studio with C++ Support) (Linux - gcc)
+1. CC linker (Windows - Microsoft Visual Studio with C++ Support) (Linux - gcc)
 
 2. [Rust](https://www.rust-lang.org/tools/install)
 
