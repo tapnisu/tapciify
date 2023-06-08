@@ -120,13 +120,11 @@ pub fn play_frames(
     let image_paths = get_paths(input);
 
     // Calculate frame time (1 / framerate)
-    let frame_time: u64;
-
-    if let Some(fps) = fps {
-        frame_time = (1000f64 / fps) as u64;
+    let frame_time = if let Some(fps) = fps {
+        (1000f64 / fps) as u64
     } else {
-        frame_time = 0;
-    }
+        0
+    };
 
     if pre_render {
         return play_pre_rendered_frames(image_paths, ascii_string, width, colored, frame_time);
