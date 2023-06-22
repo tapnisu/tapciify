@@ -19,7 +19,7 @@ pub fn ascii_symbol(brightness: f32, ascii_string: &str) -> char {
         .unwrap()
 }
 
-pub const FONT_RATIO: f64 = 11.0f64 / 24.0f64;
+pub const FONT_RATIO: f64 = 11.0 / 24.0;
 
 /// Calculate height by multiplying width by original aspect ratio
 pub fn calc_new_height(new_width: u32, width: u32, height: u32) -> u32 {
