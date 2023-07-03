@@ -27,6 +27,7 @@ pub fn calc_new_height(new_width: u32, width: u32, height: u32) -> u32 {
 }
 
 /// Converts image to symbols
+#[deprecated(since = "1.2.0", note = "please use `par_render_frame` instead")]
 pub fn render_frame(img_raw: Vec<u8>, width: u32, ascii_string: &str) -> String {
     let mut frame = String::new();
 
@@ -52,6 +53,7 @@ pub fn render_frame(img_raw: Vec<u8>, width: u32, ascii_string: &str) -> String 
 }
 
 /// Converts image to symbols and adds colors
+#[deprecated(since = "1.2.0", note = "please use `par_render_frame` instead")]
 pub fn render_colored_frame(raw: Vec<u8>, width: u32, ascii_string: &str) -> String {
     let mut x = 0;
     let mut result: String = "".to_string();
@@ -79,6 +81,8 @@ pub fn render_colored_frame(raw: Vec<u8>, width: u32, ascii_string: &str) -> Str
 }
 
 /// Run one of 2 functions depending on arguments
+#[deprecated(since = "1.2.0", note = "please use `par_render_frame` instead")]
+#[allow(deprecated)]
 pub fn render_frame_case(
     img_raw: Vec<u8>,
     width: u32,
