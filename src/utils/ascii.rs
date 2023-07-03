@@ -100,40 +100,34 @@ pub fn par_render_frame(
     colored: bool,
 ) -> (String, u32) {
     let height = calc_new_height(width, img.width(), img.height());
-    let img = resize_image(img, width, height);
+    let rgba = img
+        .resize(width, height, image::imageops::FilterType::Triangle)
+        .to_rgba8();
+    let chunks = rgba.as_raw().par_chunks(4);
 
-    // TODO: Rewrite this magic code
-    let ascii = if colored {
-        img.to_rgba8()
-            .as_raw()
-            .par_chunks(4)
-            .map(|raw| {
+    let ascii = chunks
+        .map(|raw| {
+            if colored {
                 ascii_symbol(get_lightness(raw[0], raw[1], raw[2], raw[3]), &ascii_string)
                     .to_string()
                     .truecolor(raw[0], raw[1], raw[2])
                     .to_string()
-            })
-            .collect::<Vec<String>>()
-            .par_chunks(width.try_into().unwrap())
-            .map(|line| line.join(""))
-            .collect::<Vec<String>>()
-            .join("\n")
-    } else {
-        img.to_rgba8()
-            .as_raw()
-            .par_chunks(4)
-            .map(|raw| ascii_symbol(get_lightness(raw[0], raw[1], raw[2], raw[3]), &ascii_string))
-            .collect::<Vec<char>>()
-            .par_chunks(width.try_into().unwrap())
-            .map(|line| line.to_vec().iter().collect::<String>())
-            .collect::<Vec<String>>()
-            .join("\n")
-    };
+            } else {
+                ascii_symbol(get_lightness(raw[0], raw[1], raw[2], raw[3]), &ascii_string)
+                    .to_string()
+            }
+        })
+        .collect::<Vec<String>>()
+        .par_chunks(width.try_into().unwrap())
+        .map(|line| line.join(""))
+        .collect::<Vec<String>>()
+        .join("\n");
 
     (ascii, height)
 }
 
 /// Resize image using triangle filter
+#[deprecated(since = "1.2.0")]
 pub fn resize_image(img: DynamicImage, new_width: u32, new_height: u32) -> DynamicImage {
     image::DynamicImage::ImageRgba8(image::imageops::resize(
         &img,
