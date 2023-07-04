@@ -105,7 +105,7 @@ pub fn par_render_frame(
 ) -> (String, u32) {
     let height = calc_new_height(width, img.width(), img.height());
     let rgba = img
-        .resize(width, height, image::imageops::FilterType::Triangle)
+        .resize_exact(width, height, image::imageops::FilterType::Triangle)
         .to_rgba8();
     let chunks = rgba.as_raw().par_chunks(4);
 
