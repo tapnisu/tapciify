@@ -1,6 +1,5 @@
+use crate::ascii::{DEFAULT_ASCII_STRING, DEFAULT_FONT_RATIO};
 use clap::Parser;
-
-use crate::ascii::DEFAULT_ASCII_STRING;
 
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
@@ -28,4 +27,7 @@ pub struct Arguments {
     /// Reverse the ascii string
     #[clap(short, long, action)]
     pub reverse: bool,
+    /// Font ratio: width / height
+    #[clap(long="ratio", default_value_t = DEFAULT_FONT_RATIO)]
+    pub font_ratio: f64,
 }

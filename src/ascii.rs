@@ -4,7 +4,7 @@ use rayon::prelude::*;
 use std::cmp::{max, min};
 
 pub const DEFAULT_ASCII_STRING: &str = " .,:;+*?%S#@";
-pub const FONT_RATIO: f64 = 11.0 / 24.0;
+pub const DEFAULT_FONT_RATIO: f64 = 11.0 / 24.0;
 
 /// Get brightness of pixel from 0.0 to 1.0 (calculated by HSL's lightness formula)
 pub fn get_lightness(r: u8, g: u8, b: u8, a: u8) -> f32 {
@@ -23,8 +23,8 @@ pub fn ascii_symbol(brightness: f32, ascii_string: &str) -> char {
 }
 
 /// Calculate height by multiplying width by original aspect ratio
-pub fn calc_new_height(new_width: u32, width: u32, height: u32) -> u32 {
-    (new_width as f64 * (height as f64) / width as f64 * FONT_RATIO) as u32
+pub fn calc_new_height(new_width: u32, width: u32, height: u32, font_ratio: f64) -> u32 {
+    (new_width as f64 * (height as f64) / width as f64 * font_ratio) as u32
 }
 
 /// Converts image to symbols
@@ -103,8 +103,9 @@ pub fn par_render_frame(
     width: u32,
     ascii_string: &str,
     colored: bool,
+    font_ratio: f64,
 ) -> (String, u32) {
-    let height = calc_new_height(width, img.width(), img.height());
+    let height = calc_new_height(width, img.width(), img.height(), font_ratio);
     let rgba = img
         .resize_exact(width, height, image::imageops::FilterType::Triangle)
         .to_rgba8();
@@ -135,14 +136,14 @@ pub fn par_render_frame(
 fn renders_frame() {
     let img = image::open("./assets/logo.png").unwrap();
 
-    par_render_frame(img, 128, DEFAULT_ASCII_STRING, false);
+    par_render_frame(img, 128, DEFAULT_ASCII_STRING, false, DEFAULT_FONT_RATIO);
 }
 
 #[test]
 fn renders_colored_frame() {
     let img = image::open("./assets/logo.png").unwrap();
 
-    par_render_frame(img, 128, DEFAULT_ASCII_STRING, true);
+    par_render_frame(img, 128, DEFAULT_ASCII_STRING, true, DEFAULT_FONT_RATIO);
 }
 
 /// Resize image using triangle filter
