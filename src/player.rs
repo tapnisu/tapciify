@@ -1,4 +1,3 @@
-use crate::par_render_frame;
 use crossterm::{cursor::MoveUp, execute};
 use indicatif::ProgressBar;
 use rayon::prelude::*;
@@ -6,6 +5,8 @@ use std::{io::stdout, time::Instant};
 
 #[cfg(target_family = "windows")]
 use glob::glob;
+
+use crate::ascii::par_render_frame;
 
 /// Reverse ascii string if true
 pub fn generate_ascii_string(ascii_string: String, reversed: bool) -> String {
@@ -131,4 +132,16 @@ pub fn play_frames(
     }
 
     render_frames(image_paths, ascii_string, width, colored, frame_time)
+}
+
+#[test]
+fn plays_frames() {
+    play_frames(
+        vec!["./assets/logo.png".to_string()],
+        128,
+        " .,:;+*?%S#@".to_owned(),
+        true,
+        None,
+        false,
+    );
 }

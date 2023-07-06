@@ -3,6 +3,8 @@ use image::DynamicImage;
 use rayon::prelude::*;
 use std::cmp::{max, min};
 
+pub const DEFAULT_ASCII_STRING: &str = " .,:;+*?%S#@";
+
 /// Get brightness of pixel from 0.0 to 1.0 (calculated by HSL's lightness formula)
 pub fn get_lightness(r: u8, g: u8, b: u8, a: u8) -> f32 {
     let max = max(max(r, g), b);
@@ -128,6 +130,14 @@ pub fn par_render_frame(
         .join("\n");
 
     (ascii, height)
+}
+
+#[test]
+fn renders_frame() {
+    let img = image::open("./assets/logo.png").unwrap();
+
+    par_render_frame(img.clone(), 128, DEFAULT_ASCII_STRING.to_string(), false);
+    par_render_frame(img, 128, DEFAULT_ASCII_STRING.to_string(), true);
 }
 
 /// Resize image using triangle filter
