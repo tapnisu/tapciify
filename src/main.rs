@@ -7,7 +7,7 @@ use clap::Parser;
 #[clap(author, version, about, long_about = None)]
 struct Arguments {
     /// Input files to convert to ascii
-    #[clap(short, short, num_args = 1..)]
+    #[clap(short, short, num_args = 1.., required=true)]
     input: Vec<String>,
     /// Width of output
     #[clap(short, short, value_parser)]
