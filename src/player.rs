@@ -1,8 +1,10 @@
-use crate::ascii::par_render_frame;
+use crate::ascii::image_to_ascii;
 use crossterm::{cursor::MoveUp, execute};
 use indicatif::ProgressBar;
-use rayon::prelude::*;
 use std::{io::stdout, time::Instant};
+
+#[cfg(feature = "parallelism")]
+use rayon::prelude::*;
 
 #[cfg(target_family = "windows")]
 use glob::glob;
@@ -32,7 +34,7 @@ pub fn render_frames(
         let img = image::open(&image_path)
             .unwrap_or_else(|_| panic!("Failed to read file: {}", image_path));
 
-        let frame = par_render_frame(img, width, ascii_string, colored, font_ratio);
+        let frame = image_to_ascii(img, width, ascii_string, colored, font_ratio);
 
         if first_frame {
             execute!(stdout(), MoveUp((frame.1).try_into().unwrap())).unwrap_or_default();
@@ -46,23 +48,20 @@ pub fn render_frames(
     }
 }
 
-/// Render frames from directory, and then play them
-pub fn play_pre_rendered_frames(
+#[cfg(feature = "parallelism")]
+fn pre_render(
     image_paths: Vec<String>,
     ascii_string: &str,
     width: u32,
     colored: bool,
-    frame_time: u64,
     font_ratio: f64,
-) {
-    let mut first_frame = false;
-
+) -> Vec<(String, u32)> {
     let pb = ProgressBar::new(image_paths.len().try_into().unwrap());
 
     image_paths
         .par_iter()
         .map(|path| {
-            let img = par_render_frame(
+            let img = image_to_ascii(
                 image::open(path).unwrap(),
                 width,
                 ascii_string,
@@ -75,6 +74,48 @@ pub fn play_pre_rendered_frames(
             img
         })
         .collect::<Vec<(String, u32)>>()
+}
+
+#[cfg(not(feature = "parallelism"))]
+fn pre_render(
+    image_paths: Vec<String>,
+    ascii_string: &str,
+    width: u32,
+    colored: bool,
+    font_ratio: f64,
+) -> Vec<(String, u32)> {
+    let pb = ProgressBar::new(image_paths.len().try_into().unwrap());
+
+    image_paths
+        .iter()
+        .map(|path| {
+            let img = image_to_ascii(
+                image::open(path).unwrap(),
+                width,
+                ascii_string,
+                colored,
+                font_ratio,
+            );
+
+            pb.inc(1);
+
+            img
+        })
+        .collect::<Vec<(String, u32)>>()
+}
+
+/// Render frames from directory, and then play them
+pub fn play_pre_rendered_frames(
+    image_paths: Vec<String>,
+    ascii_string: &str,
+    width: u32,
+    colored: bool,
+    frame_time: u64,
+    font_ratio: f64,
+) {
+    let mut first_frame = false;
+
+    pre_render(image_paths, ascii_string, width, colored, font_ratio)
         .iter()
         .for_each(|frame| {
             let start = Instant::now();
@@ -93,9 +134,25 @@ pub fn play_pre_rendered_frames(
 
 /// Use glob on windows
 #[cfg(target_family = "windows")]
+#[cfg(feature = "parallelism")]
 pub fn get_paths(input: Vec<String>) -> Vec<String> {
     input
         .par_iter()
+        .flat_map(|glob_p| {
+            glob(glob_p)
+                .expect("Failed to read glob pattern")
+                .map(|path| path.unwrap().display().to_string())
+                .collect::<Vec<String>>()
+        })
+        .collect()
+}
+
+/// Use glob on windows
+#[cfg(target_family = "windows")]
+#[cfg(not(feature = "parallelism"))]
+pub fn get_paths(input: Vec<String>) -> Vec<String> {
+    input
+        .iter()
         .flat_map(|glob_p| {
             glob(glob_p)
                 .expect("Failed to read glob pattern")

@@ -22,7 +22,12 @@ colored = "2"
 crossterm = "0.26"
 image = "0.24"
 indicatif = "0.17"
-rayon = "1"
+rayon = { version = "1", optional = true }
 
 [target.'cfg(windows)'.dependencies]
-glob = "0.3.1"
+glob = "0.3"
+
+[features]
+default = ["full"]
+full = ["parallelism"]
+parallelism = ["dep:rayon"]
