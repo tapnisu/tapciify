@@ -1,3 +1,4 @@
+use crate::ascii::par_render_frame;
 use crossterm::{cursor::MoveUp, execute};
 use indicatif::ProgressBar;
 use rayon::prelude::*;
@@ -5,8 +6,6 @@ use std::{io::stdout, time::Instant};
 
 #[cfg(target_family = "windows")]
 use glob::glob;
-
-use crate::ascii::par_render_frame;
 
 /// Reverse ascii string if true
 pub fn generate_ascii_string(ascii_string: String, reversed: bool) -> String {
@@ -24,6 +23,7 @@ pub fn render_frames(
     width: u32,
     colored: bool,
     frame_time: u64,
+    font_ratio: f64,
 ) {
     let mut first_frame = false;
 
@@ -32,7 +32,7 @@ pub fn render_frames(
         let img = image::open(&image_path)
             .unwrap_or_else(|_| panic!("Failed to read file: {}", image_path));
 
-        let frame = par_render_frame(img, width, ascii_string, colored);
+        let frame = par_render_frame(img, width, ascii_string, colored, font_ratio);
 
         if first_frame {
             execute!(stdout(), MoveUp((frame.1).try_into().unwrap())).unwrap_or_default();
@@ -53,6 +53,7 @@ pub fn play_pre_rendered_frames(
     width: u32,
     colored: bool,
     frame_time: u64,
+    font_ratio: f64,
 ) {
     let mut first_frame = false;
 
@@ -61,7 +62,13 @@ pub fn play_pre_rendered_frames(
     image_paths
         .par_iter()
         .map(|path| {
-            let img = par_render_frame(image::open(path).unwrap(), width, ascii_string, colored);
+            let img = par_render_frame(
+                image::open(path).unwrap(),
+                width,
+                ascii_string,
+                colored,
+                font_ratio,
+            );
 
             pb.inc(1);
 
@@ -112,6 +119,7 @@ pub fn play_frames(
     colored: bool,
     fps: Option<f64>,
     pre_render: bool,
+    font_ratio: f64,
 ) {
     let image_paths = get_paths(input);
 
@@ -123,14 +131,30 @@ pub fn play_frames(
     };
 
     if pre_render {
-        return play_pre_rendered_frames(image_paths, ascii_string, width, colored, frame_time);
+        return play_pre_rendered_frames(
+            image_paths,
+            ascii_string,
+            width,
+            colored,
+            frame_time,
+            font_ratio,
+        );
     }
 
-    render_frames(image_paths, ascii_string, width, colored, frame_time)
+    render_frames(
+        image_paths,
+        ascii_string,
+        width,
+        colored,
+        frame_time,
+        font_ratio,
+    )
 }
 
 #[test]
 fn plays_frames() {
+    use crate::ascii::DEFAULT_FONT_RATIO;
+
     play_frames(
         vec!["./assets/logo.png".to_string()],
         128,
@@ -138,5 +162,6 @@ fn plays_frames() {
         true,
         None,
         false,
+        DEFAULT_FONT_RATIO,
     );
 }

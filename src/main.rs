@@ -19,5 +19,6 @@ fn main() {
         args.colored,
         args.framerate,
         args.pre_render,
+        args.font_ratio
     )
 }
