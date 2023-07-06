@@ -6,7 +6,7 @@ use std::cmp::{max, min};
 pub const DEFAULT_ASCII_STRING: &str = " .,:;+*?%S#@";
 pub const DEFAULT_FONT_RATIO: f64 = 11.0 / 24.0;
 
-/// Get brightness of pixel from 0.0 to 1.0 (calculated by HSL's lightness formula)
+/// Calculate lightness (from 0.0 to 1.0)
 pub fn get_lightness(r: u8, g: u8, b: u8, a: u8) -> f32 {
     let max = max(max(r, g), b);
     let min = min(min(r, g), b);
@@ -28,15 +28,12 @@ pub fn calc_new_height(new_width: u32, width: u32, height: u32, font_ratio: f64)
 }
 
 /// Converts image to symbols
-#[deprecated(since = "1.2.0", note = "please use `par_render_frame` instead")]
 pub fn render_frame(img_raw: Vec<u8>, width: u32, ascii_string: &str) -> String {
-    let mut frame = String::new();
-
-    // Counter for the end of the pixels row
+    let mut result = String::new();
     let mut x = 0;
 
     for i in (0..(img_raw.len() - 1)).step_by(4) {
-        frame.push(ascii_symbol(
+        result.push(ascii_symbol(
             get_lightness(img_raw[i], img_raw[i + 1], img_raw[i + 2], img_raw[i + 3]),
             ascii_string,
         ));
@@ -44,29 +41,28 @@ pub fn render_frame(img_raw: Vec<u8>, width: u32, ascii_string: &str) -> String 
         x += 1;
 
         if x == width {
-            frame.push('\n');
+            result.push('\n');
 
             x = 0;
         }
     }
 
-    frame
+    result
 }
 
 /// Converts image to symbols and adds colors
-#[deprecated(since = "1.2.0", note = "please use `par_render_frame` instead")]
-pub fn render_colored_frame(raw: Vec<u8>, width: u32, ascii_string: &str) -> String {
+pub fn render_colored_frame(img_raw: Vec<u8>, width: u32, ascii_string: &str) -> String {
+    let mut result = String::new();
     let mut x = 0;
-    let mut result: String = "".to_string();
 
-    for i in (0..(raw.len() - 1)).step_by(4) {
+    for i in (0..(img_raw.len() - 1)).step_by(4) {
         result.push_str(
             &ascii_symbol(
-                get_lightness(raw[i], raw[i + 1], raw[i + 2], raw[i + 3]),
+                get_lightness(img_raw[i], img_raw[i + 1], img_raw[i + 2], img_raw[i + 3]),
                 ascii_string,
             )
             .to_string()
-            .truecolor(raw[i], raw[i + 1], raw[i + 2]),
+            .truecolor(img_raw[i], img_raw[i + 1], img_raw[i + 2]),
         );
 
         x += 1;
@@ -82,23 +78,8 @@ pub fn render_colored_frame(raw: Vec<u8>, width: u32, ascii_string: &str) -> Str
 }
 
 /// Run one of 2 functions depending on arguments
-#[deprecated(since = "1.2.0", note = "please use `par_render_frame` instead")]
-#[allow(deprecated)]
-pub fn render_frame_case(
-    img_raw: Vec<u8>,
-    width: u32,
-    ascii_string: String,
-    colored: bool,
-) -> String {
-    if colored {
-        render_colored_frame(img_raw, width, &ascii_string)
-    } else {
-        render_frame(img_raw, width, &ascii_string)
-    }
-}
-
-/// Render image by parts, and return String
-pub fn par_render_frame(
+#[cfg(not(feature = "parallelism"))]
+pub fn image_to_ascii(
     img: DynamicImage,
     width: u32,
     ascii_string: &str,
@@ -106,10 +87,33 @@ pub fn par_render_frame(
     font_ratio: f64,
 ) -> (String, u32) {
     let height = calc_new_height(width, img.width(), img.height(), font_ratio);
-    let rgba = img
+    let img_raw = img
+        .resize_exact(width, height, image::imageops::FilterType::Triangle)
+        .to_rgba8()
+        .as_raw()
+        .to_owned();
+
+    if colored {
+        (render_colored_frame(img_raw, width, ascii_string), height)
+    } else {
+        (render_frame(img_raw, width, ascii_string), height)
+    }
+}
+
+/// Converts image to text
+#[cfg(feature = "parallelism")]
+pub fn image_to_ascii(
+    img: DynamicImage,
+    width: u32,
+    ascii_string: &str,
+    colored: bool,
+    font_ratio: f64,
+) -> (String, u32) {
+    let height = calc_new_height(width, img.width(), img.height(), font_ratio);
+    let img_buffer = img
         .resize_exact(width, height, image::imageops::FilterType::Triangle)
         .to_rgba8();
-    let chunks = rgba.as_raw().par_chunks(4);
+    let chunks = img_buffer.as_raw().par_chunks(4);
 
     let ascii = chunks
         .map(|raw| {
@@ -136,23 +140,12 @@ pub fn par_render_frame(
 fn renders_frame() {
     let img = image::open("./assets/logo.png").unwrap();
 
-    par_render_frame(img, 128, DEFAULT_ASCII_STRING, false, DEFAULT_FONT_RATIO);
+    image_to_ascii(img, 128, DEFAULT_ASCII_STRING, false, DEFAULT_FONT_RATIO);
 }
 
 #[test]
 fn renders_colored_frame() {
     let img = image::open("./assets/logo.png").unwrap();
 
-    par_render_frame(img, 128, DEFAULT_ASCII_STRING, true, DEFAULT_FONT_RATIO);
-}
-
-/// Resize image using triangle filter
-#[deprecated(since = "1.2.0")]
-pub fn resize_image(img: DynamicImage, new_width: u32, new_height: u32) -> DynamicImage {
-    image::DynamicImage::ImageRgba8(image::imageops::resize(
-        &img,
-        new_width,
-        new_height,
-        image::imageops::FilterType::Triangle,
-    ))
+    image_to_ascii(img, 128, DEFAULT_ASCII_STRING, true, DEFAULT_FONT_RATIO);
 }

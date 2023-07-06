@@ -1,4 +1,4 @@
-use crate::ascii::par_render_frame;
+use crate::ascii::image_to_ascii;
 use crossterm::{cursor::MoveUp, execute};
 use indicatif::ProgressBar;
 use rayon::prelude::*;
@@ -32,7 +32,7 @@ pub fn render_frames(
         let img = image::open(&image_path)
             .unwrap_or_else(|_| panic!("Failed to read file: {}", image_path));
 
-        let frame = par_render_frame(img, width, ascii_string, colored, font_ratio);
+        let frame = image_to_ascii(img, width, ascii_string, colored, font_ratio);
 
         if first_frame {
             execute!(stdout(), MoveUp((frame.1).try_into().unwrap())).unwrap_or_default();
@@ -62,7 +62,7 @@ pub fn play_pre_rendered_frames(
     image_paths
         .par_iter()
         .map(|path| {
-            let img = par_render_frame(
+            let img = image_to_ascii(
                 image::open(path).unwrap(),
                 width,
                 ascii_string,
