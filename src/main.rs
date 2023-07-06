@@ -15,7 +15,7 @@ fn main() {
     play_frames(
         args.input,
         args.width,
-        ascii_string,
+        ascii_string.as_str(),
         args.colored,
         args.framerate,
         args.pre_render,

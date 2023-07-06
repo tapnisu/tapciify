@@ -20,7 +20,7 @@ pub fn generate_ascii_string(ascii_string: String, reversed: bool) -> String {
 /// Play frames from directory in real time
 pub fn render_frames(
     image_paths: Vec<String>,
-    ascii_string: String,
+    ascii_string: &str,
     width: u32,
     colored: bool,
     frame_time: u64,
@@ -32,7 +32,7 @@ pub fn render_frames(
         let img = image::open(&image_path)
             .unwrap_or_else(|_| panic!("Failed to read file: {}", image_path));
 
-        let frame = par_render_frame(img, width, ascii_string.clone(), colored);
+        let frame = par_render_frame(img, width, ascii_string, colored);
 
         if first_frame {
             execute!(stdout(), MoveUp((frame.1).try_into().unwrap())).unwrap_or_default();
@@ -49,7 +49,7 @@ pub fn render_frames(
 /// Render frames from directory, and then play them
 pub fn play_pre_rendered_frames(
     image_paths: Vec<String>,
-    ascii_string: String,
+    ascii_string: &str,
     width: u32,
     colored: bool,
     frame_time: u64,
@@ -61,12 +61,7 @@ pub fn play_pre_rendered_frames(
     image_paths
         .par_iter()
         .map(|path| {
-            let img = par_render_frame(
-                image::open(path).unwrap(),
-                width,
-                ascii_string.clone(),
-                colored,
-            );
+            let img = par_render_frame(image::open(path).unwrap(), width, ascii_string, colored);
 
             pb.inc(1);
 
@@ -113,7 +108,7 @@ pub fn get_paths(input: Vec<String>) -> Vec<String> {
 pub fn play_frames(
     input: Vec<String>,
     width: u32,
-    ascii_string: String,
+    ascii_string: &str,
     colored: bool,
     fps: Option<f64>,
     pre_render: bool,
@@ -139,7 +134,7 @@ fn plays_frames() {
     play_frames(
         vec!["./assets/logo.png".to_string()],
         128,
-        " .,:;+*?%S#@".to_owned(),
+        " .,:;+*?%S#@",
         true,
         None,
         false,

@@ -4,6 +4,7 @@ use rayon::prelude::*;
 use std::cmp::{max, min};
 
 pub const DEFAULT_ASCII_STRING: &str = " .,:;+*?%S#@";
+pub const FONT_RATIO: f64 = 11.0 / 24.0;
 
 /// Get brightness of pixel from 0.0 to 1.0 (calculated by HSL's lightness formula)
 pub fn get_lightness(r: u8, g: u8, b: u8, a: u8) -> f32 {
@@ -20,8 +21,6 @@ pub fn ascii_symbol(brightness: f32, ascii_string: &str) -> char {
         .nth(((ascii_string.chars().count() - 1) as f32 * brightness) as usize)
         .unwrap()
 }
-
-pub const FONT_RATIO: f64 = 11.0 / 24.0;
 
 /// Calculate height by multiplying width by original aspect ratio
 pub fn calc_new_height(new_width: u32, width: u32, height: u32) -> u32 {
@@ -102,7 +101,7 @@ pub fn render_frame_case(
 pub fn par_render_frame(
     img: DynamicImage,
     width: u32,
-    ascii_string: String,
+    ascii_string: &str,
     colored: bool,
 ) -> (String, u32) {
     let height = calc_new_height(width, img.width(), img.height());
@@ -114,12 +113,12 @@ pub fn par_render_frame(
     let ascii = chunks
         .map(|raw| {
             if colored {
-                ascii_symbol(get_lightness(raw[0], raw[1], raw[2], raw[3]), &ascii_string)
+                ascii_symbol(get_lightness(raw[0], raw[1], raw[2], raw[3]), ascii_string)
                     .to_string()
                     .truecolor(raw[0], raw[1], raw[2])
                     .to_string()
             } else {
-                ascii_symbol(get_lightness(raw[0], raw[1], raw[2], raw[3]), &ascii_string)
+                ascii_symbol(get_lightness(raw[0], raw[1], raw[2], raw[3]), ascii_string)
                     .to_string()
             }
         })
@@ -136,8 +135,14 @@ pub fn par_render_frame(
 fn renders_frame() {
     let img = image::open("./assets/logo.png").unwrap();
 
-    par_render_frame(img.clone(), 128, DEFAULT_ASCII_STRING.to_string(), false);
-    par_render_frame(img, 128, DEFAULT_ASCII_STRING.to_string(), true);
+    par_render_frame(img, 128, DEFAULT_ASCII_STRING, false);
+}
+
+#[test]
+fn renders_colored_frame() {
+    let img = image::open("./assets/logo.png").unwrap();
+
+    par_render_frame(img, 128, DEFAULT_ASCII_STRING, true);
 }
 
 /// Resize image using triangle filter
