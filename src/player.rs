@@ -49,6 +49,7 @@ pub fn render_frames(
     }
 }
 
+/// Convert paths to of ascii images
 #[cfg(feature = "parallelism")]
 fn pre_render(
     image_paths: Vec<String>,
@@ -77,6 +78,7 @@ fn pre_render(
         .collect::<Vec<AsciiImage>>()
 }
 
+/// Convert paths to of ascii images
 #[cfg(not(feature = "parallelism"))]
 fn pre_render(
     image_paths: Vec<String>,
@@ -105,7 +107,7 @@ fn pre_render(
         .collect::<Vec<AsciiImage>>()
 }
 
-/// Render frames from directory, and then play them
+/// Convert paths to of ascii images and play them
 pub fn play_pre_rendered_frames(
     image_paths: Vec<String>,
     ascii_string: &str,
@@ -134,7 +136,7 @@ pub fn play_pre_rendered_frames(
         });
 }
 
-/// Use glob on windows
+/// Add glob support for paths parsing on windows
 #[cfg(target_family = "windows")]
 #[cfg(feature = "parallelism")]
 pub fn get_paths(input: Vec<String>) -> Vec<String> {
@@ -149,7 +151,7 @@ pub fn get_paths(input: Vec<String>) -> Vec<String> {
         .collect()
 }
 
-/// Use glob on windows
+/// Add glob support for paths parsing on windows
 #[cfg(target_family = "windows")]
 #[cfg(not(feature = "parallelism"))]
 pub fn get_paths(input: Vec<String>) -> Vec<String> {
@@ -164,13 +166,13 @@ pub fn get_paths(input: Vec<String>) -> Vec<String> {
         .collect()
 }
 
-/// Use glob on windows
+/// Add glob support for paths parsing on windows
 #[cfg(not(target_family = "windows"))]
 pub fn get_paths(input: Vec<String>) -> Vec<String> {
     input
 }
 
-/// Play frames from directory (switch between pre_render and real time)
+/// Play array of images as ascii images
 pub fn play_frames(
     input: Vec<String>,
     width: u32,
@@ -182,7 +184,7 @@ pub fn play_frames(
 ) {
     let image_paths = get_paths(input);
 
-    // Calculate frame time (1 / framerate)
+    // Calculate frame time (1 / frame rate)
     let frame_time = if let Some(fps) = fps {
         (1000f64 / fps) as u64
     } else {
