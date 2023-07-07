@@ -16,6 +16,14 @@ pub fn get_lightness(r: u8, g: u8, b: u8, a: u8) -> f32 {
     ((max as f32 + min as f32) * a as f32) / 130050f32 // 130050 - we need to divide by 512, and divide by 255 from alpha
 }
 
+#[test]
+fn calculates_lightness() {
+    assert_eq!(get_lightness(255, 255, 255, 255), 1.0);
+    assert_eq!(get_lightness(0, 0, 0, 255), 0.0);
+    assert_eq!(get_lightness(255, 255, 255, 0), 0.0);
+    assert_eq!(get_lightness(255, 255, 255, 51), 0.2);
+}
+
 /// Convert lightness of pixel to symbol
 pub fn ascii_symbol(brightness: f32, ascii_string: &str) -> char {
     ascii_string
@@ -24,9 +32,35 @@ pub fn ascii_symbol(brightness: f32, ascii_string: &str) -> char {
         .unwrap()
 }
 
+#[test]
+fn converts_to_ascii() {
+    assert_eq!(ascii_symbol(1.0, " *#"), '#');
+    assert_eq!(ascii_symbol(0.5, " *#"), '*');
+    assert_eq!(ascii_symbol(0.0, " *#"), ' ');
+}
+
 /// Calculate height by multiplying width by original aspect ratio
 pub fn calc_new_height(new_width: u32, width: u32, height: u32, font_ratio: f64) -> u32 {
     (new_width as f64 * (height as f64) / width as f64 * font_ratio) as u32
+}
+
+/// Ascii image conversion result
+pub struct AsciiImage {
+    pub result: String,
+    pub width: u32,
+    pub height: u32,
+    pub colored: bool,
+}
+
+impl AsciiImage {
+    pub fn new(result: String, width: u32, height: u32, colored: bool) -> Self {
+        Self {
+            result,
+            width,
+            height,
+            colored,
+        }
+    }
 }
 
 /// Convert image to text
@@ -37,7 +71,7 @@ pub fn image_to_ascii(
     ascii_string: &str,
     colored: bool,
     font_ratio: f64,
-) -> (String, u32) {
+) -> AsciiImage {
     let height = calc_new_height(width, img.width(), img.height(), font_ratio);
     let img_buffer = img
         .resize_exact(width, height, image::imageops::FilterType::Triangle)
@@ -62,7 +96,7 @@ pub fn image_to_ascii(
         .collect::<Vec<String>>()
         .join("\n");
 
-    (ascii, height)
+    AsciiImage::new(ascii, width, height, colored)
 }
 
 /// Convert image to text
@@ -73,14 +107,14 @@ pub fn image_to_ascii(
     ascii_string: &str,
     colored: bool,
     font_ratio: f64,
-) -> (String, u32) {
+) -> AsciiImage {
     let height = calc_new_height(width, img.width(), img.height(), font_ratio);
     let img_buffer = img
         .resize_exact(width, height, image::imageops::FilterType::Triangle)
         .to_rgba8();
     let chunks = img_buffer.as_raw().par_chunks(4);
 
-    let ascii = chunks
+    let result = chunks
         .map(|raw| {
             if colored {
                 ascii_symbol(get_lightness(raw[0], raw[1], raw[2], raw[3]), ascii_string)
@@ -98,7 +132,7 @@ pub fn image_to_ascii(
         .collect::<Vec<String>>()
         .join("\n");
 
-    (ascii, height)
+    AsciiImage::new(result, width, height, colored)
 }
 
 #[test]
