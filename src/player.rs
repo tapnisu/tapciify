@@ -1,4 +1,4 @@
-use crate::ascii::image_to_ascii;
+use crate::ascii::{image_to_ascii, AsciiImage};
 use crossterm::{cursor::MoveUp, execute};
 use indicatif::ProgressBar;
 use std::{io::stdout, time::Instant};
@@ -34,15 +34,16 @@ pub fn render_frames(
         let img = image::open(&image_path)
             .unwrap_or_else(|_| panic!("Failed to read file: {}", image_path));
 
-        let frame = image_to_ascii(img, width, ascii_string, colored, font_ratio);
+        let ascii_image = image_to_ascii(img, width, ascii_string, colored, font_ratio);
 
         if first_frame {
-            execute!(stdout(), MoveUp((frame.1).try_into().unwrap())).unwrap_or_default();
+            execute!(stdout(), MoveUp((ascii_image.height).try_into().unwrap()))
+                .unwrap_or_default();
         } else {
             first_frame = true;
         }
 
-        println!("{}", frame.0);
+        println!("{}", ascii_image.result);
 
         while frame_time > start.elapsed().as_millis().try_into().unwrap() {}
     }
@@ -55,13 +56,13 @@ fn pre_render(
     width: u32,
     colored: bool,
     font_ratio: f64,
-) -> Vec<(String, u32)> {
+) -> Vec<AsciiImage> {
     let pb = ProgressBar::new(image_paths.len().try_into().unwrap());
 
     image_paths
         .par_iter()
         .map(|path| {
-            let img = image_to_ascii(
+            let ascii_image = image_to_ascii(
                 image::open(path).unwrap(),
                 width,
                 ascii_string,
@@ -71,9 +72,9 @@ fn pre_render(
 
             pb.inc(1);
 
-            img
+            ascii_image
         })
-        .collect::<Vec<(String, u32)>>()
+        .collect::<Vec<AsciiImage>>()
 }
 
 #[cfg(not(feature = "parallelism"))]
@@ -83,13 +84,13 @@ fn pre_render(
     width: u32,
     colored: bool,
     font_ratio: f64,
-) -> Vec<(String, u32)> {
+) -> Vec<AsciiImage> {
     let pb = ProgressBar::new(image_paths.len().try_into().unwrap());
 
     image_paths
         .iter()
         .map(|path| {
-            let img = image_to_ascii(
+            let ascii_image = image_to_ascii(
                 image::open(path).unwrap(),
                 width,
                 ascii_string,
@@ -99,9 +100,9 @@ fn pre_render(
 
             pb.inc(1);
 
-            img
+            ascii_image
         })
-        .collect::<Vec<(String, u32)>>()
+        .collect::<Vec<AsciiImage>>()
 }
 
 /// Render frames from directory, and then play them
@@ -117,16 +118,17 @@ pub fn play_pre_rendered_frames(
 
     pre_render(image_paths, ascii_string, width, colored, font_ratio)
         .iter()
-        .for_each(|frame| {
+        .for_each(|ascii_image| {
             let start = Instant::now();
 
             if first_frame {
-                execute!(stdout(), MoveUp((frame.1).try_into().unwrap())).unwrap_or_default();
+                execute!(stdout(), MoveUp((ascii_image.height).try_into().unwrap()))
+                    .unwrap_or_default();
             } else {
                 first_frame = true;
             }
 
-            println!("{}", frame.0);
+            println!("{}", ascii_image.result);
 
             while frame_time > start.elapsed().as_millis().try_into().unwrap() {}
         });
