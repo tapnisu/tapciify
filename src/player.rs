@@ -10,16 +10,7 @@ use rayon::prelude::*;
 #[cfg(target_family = "windows")]
 use glob::glob;
 
-/// Reverse ascii string if true
-pub fn generate_ascii_string(ascii_string: String, reversed: bool) -> String {
-    if reversed {
-        return ascii_string.chars().rev().collect::<String>();
-    }
-
-    ascii_string
-}
-
-/// Play frames from directory in real time
+/// Play paths as ascii images
 pub fn play_frames(
     image_paths: Vec<String>,
     ascii_string: &str,
@@ -194,6 +185,13 @@ pub struct Player {
 }
 
 impl Player {
+    /// Reverse ascii string if true
+    pub fn reverse_ascii_string(&mut self) -> String {
+        self.ascii_string = self.ascii_string.chars().rev().collect();
+
+        self.ascii_string.clone()
+    }
+
     /// Play frames
     pub fn play(self) {
         let image_paths = get_paths(self.images_paths);
