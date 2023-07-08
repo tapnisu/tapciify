@@ -10,7 +10,7 @@ fn main() {
     let cli = Cli::parse();
 
     let ascii_string = generate_ascii_string(cli.ascii_string, cli.reverse);
-    let frame_time = calculate_frame_time(cli.framerate);
+    let frame_time = calculate_frame_time(cli.frame_rate);
 
     Player {
         images_paths: cli.input,

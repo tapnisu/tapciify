@@ -12,8 +12,8 @@ pub struct Cli {
     pub width: u32,
 
     /// Framerate for showing images
-    #[clap(short, long)]
-    pub framerate: Option<f64>,
+    #[clap(short, long="framerate", value_name="framerate")]
+    pub frame_rate: Option<f64>,
     /// Render, and then show
     #[clap(short, long, action)]
     pub pre_render: bool,
