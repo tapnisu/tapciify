@@ -20,7 +20,7 @@ pub fn generate_ascii_string(ascii_string: String, reversed: bool) -> String {
 }
 
 /// Play frames from directory in real time
-pub fn render_frames(
+pub fn play_frames(
     image_paths: Vec<String>,
     ascii_string: &str,
     width: u32,
@@ -210,7 +210,7 @@ impl Player {
             );
         }
 
-        render_frames(
+        play_frames(
             image_paths,
             self.ascii_string.as_str(),
             width,
