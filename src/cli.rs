@@ -3,7 +3,7 @@ use clap::Parser;
 
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
-pub struct Arguments {
+pub struct Cli {
     /// Input files to convert to ascii
     #[clap(short, short, num_args = 1.., required=true)]
     pub input: Vec<String>,
