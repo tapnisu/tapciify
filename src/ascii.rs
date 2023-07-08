@@ -13,7 +13,7 @@ pub fn get_lightness(r: u8, g: u8, b: u8, a: u8) -> f32 {
     let max = max(max(r, g), b);
     let min = min(min(r, g), b);
 
-    ((max as f32 + min as f32) * a as f32) / 130050f32 // 130050 - we need to divide by 512, and divide by 255 from alpha
+    ((max as f32 + min as f32) * a as f32) / 130050.0 // 130050 - we need to divide by 512, and divide by 255 from alpha
 }
 
 #[test]
