@@ -1,6 +1,7 @@
-use crate::ascii::{image_to_ascii, AsciiImage};
+use crate::ascii::{image_to_ascii, AsciiImage, DEFAULT_ASCII_STRING, DEFAULT_FONT_RATIO};
 use crossterm::{cursor::MoveUp, execute};
 use indicatif::ProgressBar;
+
 use std::{io::stdout, time::Instant};
 
 #[cfg(feature = "parallelism")]
@@ -172,57 +173,74 @@ pub fn get_paths(input: Vec<String>) -> Vec<String> {
     input
 }
 
-/// Play array of images as ascii images
-pub fn play_frames(
-    input: Vec<String>,
-    width: u32,
-    ascii_string: &str,
-    colored: bool,
-    fps: Option<f64>,
-    pre_render: bool,
-    font_ratio: f64,
-) {
-    let image_paths = get_paths(input);
-
-    // Calculate frame time (1 / frame rate)
-    let frame_time = if let Some(fps) = fps {
-        (1000f64 / fps) as u64
+// Calculate frame time (1 / frame rate)
+pub fn calculate_frame_time(frame_rate: Option<f64>) -> u64 {
+    if let Some(frame_rate) = frame_rate {
+        (1000f64 / frame_rate) as u64
     } else {
         0
-    };
-
-    if pre_render {
-        return play_pre_rendered_frames(
-            image_paths,
-            ascii_string,
-            width,
-            colored,
-            frame_time,
-            font_ratio,
-        );
     }
+}
 
-    render_frames(
-        image_paths,
-        ascii_string,
-        width,
-        colored,
-        frame_time,
-        font_ratio,
-    )
+pub struct Player {
+    pub images_paths: Vec<String>,
+    pub width: Option<u32>,
+    pub ascii_string: String,
+    pub colored: bool,
+    pub frame_time: u64,
+    pub pre_render: bool,
+    pub font_ratio: f64,
+}
+
+impl Player {
+    /// Play frames
+    pub fn play(self) {
+        let image_paths = get_paths(self.images_paths);
+
+        let width = self.width.expect("Width is required");
+
+        if self.pre_render {
+            return play_pre_rendered_frames(
+                image_paths,
+                self.ascii_string.as_str(),
+                width,
+                self.colored,
+                self.frame_time,
+                self.font_ratio,
+            );
+        }
+
+        render_frames(
+            image_paths,
+            self.ascii_string.as_str(),
+            width,
+            self.colored,
+            self.frame_time,
+            self.font_ratio,
+        )
+    }
+}
+
+impl Default for Player {
+    fn default() -> Player {
+        Player {
+            images_paths: vec![],
+            width: None,
+            ascii_string: DEFAULT_ASCII_STRING.to_owned(),
+            colored: false,
+            frame_time: 0,
+            pre_render: false,
+            font_ratio: DEFAULT_FONT_RATIO,
+        }
+    }
 }
 
 #[test]
 fn plays_frames() {
-    use crate::ascii::DEFAULT_FONT_RATIO;
-
-    play_frames(
-        vec!["./assets/logo.png".to_string()],
-        128,
-        " .,:;+*?%S#@",
-        true,
-        None,
-        false,
-        DEFAULT_FONT_RATIO,
-    );
+    Player {
+        images_paths: vec!["./assets/logo.png".to_string()],
+        width: Some(128),
+        ..Default::default()
+    }
+    .play()
 }

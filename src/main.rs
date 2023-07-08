@@ -4,21 +4,22 @@ pub mod player;
 
 use clap::Parser;
 use cli::Arguments;
-use player::{generate_ascii_string, play_frames};
+use player::{calculate_frame_time, generate_ascii_string, Player};
 
 fn main() {
     let args = Arguments::parse();
 
-    // String for pixel lightness
     let ascii_string = generate_ascii_string(args.ascii_string, args.reverse);
+    let frame_time = calculate_frame_time(args.framerate);
 
-    play_frames(
-        args.input,
-        args.width,
-        ascii_string.as_str(),
-        args.colored,
-        args.framerate,
-        args.pre_render,
-        args.font_ratio,
-    )
+    Player {
+        images_paths: args.input,
+        width: Some(args.width),
+        ascii_string,
+        colored: args.colored,
+        frame_time,
+        pre_render: args.pre_render,
+        font_ratio: args.font_ratio,
+    }
+    .play();
 }
