@@ -17,11 +17,11 @@ categories = [
 license = "MIT"
 
 [dependencies]
-clap = { version = "4", features = ["derive"] }
+clap = { version = "4", features = ["derive"], optional = true }
 colored = "2"
-crossterm = "0.26"
+crossterm = { version = "0.26", optional = true }
 image = "0.24"
-indicatif = "0.17"
+indicatif = { version = "0.17", optional = true }
 rayon = { version = "1", optional = true }
 
 [target.'cfg(windows)'.dependencies]
@@ -29,5 +29,10 @@ glob = "0.3"
 
 [features]
 default = ["full"]
-full = ["parallelism"]
+full = ["parallelism", "player"]
 parallelism = ["dep:rayon"]
+player = ["dep:clap", "dep:crossterm", "dep:indicatif"]
+
+[[bin]]
+name = "tapciify"
+required-features = ["player"]

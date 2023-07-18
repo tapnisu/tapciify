@@ -63,6 +63,10 @@ impl AsciiImage {
     }
 }
 
+pub struct AsciiConverter {}
+
+impl AsciiConverter {}
+
 /// Convert image to text
 #[cfg(not(feature = "parallelism"))]
 pub fn image_to_ascii(
