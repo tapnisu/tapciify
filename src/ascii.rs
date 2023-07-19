@@ -63,92 +63,135 @@ impl AsciiImage {
     }
 }
 
-pub struct AsciiConverter {}
-
-impl AsciiConverter {}
-
-/// Convert image to text
-#[cfg(not(feature = "parallelism"))]
-pub fn image_to_ascii(
-    img: DynamicImage,
-    width: u32,
-    ascii_string: &str,
-    colored: bool,
-    font_ratio: f64,
-) -> AsciiImage {
-    let height = calc_new_height(width, img.width(), img.height(), font_ratio);
-    let img_buffer = img
-        .resize_exact(width, height, image::imageops::FilterType::Triangle)
-        .to_rgba8();
-    let chunks = img_buffer.as_raw().chunks(4);
-
-    let ascii = chunks
-        .map(|raw| {
-            if colored {
-                ascii_symbol(get_lightness(raw[0], raw[1], raw[2], raw[3]), ascii_string)
-                    .to_string()
-                    .truecolor(raw[0], raw[1], raw[2])
-                    .to_string()
-            } else {
-                ascii_symbol(get_lightness(raw[0], raw[1], raw[2], raw[3]), ascii_string)
-                    .to_string()
-            }
-        })
-        .collect::<Vec<String>>()
-        .chunks(width.try_into().unwrap())
-        .map(|line| line.join(""))
-        .collect::<Vec<String>>()
-        .join("\n");
-
-    AsciiImage::new(ascii, width, height, colored)
+pub struct AsciiConverter {
+    pub img: DynamicImage,
+    pub width: u32,
+    pub ascii_string: String,
+    pub colored: bool,
+    pub font_ratio: f64,
 }
 
-/// Convert image to text
-#[cfg(feature = "parallelism")]
-pub fn image_to_ascii(
-    img: DynamicImage,
-    width: u32,
-    ascii_string: &str,
-    colored: bool,
-    font_ratio: f64,
-) -> AsciiImage {
-    let height = calc_new_height(width, img.width(), img.height(), font_ratio);
-    let img_buffer = img
-        .resize_exact(width, height, image::imageops::FilterType::Triangle)
-        .to_rgba8();
-    let chunks = img_buffer.as_raw().par_chunks(4);
+impl AsciiConverter {
+    /// Convert image to text
+    #[cfg(not(feature = "parallelism"))]
+    pub fn convert(&self) -> AsciiImage {
+        let height = calc_new_height(
+            self.width,
+            self.img.width(),
+            self.img.height(),
+            self.font_ratio,
+        );
+        let img_buffer = self
+            .img
+            .resize_exact(self.width, height, image::imageops::FilterType::Triangle)
+            .to_rgba8();
+        let chunks = img_buffer.as_raw().chunks(4);
 
-    let result = chunks
-        .map(|raw| {
-            if colored {
-                ascii_symbol(get_lightness(raw[0], raw[1], raw[2], raw[3]), ascii_string)
+        let ascii = chunks
+            .map(|raw| {
+                if self.colored {
+                    ascii_symbol(
+                        get_lightness(raw[0], raw[1], raw[2], raw[3]),
+                        &self.ascii_string,
+                    )
                     .to_string()
                     .truecolor(raw[0], raw[1], raw[2])
                     .to_string()
-            } else {
-                ascii_symbol(get_lightness(raw[0], raw[1], raw[2], raw[3]), ascii_string)
+                } else {
+                    ascii_symbol(
+                        get_lightness(raw[0], raw[1], raw[2], raw[3]),
+                        &self.ascii_string,
+                    )
                     .to_string()
-            }
-        })
-        .collect::<Vec<String>>()
-        .par_chunks(width.try_into().unwrap())
-        .map(|line| line.join(""))
-        .collect::<Vec<String>>()
-        .join("\n");
+                }
+            })
+            .collect::<Vec<String>>()
+            .chunks(self.width.try_into().unwrap())
+            .map(|line| line.join(""))
+            .collect::<Vec<String>>()
+            .join("\n");
 
-    AsciiImage::new(result, width, height, colored)
+        AsciiImage::new(ascii, self.width, height, self.colored)
+    }
+
+    /// Convert image to text
+    #[cfg(feature = "parallelism")]
+    pub fn convert(&self) -> AsciiImage {
+        let height = calc_new_height(
+            self.width,
+            self.img.width(),
+            self.img.height(),
+            self.font_ratio,
+        );
+        let img_buffer = self
+            .img
+            .resize_exact(self.width, height, image::imageops::FilterType::Triangle)
+            .to_rgba8();
+        let chunks = img_buffer.as_raw().par_chunks(4);
+
+        let result = chunks
+            .map(|raw| {
+                if self.colored {
+                    ascii_symbol(
+                        get_lightness(raw[0], raw[1], raw[2], raw[3]),
+                        &self.ascii_string,
+                    )
+                    .to_string()
+                    .truecolor(raw[0], raw[1], raw[2])
+                    .to_string()
+                } else {
+                    ascii_symbol(
+                        get_lightness(raw[0], raw[1], raw[2], raw[3]),
+                        &self.ascii_string,
+                    )
+                    .to_string()
+                }
+            })
+            .collect::<Vec<String>>()
+            .par_chunks(self.width.try_into().unwrap())
+            .map(|line| line.join(""))
+            .collect::<Vec<String>>()
+            .join("\n");
+
+        AsciiImage::new(result, self.width, height, self.colored)
+    }
+}
+
+impl Default for AsciiConverter {
+    fn default() -> AsciiConverter {
+        AsciiConverter {
+            img: DynamicImage::new_rgba16(0, 0),
+            width: 32,
+            ascii_string: DEFAULT_ASCII_STRING.to_owned(),
+            colored: false,
+            font_ratio: DEFAULT_FONT_RATIO,
+        }
+    }
 }
 
 #[test]
 fn renders_frame() {
     let img = image::open("./assets/logo.png").unwrap();
 
-    image_to_ascii(img, 128, DEFAULT_ASCII_STRING, false, DEFAULT_FONT_RATIO);
+    let ascii_converter = AsciiConverter {
+        img,
+        width: 128,
+        ..Default::default()
+    };
+
+    ascii_converter.convert();
 }
 
 #[test]
 fn renders_colored_frame() {
     let img = image::open("./assets/logo.png").unwrap();
 
-    image_to_ascii(img, 128, DEFAULT_ASCII_STRING, true, DEFAULT_FONT_RATIO);
+    let ascii_converter = AsciiConverter {
+        img,
+        width: 128,
+        colored: true,
+        ..Default::default()
+    };
+
+    ascii_converter.convert();
 }

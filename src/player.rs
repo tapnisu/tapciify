@@ -1,4 +1,4 @@
-use crate::ascii::{image_to_ascii, AsciiImage, DEFAULT_ASCII_STRING, DEFAULT_FONT_RATIO};
+use crate::ascii::{AsciiConverter, AsciiImage, DEFAULT_ASCII_STRING, DEFAULT_FONT_RATIO};
 use crossterm::{cursor::MoveUp, execute};
 use indicatif::ProgressBar;
 
@@ -26,7 +26,14 @@ pub fn play_frames(
         let img = image::open(&image_path)
             .unwrap_or_else(|_| panic!("Failed to read file: {}", image_path));
 
-        let ascii_image = image_to_ascii(img, width, ascii_string, colored, font_ratio);
+        let ascii_image = AsciiConverter {
+            img,
+            width,
+            ascii_string: ascii_string.to_owned(),
+            colored,
+            font_ratio,
+        }
+        .convert();
 
         if first_frame {
             execute!(stdout(), MoveUp((ascii_image.height).try_into().unwrap()))
@@ -55,13 +62,14 @@ fn pre_render(
     image_paths
         .par_iter()
         .map(|path| {
-            let ascii_image = image_to_ascii(
-                image::open(path).unwrap(),
+            let ascii_image = AsciiConverter {
+                img: image::open(path).unwrap(),
                 width,
-                ascii_string,
+                ascii_string: ascii_string.to_owned(),
                 colored,
                 font_ratio,
-            );
+            }
+            .convert();
 
             pb.inc(1);
 
