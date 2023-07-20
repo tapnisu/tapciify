@@ -184,15 +184,31 @@ impl AsciiConverter {
     /// Convert image to raw ascii image
     #[cfg(not(feature = "parallelism"))]
     pub fn convert_raw(&self) -> RawAsciiImage {
-        let height = calc_new_height(
-            self.width,
-            self.img.width(),
-            self.img.height(),
-            self.font_ratio,
-        );
+        let width = if self.width == 0 {
+            calc_new_width(
+                self.height,
+                self.img.width(),
+                self.img.height(),
+                self.font_ratio,
+            )
+        } else {
+            self.width
+        };
+
+        let height = if self.height == 0 {
+            calc_new_height(
+                self.width,
+                self.img.width(),
+                self.img.height(),
+                self.font_ratio,
+            )
+        } else {
+            self.height
+        };
+
         let img_buffer = self
             .img
-            .resize_exact(self.width, height, image::imageops::FilterType::Triangle)
+            .resize_exact(width, height, image::imageops::FilterType::Triangle)
             .to_rgba8();
         let chunks = img_buffer.as_raw().chunks(4);
 
@@ -200,7 +216,7 @@ impl AsciiConverter {
             .map(|raw| AsciiCharacter::new(raw[0], raw[1], raw[2], raw[3], &self.ascii_string))
             .collect::<Vec<AsciiCharacter>>();
 
-        RawAsciiImage::new(result, self.width, height, self.colored)
+        RawAsciiImage::new(result, width, height, self.colored)
     }
 
     /// Convert image to ascii
@@ -225,7 +241,7 @@ impl AsciiConverter {
             .collect::<Vec<String>>();
 
         let result = characters
-            .par_chunks(self.width.try_into().unwrap())
+            .par_chunks(raw_ascii_image.width.try_into().unwrap())
             .map(|line| line.join(""))
             .collect::<Vec<String>>()
             .join("\n");
@@ -260,7 +276,7 @@ impl AsciiConverter {
             .collect::<Vec<String>>();
 
         let result = characters
-            .chunks(self.width.try_into().unwrap())
+            .chunks(raw_ascii_image.width.try_into().unwrap())
             .map(|line| line.join(""))
             .collect::<Vec<String>>()
             .join("\n");
