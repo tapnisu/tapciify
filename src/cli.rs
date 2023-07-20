@@ -1,18 +1,26 @@
 use crate::ascii::{DEFAULT_ASCII_STRING, DEFAULT_FONT_RATIO};
-use clap::Parser;
+use clap::{ArgGroup, Parser};
 
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
+#[clap(group(
+    ArgGroup::new("size")
+        .required(true)
+        .args(&["width", "height"]),
+))]
 pub struct Cli {
     /// Input files to convert to ascii
     #[clap(short, short, num_args = 1.., required=true)]
     pub input: Vec<String>,
     /// Width of output
     #[clap(short, short, value_parser)]
-    pub width: u32,
+    pub width: Option<u32>,
+    /// Height of output
+    #[clap(short, short, value_parser)]
+    pub height: Option<u32>,
 
     /// Framerate for showing images
-    #[clap(short, long="framerate", value_name="framerate")]
+    #[clap(short, long = "framerate", value_name = "framerate")]
     pub frame_rate: Option<f64>,
     /// Render, and then show
     #[clap(short, long, action)]

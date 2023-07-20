@@ -15,6 +15,7 @@ pub fn play_frames(
     image_paths: Vec<String>,
     ascii_string: &str,
     width: u32,
+    height: u32,
     colored: bool,
     frame_time: u64,
     font_ratio: f64,
@@ -29,6 +30,7 @@ pub fn play_frames(
         let ascii_image = AsciiConverter {
             img,
             width,
+            height,
             ascii_string: ascii_string.to_owned(),
             colored,
             font_ratio,
@@ -54,6 +56,7 @@ fn pre_render(
     image_paths: Vec<String>,
     ascii_string: &str,
     width: u32,
+    height: u32,
     colored: bool,
     font_ratio: f64,
 ) -> Vec<AsciiImage> {
@@ -65,6 +68,7 @@ fn pre_render(
             let ascii_image = AsciiConverter {
                 img: image::open(path).unwrap(),
                 width,
+                height,
                 ascii_string: ascii_string.to_owned(),
                 colored,
                 font_ratio,
@@ -84,6 +88,7 @@ fn pre_render(
     image_paths: Vec<String>,
     ascii_string: &str,
     width: u32,
+    height: u32,
     colored: bool,
     font_ratio: f64,
 ) -> Vec<AsciiImage> {
@@ -95,6 +100,7 @@ fn pre_render(
             let ascii_image = AsciiConverter {
                 img: image::open(path).unwrap(),
                 width,
+                height,
                 ascii_string: ascii_string.to_owned(),
                 colored,
                 font_ratio,
@@ -113,28 +119,36 @@ pub fn play_pre_rendered_frames(
     image_paths: Vec<String>,
     ascii_string: &str,
     width: u32,
+    height: u32,
     colored: bool,
     frame_time: u64,
     font_ratio: f64,
 ) {
     let mut first_frame = false;
 
-    pre_render(image_paths, ascii_string, width, colored, font_ratio)
-        .iter()
-        .for_each(|ascii_image| {
-            let start = Instant::now();
+    pre_render(
+        image_paths,
+        ascii_string,
+        width,
+        height,
+        colored,
+        font_ratio,
+    )
+    .iter()
+    .for_each(|ascii_image| {
+        let start = Instant::now();
 
-            if first_frame {
-                execute!(stdout(), MoveUp((ascii_image.height).try_into().unwrap()))
-                    .unwrap_or_default();
-            } else {
-                first_frame = true;
-            }
+        if first_frame {
+            execute!(stdout(), MoveUp((ascii_image.height).try_into().unwrap()))
+                .unwrap_or_default();
+        } else {
+            first_frame = true;
+        }
 
-            println!("{}", ascii_image.result);
+        println!("{}", ascii_image.result);
 
-            while frame_time > start.elapsed().as_millis().try_into().unwrap() {}
-        });
+        while frame_time > start.elapsed().as_millis().try_into().unwrap() {}
+    });
 }
 
 /// Add glob support for paths parsing on windows
@@ -185,7 +199,8 @@ pub fn calculate_frame_time(frame_rate: Option<f64>) -> u64 {
 /// Player to convert and play frames
 pub struct Player {
     pub images_paths: Vec<String>,
-    pub width: Option<u32>,
+    pub width: u32,
+    pub height: u32,
     pub ascii_string: String,
     pub colored: bool,
     pub frame_time: u64,
@@ -205,13 +220,12 @@ impl Player {
     pub fn play(self) {
         let image_paths = get_paths(self.images_paths);
 
-        let width = self.width.expect("Width is required");
-
         if self.pre_render {
             return play_pre_rendered_frames(
                 image_paths,
                 self.ascii_string.as_str(),
-                width,
+                self.width,
+                self.height,
                 self.colored,
                 self.frame_time,
                 self.font_ratio,
@@ -221,7 +235,8 @@ impl Player {
         play_frames(
             image_paths,
             self.ascii_string.as_str(),
-            width,
+            self.width,
+            self.height,
             self.colored,
             self.frame_time,
             self.font_ratio,
@@ -233,7 +248,8 @@ impl Default for Player {
     fn default() -> Player {
         Player {
             images_paths: vec![],
-            width: None,
+            width: 0,
+            height: 0,
             ascii_string: DEFAULT_ASCII_STRING.to_owned(),
             colored: false,
             frame_time: 0,
@@ -247,7 +263,7 @@ impl Default for Player {
 fn plays_frames() {
     Player {
         images_paths: vec!["./assets/logo.png".to_string()],
-        width: Some(128),
+        width: 128,
         ..Default::default()
     }
     .play()
