@@ -13,8 +13,8 @@ fn main() {
 
     let mut player = Player {
         images_paths: cli.input,
-        width: cli.width,
-        height: 0,
+        width: cli.width.unwrap_or(0),
+        height: cli.height.unwrap_or(0),
         ascii_string: cli.ascii_string,
         colored: cli.colored,
         frame_time,

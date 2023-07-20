@@ -88,6 +88,7 @@ fn pre_render(
     image_paths: Vec<String>,
     ascii_string: &str,
     width: u32,
+    height: u32,
     colored: bool,
     font_ratio: f64,
 ) -> Vec<AsciiImage> {
@@ -99,6 +100,7 @@ fn pre_render(
             let ascii_image = AsciiConverter {
                 img: image::open(path).unwrap(),
                 width,
+                height,
                 ascii_string: ascii_string.to_owned(),
                 colored,
                 font_ratio,
