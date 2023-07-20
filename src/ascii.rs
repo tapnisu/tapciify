@@ -34,9 +34,11 @@ pub fn ascii_character(lightness: f32, ascii_string: &str) -> char {
 
 #[test]
 fn converts_to_ascii() {
-    assert_eq!(ascii_character(1.0, " *#"), '#');
-    assert_eq!(ascii_character(0.5, " *#"), '*');
-    assert_eq!(ascii_character(0.0, " *#"), ' ');
+    let ascii_string = " *#";
+
+    assert_eq!(ascii_character(1.0, ascii_string), '#');
+    assert_eq!(ascii_character(0.5, ascii_string), '*');
+    assert_eq!(ascii_character(0.0, ascii_string), ' ');
 }
 
 /// Calculate height by multiplying width by original aspect ratio
@@ -67,6 +69,24 @@ impl AsciiCharacter {
             a,
         }
     }
+}
+
+#[test]
+fn converts_to_ascii_character() {
+    let ascii_string = " *#";
+
+    assert_eq!(
+        AsciiCharacter::new(255, 255, 255, 255, ascii_string).character,
+        '#'
+    );
+    assert_eq!(
+        AsciiCharacter::new(255, 255, 255, 0, ascii_string).character,
+        ' '
+    );
+    assert_eq!(
+        AsciiCharacter::new(0, 0, 0, 255, ascii_string).character,
+        ' '
+    );
 }
 
 /// Raw Ascii image conversion result
