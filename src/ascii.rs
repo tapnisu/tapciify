@@ -186,26 +186,30 @@ impl AsciiConverter {
     pub fn convert(self) -> AsciiImage {
         let raw_ascii_image = AsciiConverter::convert_raw(&self);
 
+        let characters = raw_ascii_image
+            .result
+            .par_iter()
+            .map(|ascii_character| {
+                if self.colored {
+                    ascii_character
+                        .character
+                        .to_string()
+                        .truecolor(ascii_character.r, ascii_character.g, ascii_character.b)
+                        .to_string()
+                } else {
+                    ascii_character.character.to_string()
+                }
+            })
+            .collect::<Vec<String>>();
+
+        let result = characters
+            .par_chunks(self.width.try_into().unwrap())
+            .map(|line| line.join(""))
+            .collect::<Vec<String>>()
+            .join("\n");
+
         AsciiImage::new(
-            raw_ascii_image
-                .result
-                .par_iter()
-                .map(|character| {
-                    if self.colored {
-                        character
-                            .character
-                            .to_string()
-                            .truecolor(character.r, character.g, character.b)
-                            .to_string()
-                    } else {
-                        character.character.to_string()
-                    }
-                })
-                .collect::<Vec<String>>()
-                .par_chunks(self.width.try_into().unwrap())
-                .map(|line| line.join(""))
-                .collect::<Vec<String>>()
-                .join("\n"),
+            result,
             raw_ascii_image.width,
             raw_ascii_image.height,
             raw_ascii_image.colored,
@@ -217,26 +221,30 @@ impl AsciiConverter {
     pub fn convert(self) -> AsciiImage {
         let raw_ascii_image = AsciiConverter::convert_raw(&self);
 
+        let characters = raw_ascii_image
+            .result
+            .iter()
+            .map(|ascii_character| {
+                if self.colored {
+                    ascii_character
+                        .character
+                        .to_string()
+                        .truecolor(ascii_character.r, ascii_character.g, ascii_character.b)
+                        .to_string()
+                } else {
+                    ascii_character.character.to_string()
+                }
+            })
+            .collect::<Vec<String>>();
+
+        let result = characters
+            .chunks(self.width.try_into().unwrap())
+            .map(|line| line.join(""))
+            .collect::<Vec<String>>()
+            .join("\n");
+
         AsciiImage::new(
-            raw_ascii_image
-                .result
-                .iter()
-                .map(|character| {
-                    if self.colored {
-                        character
-                            .character
-                            .to_string()
-                            .truecolor(character.r, character.g, character.b)
-                            .to_string()
-                    } else {
-                        character.character.to_string()
-                    }
-                })
-                .collect::<Vec<String>>()
-                .chunks(self.width.try_into().unwrap())
-                .map(|line| line.join(""))
-                .collect::<Vec<String>>()
-                .join("\n"),
+            result,
             raw_ascii_image.width,
             raw_ascii_image.height,
             raw_ascii_image.colored,
