@@ -153,6 +153,21 @@ pub fn get_paths(input: Vec<String>) -> Vec<String> {
 }
 
 /// Add glob support for paths parsing on windows
+#[cfg(target_family = "windows")]
+#[cfg(not(feature = "parallelism"))]
+pub fn get_paths(input: Vec<String>) -> Vec<String> {
+    input
+        .iter()
+        .flat_map(|glob_p| {
+            glob(glob_p)
+                .expect("Failed to read glob pattern")
+                .map(|path| path.unwrap().display().to_string())
+                .collect::<Vec<String>>()
+        })
+        .collect()
+}
+
+/// Add glob support for paths parsing on windows
 #[cfg(not(target_family = "windows"))]
 pub fn get_paths(input: Vec<String>) -> Vec<String> {
     input
