@@ -41,7 +41,12 @@ fn converts_to_ascii() {
     assert_eq!(ascii_character(0.0, ascii_string), ' ');
 }
 
-/// Calculate height by multiplying width by original aspect ratio
+/// Calculate new width from aspect ratio and new height
+pub fn calc_new_width(new_height: u32, width: u32, height: u32, font_ratio: f64) -> u32 {
+    (new_height as f64 / (height as f64) * width as f64 / font_ratio) as u32
+}
+
+/// Calculate new height from aspect ratio and new width
 pub fn calc_new_height(new_width: u32, width: u32, height: u32, font_ratio: f64) -> u32 {
     (new_width as f64 * (height as f64) / width as f64 * font_ratio) as u32
 }
@@ -131,6 +136,7 @@ impl AsciiImage {
 pub struct AsciiConverter {
     pub img: DynamicImage,
     pub width: u32,
+    pub height: u32,
     pub ascii_string: String,
     pub colored: bool,
     pub font_ratio: f64,
@@ -140,15 +146,31 @@ impl AsciiConverter {
     /// Convert image to raw ascii image
     #[cfg(feature = "parallelism")]
     pub fn convert_raw(&self) -> RawAsciiImage {
-        let height = calc_new_height(
-            self.width,
-            self.img.width(),
-            self.img.height(),
-            self.font_ratio,
-        );
+        let width = if self.width == 0 {
+            calc_new_width(
+                self.height,
+                self.img.width(),
+                self.img.height(),
+                self.font_ratio,
+            )
+        } else {
+            self.height
+        };
+
+        let height = if self.height == 0 {
+            calc_new_height(
+                self.width,
+                self.img.width(),
+                self.img.height(),
+                self.font_ratio,
+            )
+        } else {
+            self.height
+        };
+
         let img_buffer = self
             .img
-            .resize_exact(self.width, height, image::imageops::FilterType::Triangle)
+            .resize_exact(width, height, image::imageops::FilterType::Triangle)
             .to_rgba8();
         let chunks = img_buffer.as_raw().par_chunks(4);
 
@@ -156,7 +178,7 @@ impl AsciiConverter {
             .map(|raw| AsciiCharacter::new(raw[0], raw[1], raw[2], raw[3], &self.ascii_string))
             .collect::<Vec<AsciiCharacter>>();
 
-        RawAsciiImage::new(result, self.width, height, self.colored)
+        RawAsciiImage::new(result, width, height, self.colored)
     }
 
     /// Convert image to raw ascii image
@@ -256,7 +278,8 @@ impl Default for AsciiConverter {
     fn default() -> AsciiConverter {
         AsciiConverter {
             img: DynamicImage::new_rgba16(0, 0),
-            width: 32,
+            width: 0,
+            height: 0,
             ascii_string: DEFAULT_ASCII_STRING.to_owned(),
             colored: false,
             font_ratio: DEFAULT_FONT_RATIO,
