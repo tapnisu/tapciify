@@ -25,23 +25,67 @@ fn calculates_lightness() {
 }
 
 /// Convert lightness of pixel to symbol
-pub fn ascii_symbol(brightness: f32, ascii_string: &str) -> char {
+pub fn ascii_character(lightness: f32, ascii_string: &str) -> char {
     ascii_string
         .chars()
-        .nth(((ascii_string.chars().count() - 1) as f32 * brightness) as usize)
+        .nth(((ascii_string.chars().count() - 1) as f32 * lightness) as usize)
         .unwrap()
 }
 
 #[test]
 fn converts_to_ascii() {
-    assert_eq!(ascii_symbol(1.0, " *#"), '#');
-    assert_eq!(ascii_symbol(0.5, " *#"), '*');
-    assert_eq!(ascii_symbol(0.0, " *#"), ' ');
+    assert_eq!(ascii_character(1.0, " *#"), '#');
+    assert_eq!(ascii_character(0.5, " *#"), '*');
+    assert_eq!(ascii_character(0.0, " *#"), ' ');
 }
 
 /// Calculate height by multiplying width by original aspect ratio
 pub fn calc_new_height(new_width: u32, width: u32, height: u32, font_ratio: f64) -> u32 {
     (new_width as f64 * (height as f64) / width as f64 * font_ratio) as u32
+}
+
+/// Ascii character of RawAsciiImage
+pub struct AsciiCharacter {
+    pub character: char,
+    pub r: u8,
+    pub g: u8,
+    pub b: u8,
+    pub a: u8,
+}
+
+impl AsciiCharacter {
+    pub fn new(r: u8, g: u8, b: u8, a: u8, ascii_string: &str) -> AsciiCharacter {
+        let lightness = get_lightness(r, g, b, a);
+
+        let character = ascii_character(lightness, ascii_string);
+
+        AsciiCharacter {
+            character,
+            r,
+            g,
+            b,
+            a,
+        }
+    }
+}
+
+/// Raw Ascii image conversion result
+pub struct RawAsciiImage {
+    pub result: Vec<AsciiCharacter>,
+    pub width: u32,
+    pub height: u32,
+    pub colored: bool,
+}
+
+impl RawAsciiImage {
+    pub fn new(result: Vec<AsciiCharacter>, width: u32, height: u32, colored: bool) -> Self {
+        Self {
+            result,
+            width,
+            height,
+            colored,
+        }
+    }
 }
 
 /// Ascii image conversion result
@@ -63,6 +107,7 @@ impl AsciiImage {
     }
 }
 
+/// Converter of images to ascii
 pub struct AsciiConverter {
     pub img: DynamicImage,
     pub width: u32,
@@ -72,9 +117,9 @@ pub struct AsciiConverter {
 }
 
 impl AsciiConverter {
-    /// Convert image to text
+    /// Convert image to raw ascii image
     #[cfg(not(feature = "parallelism"))]
-    pub fn convert(&self) -> AsciiImage {
+    pub fn convert_raw(&self) -> RawAsciiImage {
         let height = calc_new_height(
             self.width,
             self.img.width(),
@@ -87,36 +132,16 @@ impl AsciiConverter {
             .to_rgba8();
         let chunks = img_buffer.as_raw().chunks(4);
 
-        let ascii = chunks
-            .map(|raw| {
-                if self.colored {
-                    ascii_symbol(
-                        get_lightness(raw[0], raw[1], raw[2], raw[3]),
-                        &self.ascii_string,
-                    )
-                    .to_string()
-                    .truecolor(raw[0], raw[1], raw[2])
-                    .to_string()
-                } else {
-                    ascii_symbol(
-                        get_lightness(raw[0], raw[1], raw[2], raw[3]),
-                        &self.ascii_string,
-                    )
-                    .to_string()
-                }
-            })
-            .collect::<Vec<String>>()
-            .chunks(self.width.try_into().unwrap())
-            .map(|line| line.join(""))
-            .collect::<Vec<String>>()
-            .join("\n");
+        let result = chunks
+            .map(|raw| AsciiCharacter::new(raw[0], raw[1], raw[2], raw[3], &self.ascii_string))
+            .collect::<Vec<AsciiCharacter>>();
 
-        AsciiImage::new(ascii, self.width, height, self.colored)
+        RawAsciiImage::new(result, self.width, height, self.colored)
     }
 
-    /// Convert image to text
+    /// Convert image to raw ascii image
     #[cfg(feature = "parallelism")]
-    pub fn convert(&self) -> AsciiImage {
+    pub fn convert_raw(&self) -> RawAsciiImage {
         let height = calc_new_height(
             self.width,
             self.img.width(),
@@ -130,30 +155,72 @@ impl AsciiConverter {
         let chunks = img_buffer.as_raw().par_chunks(4);
 
         let result = chunks
-            .map(|raw| {
-                if self.colored {
-                    ascii_symbol(
-                        get_lightness(raw[0], raw[1], raw[2], raw[3]),
-                        &self.ascii_string,
-                    )
-                    .to_string()
-                    .truecolor(raw[0], raw[1], raw[2])
-                    .to_string()
-                } else {
-                    ascii_symbol(
-                        get_lightness(raw[0], raw[1], raw[2], raw[3]),
-                        &self.ascii_string,
-                    )
-                    .to_string()
-                }
-            })
-            .collect::<Vec<String>>()
-            .par_chunks(self.width.try_into().unwrap())
-            .map(|line| line.join(""))
-            .collect::<Vec<String>>()
-            .join("\n");
+            .map(|raw| AsciiCharacter::new(raw[0], raw[1], raw[2], raw[3], &self.ascii_string))
+            .collect::<Vec<AsciiCharacter>>();
 
-        AsciiImage::new(result, self.width, height, self.colored)
+        RawAsciiImage::new(result, self.width, height, self.colored)
+    }
+
+    /// Convert image to ascii
+    #[cfg(not(feature = "parallelism"))]
+    pub fn convert(self) -> AsciiImage {
+        let raw_ascii_image = AsciiConverter::convert_raw(&self);
+
+        AsciiImage::new(
+            raw_ascii_image
+                .result
+                .iter()
+                .map(|character| {
+                    if self.colored {
+                        character
+                            .character
+                            .to_string()
+                            .truecolor(character.r, character.g, character.b)
+                            .to_string()
+                    } else {
+                        character.character.to_string()
+                    }
+                })
+                .collect::<Vec<String>>()
+                .chunks(self.width.try_into().unwrap())
+                .map(|line| line.join(""))
+                .collect::<Vec<String>>()
+                .join("\n"),
+            raw_ascii_image.width,
+            raw_ascii_image.height,
+            raw_ascii_image.colored,
+        )
+    }
+
+    /// Convert image to ascii
+    #[cfg(feature = "parallelism")]
+    pub fn convert(self) -> AsciiImage {
+        let raw_ascii_image = AsciiConverter::convert_raw(&self);
+
+        AsciiImage::new(
+            raw_ascii_image
+                .result
+                .par_iter()
+                .map(|character| {
+                    if self.colored {
+                        character
+                            .character
+                            .to_string()
+                            .truecolor(character.r, character.g, character.b)
+                            .to_string()
+                    } else {
+                        character.character.to_string()
+                    }
+                })
+                .collect::<Vec<String>>()
+                .par_chunks(self.width.try_into().unwrap())
+                .map(|line| line.join(""))
+                .collect::<Vec<String>>()
+                .join("\n"),
+            raw_ascii_image.width,
+            raw_ascii_image.height,
+            raw_ascii_image.colored,
+        )
     }
 }
 
@@ -179,7 +246,7 @@ fn renders_frame() {
         ..Default::default()
     };
 
-    ascii_converter.convert();
+    ascii_converter.convert_raw();
 }
 
 #[test]
@@ -193,5 +260,5 @@ fn renders_colored_frame() {
         ..Default::default()
     };
 
-    ascii_converter.convert();
+    ascii_converter.convert_raw();
 }

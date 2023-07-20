@@ -92,13 +92,14 @@ fn pre_render(
     image_paths
         .iter()
         .map(|path| {
-            let ascii_image = image_to_ascii(
-                image::open(path).unwrap(),
+            let ascii_image = AsciiConverter {
+                img: image::open(path).unwrap(),
                 width,
-                ascii_string,
+                ascii_string: ascii_string.to_owned(),
                 colored,
                 font_ratio,
-            );
+            }
+            .convert();
 
             pb.inc(1);
 
