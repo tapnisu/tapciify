@@ -154,7 +154,7 @@ impl AsciiConverter {
                 self.font_ratio,
             )
         } else {
-            self.height
+            self.width
         };
 
         let height = if self.height == 0 {
