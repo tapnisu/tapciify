@@ -10,13 +10,13 @@ use clap::{ArgGroup, Parser};
 ))]
 pub struct Cli {
     /// Input files to convert to ascii
-    #[clap(short, short, num_args = 1.., required=true)]
+    #[clap(short, long, num_args = 1.., required=true)]
     pub input: Vec<String>,
     /// Width of output
-    #[clap(short, short, value_parser)]
+    #[clap(short, long, value_parser)]
     pub width: Option<u32>,
     /// Height of output
-    #[clap(short, short, value_parser)]
+    #[clap(long, value_parser)]
     pub height: Option<u32>,
 
     /// Framerate for showing images
