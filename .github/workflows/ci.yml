@@ -18,6 +18,8 @@ jobs:
         run: cargo build --verbose
       - name: Build with no default features
         run: cargo build --no-default-features
+      - name: Build with no default features
+        run: cargo build --no-default-features -F player
       - name: Run tests
         run: cargo test --verbose
       - name: Clippy
