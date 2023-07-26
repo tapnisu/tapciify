@@ -10,147 +10,6 @@ use rayon::prelude::*;
 #[cfg(target_family = "windows")]
 use glob::glob;
 
-/// Play paths as ascii images
-pub fn play_frames(
-    image_paths: Vec<String>,
-    ascii_string: &str,
-    width: u32,
-    height: u32,
-    colored: bool,
-    frame_time: u64,
-    font_ratio: f64,
-) {
-    let mut first_frame = false;
-
-    for image_path in image_paths {
-        let start = Instant::now();
-        let img = image::open(&image_path)
-            .unwrap_or_else(|_| panic!("Failed to read file: {}", image_path));
-
-        let ascii_image = AsciiConverter {
-            img,
-            width,
-            height,
-            ascii_string: ascii_string.to_owned(),
-            colored,
-            font_ratio,
-        }
-        .convert();
-
-        if first_frame {
-            execute!(stdout(), MoveUp((ascii_image.height).try_into().unwrap()))
-                .unwrap_or_default();
-        } else {
-            first_frame = true;
-        }
-
-        println!("{}", ascii_image.result);
-
-        while frame_time > start.elapsed().as_millis().try_into().unwrap() {}
-    }
-}
-
-/// Convert paths to of ascii images
-#[cfg(feature = "parallelism")]
-fn pre_render(
-    image_paths: Vec<String>,
-    ascii_string: &str,
-    width: u32,
-    height: u32,
-    colored: bool,
-    font_ratio: f64,
-) -> Vec<AsciiImage> {
-    let pb = ProgressBar::new(image_paths.len().try_into().unwrap());
-
-    image_paths
-        .par_iter()
-        .map(|path| {
-            let ascii_image = AsciiConverter {
-                img: image::open(path).unwrap(),
-                width,
-                height,
-                ascii_string: ascii_string.to_owned(),
-                colored,
-                font_ratio,
-            }
-            .convert();
-
-            pb.inc(1);
-
-            ascii_image
-        })
-        .collect::<Vec<AsciiImage>>()
-}
-
-/// Convert paths to of ascii images
-#[cfg(not(feature = "parallelism"))]
-fn pre_render(
-    image_paths: Vec<String>,
-    ascii_string: &str,
-    width: u32,
-    height: u32,
-    colored: bool,
-    font_ratio: f64,
-) -> Vec<AsciiImage> {
-    let pb = ProgressBar::new(image_paths.len().try_into().unwrap());
-
-    image_paths
-        .iter()
-        .map(|path| {
-            let ascii_image = AsciiConverter {
-                img: image::open(path).unwrap(),
-                width,
-                height,
-                ascii_string: ascii_string.to_owned(),
-                colored,
-                font_ratio,
-            }
-            .convert();
-
-            pb.inc(1);
-
-            ascii_image
-        })
-        .collect::<Vec<AsciiImage>>()
-}
-
-/// Convert paths to of ascii images and play them
-pub fn play_pre_rendered_frames(
-    image_paths: Vec<String>,
-    ascii_string: &str,
-    width: u32,
-    height: u32,
-    colored: bool,
-    frame_time: u64,
-    font_ratio: f64,
-) {
-    let mut first_frame = false;
-
-    pre_render(
-        image_paths,
-        ascii_string,
-        width,
-        height,
-        colored,
-        font_ratio,
-    )
-    .iter()
-    .for_each(|ascii_image| {
-        let start = Instant::now();
-
-        if first_frame {
-            execute!(stdout(), MoveUp((ascii_image.height).try_into().unwrap()))
-                .unwrap_or_default();
-        } else {
-            first_frame = true;
-        }
-
-        println!("{}", ascii_image.result);
-
-        while frame_time > start.elapsed().as_millis().try_into().unwrap() {}
-    });
-}
-
 /// Add glob support for paths parsing on windows
 #[cfg(target_family = "windows")]
 #[cfg(feature = "parallelism")]
@@ -216,31 +75,115 @@ impl Player {
         self.ascii_string.clone()
     }
 
+    /// Play paths as ascii images
+    pub fn play_frames(&self) {
+        let mut first_frame = false;
+
+        for image_path in get_paths(self.images_paths.clone()) {
+            let start = Instant::now();
+            let img = image::open(&image_path)
+                .unwrap_or_else(|_| panic!("Failed to read file: {}", image_path));
+
+            let ascii_image = AsciiConverter {
+                img,
+                width: self.width,
+                height: self.height,
+                ascii_string: self.ascii_string.to_owned(),
+                colored: self.colored,
+                font_ratio: self.font_ratio,
+            }
+            .convert();
+
+            if first_frame {
+                execute!(stdout(), MoveUp((ascii_image.height).try_into().unwrap()))
+                    .unwrap_or_default();
+            } else {
+                first_frame = true;
+            }
+
+            println!("{}", ascii_image.result);
+
+            while self.frame_time > start.elapsed().as_millis().try_into().unwrap() {}
+        }
+    }
+
+    /// Convert paths to of ascii images
+    #[cfg(feature = "parallelism")]
+    fn pre_render(&self) -> Vec<AsciiImage> {
+        let pb = ProgressBar::new(self.images_paths.len().try_into().unwrap());
+
+        self.images_paths
+            .par_iter()
+            .map(|path| {
+                let ascii_image = AsciiConverter {
+                    img: image::open(path).unwrap(),
+                    width: self.width,
+                    height: self.height,
+                    ascii_string: self.ascii_string.to_owned(),
+                    colored: self.colored,
+                    font_ratio: self.font_ratio,
+                }
+                .convert();
+
+                pb.inc(1);
+
+                ascii_image
+            })
+            .collect::<Vec<AsciiImage>>()
+    }
+
+    /// Convert paths to of ascii images
+    #[cfg(not(feature = "parallelism"))]
+    fn pre_render(&self) -> Vec<AsciiImage> {
+        let pb = ProgressBar::new(self.images_paths.len().try_into().unwrap());
+
+        self.images_paths
+            .iter()
+            .map(|path| {
+                let ascii_image = AsciiConverter {
+                    img: image::open(path).unwrap(),
+                    width: self.width,
+                    height: self.height,
+                    ascii_string: self.ascii_string.to_owned(),
+                    colored: self.colored,
+                    font_ratio: self.font_ratio,
+                }
+                .convert();
+
+                pb.inc(1);
+
+                ascii_image
+            })
+            .collect::<Vec<AsciiImage>>()
+    }
+
+    /// Convert paths to of ascii images and play them
+    pub fn play_pre_rendered_frames(&self) {
+        let mut first_frame = false;
+
+        Self::pre_render(self).iter().for_each(|ascii_image| {
+            let start = Instant::now();
+
+            if first_frame {
+                execute!(stdout(), MoveUp((ascii_image.height).try_into().unwrap()))
+                    .unwrap_or_default();
+            } else {
+                first_frame = true;
+            }
+
+            println!("{}", ascii_image.result);
+
+            while self.frame_time > start.elapsed().as_millis().try_into().unwrap() {}
+        });
+    }
+
     /// Play frames
     pub fn play(self) {
-        let image_paths = get_paths(self.images_paths);
-
         if self.pre_render {
-            return play_pre_rendered_frames(
-                image_paths,
-                self.ascii_string.as_str(),
-                self.width,
-                self.height,
-                self.colored,
-                self.frame_time,
-                self.font_ratio,
-            );
+            return Self::play_pre_rendered_frames(&self);
         }
 
-        play_frames(
-            image_paths,
-            self.ascii_string.as_str(),
-            self.width,
-            self.height,
-            self.colored,
-            self.frame_time,
-            self.font_ratio,
-        )
+        Self::play_frames(&self)
     }
 }
 
