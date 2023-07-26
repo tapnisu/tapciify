@@ -8,6 +8,7 @@ use clap::{ArgGroup, Parser};
         .required(true)
         .args(&["width", "height"]),
 ))]
+#[clap(disable_help_flag = true)]
 pub struct Cli {
     /// Input files to convert to ascii
     #[clap(short, long, num_args = 1.., required=true)]
@@ -16,7 +17,7 @@ pub struct Cli {
     #[clap(short, long, value_parser)]
     pub width: Option<u32>,
     /// Height of output
-    #[clap(long, value_parser)]
+    #[clap(short, long, value_parser)]
     pub height: Option<u32>,
 
     /// Framerate for showing images
@@ -38,4 +39,6 @@ pub struct Cli {
     /// Font ratio: width / height
     #[clap(long="ratio", default_value_t = DEFAULT_FONT_RATIO)]
     pub font_ratio: f64,
+    #[arg(short='H', long, action = clap::ArgAction::Help)]
+    help: bool,
 }
