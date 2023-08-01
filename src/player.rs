@@ -101,7 +101,7 @@ impl Player {
                 first_frame = true;
             }
 
-            println!("{}", ascii_image.result);
+            println!("{}", ascii_image.text);
 
             while self.frame_time > start.elapsed().as_millis().try_into().unwrap() {}
         }
@@ -171,7 +171,7 @@ impl Player {
                 first_frame = true;
             }
 
-            println!("{}", ascii_image.result);
+            println!("{}", ascii_image.text);
 
             while self.frame_time > start.elapsed().as_millis().try_into().unwrap() {}
         });

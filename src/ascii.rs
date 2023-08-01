@@ -96,16 +96,16 @@ fn converts_to_ascii_character() {
 
 /// Raw Ascii image conversion result
 pub struct RawAsciiImage {
-    pub result: Vec<AsciiCharacter>,
+    pub characters: Vec<AsciiCharacter>,
     pub width: u32,
     pub height: u32,
     pub colored: bool,
 }
 
 impl RawAsciiImage {
-    pub fn new(result: Vec<AsciiCharacter>, width: u32, height: u32, colored: bool) -> Self {
+    pub fn new(characters: Vec<AsciiCharacter>, width: u32, height: u32, colored: bool) -> Self {
         Self {
-            result,
+            characters,
             width,
             height,
             colored,
@@ -115,16 +115,16 @@ impl RawAsciiImage {
 
 /// Ascii image conversion result
 pub struct AsciiImage {
-    pub result: String,
+    pub text: String,
     pub width: u32,
     pub height: u32,
     pub colored: bool,
 }
 
 impl AsciiImage {
-    pub fn new(result: String, width: u32, height: u32, colored: bool) -> Self {
+    pub fn new(text: String, width: u32, height: u32, colored: bool) -> Self {
         Self {
-            result,
+            text,
             width,
             height,
             colored,
@@ -174,11 +174,11 @@ impl AsciiConverter {
             .to_rgba8();
         let chunks = img_buffer.as_raw().par_chunks(4);
 
-        let result = chunks
+        let characters = chunks
             .map(|raw| AsciiCharacter::new(raw[0], raw[1], raw[2], raw[3], &self.ascii_string))
             .collect::<Vec<AsciiCharacter>>();
 
-        RawAsciiImage::new(result, width, height, self.colored)
+        RawAsciiImage::new(characters, width, height, self.colored)
     }
 
     /// Convert image to raw ascii image
@@ -212,11 +212,11 @@ impl AsciiConverter {
             .to_rgba8();
         let chunks = img_buffer.as_raw().chunks(4);
 
-        let result = chunks
+        let characters = chunks
             .map(|raw| AsciiCharacter::new(raw[0], raw[1], raw[2], raw[3], &self.ascii_string))
             .collect::<Vec<AsciiCharacter>>();
 
-        RawAsciiImage::new(result, width, height, self.colored)
+        RawAsciiImage::new(characters, width, height, self.colored)
     }
 
     /// Convert image to ascii
@@ -225,7 +225,7 @@ impl AsciiConverter {
         let raw_ascii_image = AsciiConverter::convert_raw(&self);
 
         let characters = raw_ascii_image
-            .result
+            .characters
             .par_iter()
             .map(|ascii_character| {
                 if self.colored {
@@ -240,14 +240,14 @@ impl AsciiConverter {
             })
             .collect::<Vec<String>>();
 
-        let result = characters
+        let text = characters
             .par_chunks(raw_ascii_image.width.try_into().unwrap())
             .map(|line| line.join(""))
             .collect::<Vec<String>>()
             .join("\n");
 
         AsciiImage::new(
-            result,
+            text,
             raw_ascii_image.width,
             raw_ascii_image.height,
             raw_ascii_image.colored,
@@ -260,7 +260,7 @@ impl AsciiConverter {
         let raw_ascii_image = AsciiConverter::convert_raw(&self);
 
         let characters = raw_ascii_image
-            .result
+            .characters
             .iter()
             .map(|ascii_character| {
                 if self.colored {
@@ -275,14 +275,14 @@ impl AsciiConverter {
             })
             .collect::<Vec<String>>();
 
-        let result = characters
+        let text = characters
             .chunks(raw_ascii_image.width.try_into().unwrap())
             .map(|line| line.join(""))
             .collect::<Vec<String>>()
             .join("\n");
 
         AsciiImage::new(
-            result,
+            text,
             raw_ascii_image.width,
             raw_ascii_image.height,
             raw_ascii_image.colored,
