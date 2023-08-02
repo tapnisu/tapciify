@@ -16,11 +16,11 @@ pub struct Cli {
     #[clap(short, long, value_parser)]
     pub width: Option<u32>,
     /// Height of output
-    #[clap(short='H', long, value_parser)]
+    #[clap(short = 'H', long, value_parser)]
     pub height: Option<u32>,
 
     /// Framerate for showing images
-    #[clap(short, long = "framerate", value_name = "framerate")]
+    #[clap(short, long = "fps", long = "framerate", value_name = "framerate")]
     pub frame_rate: Option<f64>,
     /// Render, and then show
     #[clap(short, long, action)]

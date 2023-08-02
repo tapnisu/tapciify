@@ -2,7 +2,7 @@
 
 <h1 align="center">Tapciify</h1>
 
-<p align="center">CLI tool that can let you view images/videos in terminal as ASCII</p>
+<p align="center">CLI tool that can let you view images in terminal as ASCII art</p>
 
 ## Requirements
 

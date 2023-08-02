@@ -94,7 +94,7 @@ fn converts_to_ascii_character() {
     );
 }
 
-/// Raw Ascii image conversion result
+/// Raw Ascii art conversion result
 pub struct RawAsciiArt {
     pub characters: Vec<AsciiCharacter>,
     pub width: u32,
@@ -113,7 +113,7 @@ impl RawAsciiArt {
     }
 }
 
-/// Ascii image conversion result
+/// Ascii art conversion result
 pub struct AsciiRaw {
     pub text: String,
     pub width: u32,
@@ -132,7 +132,7 @@ impl AsciiRaw {
     }
 }
 
-/// Converter of images to ascii
+/// Converter of images to ASCII art
 pub struct AsciiConverter {
     pub img: DynamicImage,
     pub width: u32,
@@ -143,7 +143,7 @@ pub struct AsciiConverter {
 }
 
 impl AsciiConverter {
-    /// Convert image to raw ascii image
+    /// Convert image to raw ASCII art
     #[cfg(feature = "parallelism")]
     pub fn convert_raw(&self) -> RawAsciiArt {
         let width = if self.width == 0 {
@@ -181,7 +181,7 @@ impl AsciiConverter {
         RawAsciiArt::new(characters, width, height, self.colored)
     }
 
-    /// Convert image to raw ascii image
+    /// Convert image to raw ASCII art
     #[cfg(not(feature = "parallelism"))]
     pub fn convert_raw(&self) -> RawAsciiArt {
         let width = if self.width == 0 {
@@ -219,7 +219,7 @@ impl AsciiConverter {
         RawAsciiArt::new(characters, width, height, self.colored)
     }
 
-    /// Convert image to ascii
+    /// Convert image to ASCII art
     #[cfg(feature = "parallelism")]
     pub fn convert(self) -> AsciiRaw {
         let raw_ascii_art = AsciiConverter::convert_raw(&self);
@@ -254,12 +254,12 @@ impl AsciiConverter {
         )
     }
 
-    /// Convert image to ascii
+    /// Convert image to ASCII art
     #[cfg(not(feature = "parallelism"))]
     pub fn convert(self) -> AsciiRaw {
-        let raw_ascii_image = AsciiConverter::convert_raw(&self);
+        let raw_ascii_art = AsciiConverter::convert_raw(&self);
 
-        let characters = raw_ascii_image
+        let characters = raw_ascii_art
             .characters
             .iter()
             .map(|ascii_character| {
@@ -276,16 +276,16 @@ impl AsciiConverter {
             .collect::<Vec<String>>();
 
         let text = characters
-            .chunks(raw_ascii_image.width.try_into().unwrap())
+            .chunks(raw_ascii_art.width.try_into().unwrap())
             .map(|line| line.join(""))
             .collect::<Vec<String>>()
             .join("\n");
 
         AsciiRaw::new(
             text,
-            raw_ascii_image.width,
-            raw_ascii_image.height,
-            raw_ascii_image.colored,
+            raw_ascii_art.width,
+            raw_ascii_art.height,
+            raw_ascii_art.colored,
         )
     }
 }
