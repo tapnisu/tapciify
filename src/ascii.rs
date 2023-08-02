@@ -114,14 +114,14 @@ impl RawAsciiArt {
 }
 
 /// Ascii art conversion result
-pub struct AsciiRaw {
+pub struct AsciiArt {
     pub text: String,
     pub width: u32,
     pub height: u32,
     pub colored: bool,
 }
 
-impl AsciiRaw {
+impl AsciiArt {
     pub fn new(text: String, width: u32, height: u32, colored: bool) -> Self {
         Self {
             text,
@@ -221,7 +221,7 @@ impl AsciiConverter {
 
     /// Convert image to ASCII art
     #[cfg(feature = "parallelism")]
-    pub fn convert(self) -> AsciiRaw {
+    pub fn convert(self) -> AsciiArt {
         let raw_ascii_art = AsciiConverter::convert_raw(&self);
 
         let characters = raw_ascii_art
@@ -246,7 +246,7 @@ impl AsciiConverter {
             .collect::<Vec<String>>()
             .join("\n");
 
-        AsciiRaw::new(
+        AsciiArt::new(
             text,
             raw_ascii_art.width,
             raw_ascii_art.height,
@@ -256,7 +256,7 @@ impl AsciiConverter {
 
     /// Convert image to ASCII art
     #[cfg(not(feature = "parallelism"))]
-    pub fn convert(self) -> AsciiRaw {
+    pub fn convert(self) -> AsciiArt {
         let raw_ascii_art = AsciiConverter::convert_raw(&self);
 
         let characters = raw_ascii_art
@@ -281,7 +281,7 @@ impl AsciiConverter {
             .collect::<Vec<String>>()
             .join("\n");
 
-        AsciiRaw::new(
+        AsciiArt::new(
             text,
             raw_ascii_art.width,
             raw_ascii_art.height,
