@@ -68,14 +68,14 @@ pub struct Player {
 }
 
 impl Player {
-    /// Reverse ascii string if true
+    /// Reverse ASCII string if true
     pub fn reverse_ascii_string(&mut self) -> String {
         self.ascii_string = self.ascii_string.chars().rev().collect();
 
         self.ascii_string.clone()
     }
 
-    /// Play paths as ascii images
+    /// Play paths as ASCII arts
     pub fn play_frames(&self) {
         let mut first_frame = false;
 
@@ -107,7 +107,7 @@ impl Player {
         }
     }
 
-    /// Convert paths to of ascii images
+    /// Convert paths to of ASCII arts
     #[cfg(feature = "parallelism")]
     fn pre_render(&self) -> Vec<AsciiRaw> {
         let pb = ProgressBar::new(self.images_paths.len().try_into().unwrap());
@@ -132,7 +132,7 @@ impl Player {
             .collect::<Vec<AsciiRaw>>()
     }
 
-    /// Convert paths to of ascii images
+    /// Convert paths to of ASCII arts
     #[cfg(not(feature = "parallelism"))]
     fn pre_render(&self) -> Vec<AsciiRaw> {
         let pb = ProgressBar::new(self.images_paths.len().try_into().unwrap());
@@ -157,7 +157,7 @@ impl Player {
             .collect::<Vec<AsciiRaw>>()
     }
 
-    /// Convert paths to of ascii images and play them
+    /// Convert paths to of ASCII arts and play them
     pub fn play_pre_rendered_frames(&self) {
         let mut first_frame = false;
 
