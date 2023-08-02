@@ -1,4 +1,4 @@
-use crate::ascii::{AsciiConverter, AsciiImage, DEFAULT_ASCII_STRING, DEFAULT_FONT_RATIO};
+use crate::ascii::{AsciiConverter, AsciiRaw, DEFAULT_ASCII_STRING, DEFAULT_FONT_RATIO};
 use crossterm::{cursor::MoveUp, execute};
 use indicatif::ProgressBar;
 
@@ -109,7 +109,7 @@ impl Player {
 
     /// Convert paths to of ascii images
     #[cfg(feature = "parallelism")]
-    fn pre_render(&self) -> Vec<AsciiImage> {
+    fn pre_render(&self) -> Vec<AsciiRaw> {
         let pb = ProgressBar::new(self.images_paths.len().try_into().unwrap());
 
         self.images_paths
@@ -129,12 +129,12 @@ impl Player {
 
                 ascii_image
             })
-            .collect::<Vec<AsciiImage>>()
+            .collect::<Vec<AsciiRaw>>()
     }
 
     /// Convert paths to of ascii images
     #[cfg(not(feature = "parallelism"))]
-    fn pre_render(&self) -> Vec<AsciiImage> {
+    fn pre_render(&self) -> Vec<AsciiRaw> {
         let pb = ProgressBar::new(self.images_paths.len().try_into().unwrap());
 
         self.images_paths
@@ -154,7 +154,7 @@ impl Player {
 
                 ascii_image
             })
-            .collect::<Vec<AsciiImage>>()
+            .collect::<Vec<AsciiRaw>>()
     }
 
     /// Convert paths to of ascii images and play them
