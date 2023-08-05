@@ -66,6 +66,7 @@ pub fn calc_new_height(new_width: u32, width: u32, height: u32, font_ratio: f64)
 }
 
 /// Ascii character of RawAsciiImage
+#[derive(Debug, Clone)]
 pub struct AsciiCharacter {
     pub character: char,
     pub r: u8,
@@ -75,18 +76,24 @@ pub struct AsciiCharacter {
 }
 
 impl AsciiCharacter {
-    pub fn new(r: u8, g: u8, b: u8, a: u8, ascii_string: &str) -> AsciiCharacter {
+    pub fn new(
+        r: u8,
+        g: u8,
+        b: u8,
+        a: u8,
+        ascii_string: &str,
+    ) -> Result<AsciiCharacter, AsciiStringError> {
         let lightness = get_lightness(r, g, b, a);
 
-        let character = ascii_character(lightness, ascii_string).unwrap();
+        let character = ascii_character(lightness, ascii_string)?;
 
-        AsciiCharacter {
+        Ok(AsciiCharacter {
             character,
             r,
             g,
             b,
             a,
-        }
+        })
     }
 }
 
@@ -95,20 +102,29 @@ fn converts_to_ascii_character() {
     let ascii_string = " *#";
 
     assert_eq!(
-        AsciiCharacter::new(255, 255, 255, 255, ascii_string).character,
+        AsciiCharacter::new(255, 255, 255, 255, ascii_string)
+            .unwrap()
+            .character,
         '#'
     );
     assert_eq!(
-        AsciiCharacter::new(255, 255, 255, 0, ascii_string).character,
+        AsciiCharacter::new(255, 255, 255, 0, ascii_string)
+            .unwrap()
+            .character,
         ' '
     );
     assert_eq!(
-        AsciiCharacter::new(0, 0, 0, 255, ascii_string).character,
+        AsciiCharacter::new(0, 0, 0, 255, ascii_string)
+            .unwrap()
+            .character,
         ' '
     );
+
+    assert!(AsciiCharacter::new(0, 0, 0, 255, "").is_err());
 }
 
 /// Raw Ascii art conversion result
+#[derive(Debug, Clone)]
 pub struct RawAsciiArt {
     pub characters: Vec<AsciiCharacter>,
     pub width: u32,
@@ -128,6 +144,7 @@ impl RawAsciiArt {
 }
 
 /// Ascii art conversion result
+#[derive(Debug, Clone)]
 pub struct AsciiArt {
     pub text: String,
     pub width: u32,
@@ -147,6 +164,7 @@ impl AsciiArt {
 }
 
 /// Converter of images to ASCII art
+#[derive(Debug, Clone)]
 pub struct AsciiConverter {
     pub img: DynamicImage,
     pub width: u32,
@@ -159,7 +177,7 @@ pub struct AsciiConverter {
 impl AsciiConverter {
     /// Convert image to raw ASCII art
     #[cfg(feature = "parallelism")]
-    pub fn convert_raw(&self) -> RawAsciiArt {
+    pub fn convert_raw(&self) -> Result<RawAsciiArt, AsciiStringError> {
         let width = if self.width == 0 {
             calc_new_width(
                 self.height,
@@ -190,9 +208,9 @@ impl AsciiConverter {
 
         let characters = chunks
             .map(|raw| AsciiCharacter::new(raw[0], raw[1], raw[2], raw[3], &self.ascii_string))
-            .collect::<Vec<AsciiCharacter>>();
+            .collect::<Result<Vec<AsciiCharacter>, AsciiStringError>>()?;
 
-        RawAsciiArt::new(characters, width, height, self.colored)
+        Ok(RawAsciiArt::new(characters, width, height, self.colored))
     }
 
     /// Convert image to raw ASCII art
@@ -235,8 +253,8 @@ impl AsciiConverter {
 
     /// Convert image to ASCII art
     #[cfg(feature = "parallelism")]
-    pub fn convert(self) -> AsciiArt {
-        let raw_ascii_art = AsciiConverter::convert_raw(&self);
+    pub fn convert(self) -> Result<AsciiArt, AsciiStringError> {
+        let raw_ascii_art = AsciiConverter::convert_raw(&self)?;
 
         let characters = raw_ascii_art
             .characters
@@ -260,12 +278,12 @@ impl AsciiConverter {
             .collect::<Vec<String>>()
             .join("\n");
 
-        AsciiArt::new(
+        Ok(AsciiArt::new(
             text,
             raw_ascii_art.width,
             raw_ascii_art.height,
             raw_ascii_art.colored,
-        )
+        ))
     }
 
     /// Convert image to ASCII art

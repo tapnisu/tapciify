@@ -1,4 +1,4 @@
-use crate::ascii::{AsciiConverter, AsciiArt, DEFAULT_ASCII_STRING, DEFAULT_FONT_RATIO};
+use crate::ascii::{AsciiArt, AsciiConverter, DEFAULT_ASCII_STRING, DEFAULT_FONT_RATIO};
 use crossterm::{cursor::MoveUp, execute};
 use indicatif::ProgressBar;
 
@@ -56,6 +56,7 @@ pub fn calculate_frame_time(frame_rate: Option<f64>) -> u64 {
 }
 
 /// Player to convert and play frames
+#[derive(Debug, Clone)]
 pub struct Player {
     pub images_paths: Vec<String>,
     pub width: u32,
