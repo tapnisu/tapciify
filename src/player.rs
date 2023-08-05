@@ -170,27 +170,32 @@ impl Player {
 
     /// Convert paths to of ASCII arts
     #[cfg(not(feature = "parallelism"))]
-    fn pre_render(&self) -> Vec<AsciiArt> {
+    fn pre_render(&self) -> Result<Vec<AsciiArt>, PlayerError> {
         let pb = ProgressBar::new(self.images_paths.len().try_into().unwrap());
 
-        self.images_paths
+        let frames = self
+            .images_paths
             .iter()
-            .map(|path| {
+            .map(|path| -> Result<AsciiArt, PlayerError> {
+                let img = image::open(path)?;
+
                 let ascii_image = AsciiConverter {
-                    img: image::open(path).unwrap(),
+                    img,
                     width: self.width,
                     height: self.height,
                     ascii_string: self.ascii_string.to_owned(),
                     colored: self.colored,
                     font_ratio: self.font_ratio,
                 }
-                .convert();
+                .convert()?;
 
                 pb.inc(1);
 
-                ascii_image
+                Ok(ascii_image)
             })
-            .collect::<Vec<AsciiArt>>()
+            .collect::<Result<Vec<AsciiArt>, PlayerError>>()?;
+
+        Ok(frames)
     }
 
     /// Convert paths to of ASCII arts and play them
