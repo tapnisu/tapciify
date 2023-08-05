@@ -159,6 +159,42 @@ impl AsciiArt {
     }
 }
 
+#[derive(Debug, Clone)]
+pub struct SizeError;
+
+impl fmt::Display for SizeError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "width and height can't both be 0")
+    }
+}
+
+#[derive(Debug, Clone)]
+pub enum AsciiConverterError {
+    AsciiStringError(AsciiStringError),
+    SizeError(SizeError),
+}
+
+impl From<AsciiStringError> for AsciiConverterError {
+    fn from(e: AsciiStringError) -> Self {
+        AsciiConverterError::AsciiStringError(e)
+    }
+}
+
+impl From<SizeError> for AsciiConverterError {
+    fn from(e: SizeError) -> Self {
+        AsciiConverterError::SizeError(e)
+    }
+}
+
+impl fmt::Display for AsciiConverterError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            AsciiConverterError::AsciiStringError(err) => err.fmt(f),
+            AsciiConverterError::SizeError(err) => err.fmt(f),
+        }
+    }
+}
+
 /// Converter of images to ASCII art
 #[derive(Debug, Clone)]
 pub struct AsciiConverter {
@@ -173,7 +209,11 @@ pub struct AsciiConverter {
 impl AsciiConverter {
     /// Convert image to raw ASCII art
     #[cfg(feature = "parallelism")]
-    pub fn convert_raw(&self) -> Result<RawAsciiArt, AsciiStringError> {
+    pub fn convert_raw(&self) -> Result<RawAsciiArt, AsciiConverterError> {
+        if self.width == 0 && self.height == 0 {
+            return Err(AsciiConverterError::SizeError(SizeError));
+        }
+
         let width = if self.width == 0 {
             calc_new_width(
                 self.height,
@@ -249,7 +289,7 @@ impl AsciiConverter {
 
     /// Convert image to ASCII art
     #[cfg(feature = "parallelism")]
-    pub fn convert(self) -> Result<AsciiArt, AsciiStringError> {
+    pub fn convert(self) -> Result<AsciiArt, AsciiConverterError> {
         let raw_ascii_art = AsciiConverter::convert_raw(&self)?;
 
         let characters = raw_ascii_art

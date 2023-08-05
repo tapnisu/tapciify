@@ -1,5 +1,6 @@
 use crate::ascii::{
-    AsciiArt, AsciiConverter, AsciiStringError, DEFAULT_ASCII_STRING, DEFAULT_FONT_RATIO,
+    AsciiArt, AsciiConverter, AsciiConverterError, AsciiStringError, SizeError,
+    DEFAULT_ASCII_STRING, DEFAULT_FONT_RATIO,
 };
 use crossterm::{cursor::MoveUp, execute};
 use image::ImageError;
@@ -72,14 +73,12 @@ pub struct Player {
 
 #[derive(Debug)]
 pub enum PlayerError {
-    AsciiStringError(AsciiStringError),
     ImageError(ImageError),
-}
 
-impl From<AsciiStringError> for PlayerError {
-    fn from(e: AsciiStringError) -> Self {
-        PlayerError::AsciiStringError(e)
-    }
+    AsciiConverterError(AsciiConverterError),
+
+    AsciiStringError(AsciiStringError),
+    SizeError(SizeError),
 }
 
 impl From<ImageError> for PlayerError {
@@ -88,11 +87,33 @@ impl From<ImageError> for PlayerError {
     }
 }
 
+impl From<AsciiConverterError> for PlayerError {
+    fn from(e: AsciiConverterError) -> Self {
+        PlayerError::AsciiConverterError(e)
+    }
+}
+
+impl From<AsciiStringError> for PlayerError {
+    fn from(e: AsciiStringError) -> Self {
+        PlayerError::AsciiStringError(e)
+    }
+}
+
+impl From<SizeError> for PlayerError {
+    fn from(e: SizeError) -> Self {
+        PlayerError::SizeError(e)
+    }
+}
+
 impl fmt::Display for PlayerError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            PlayerError::AsciiStringError(err) => err.fmt(f),
             PlayerError::ImageError(err) => err.fmt(f),
+
+            PlayerError::AsciiConverterError(err) => err.fmt(f),
+
+            PlayerError::AsciiStringError(err) => err.fmt(f),
+            PlayerError::SizeError(err) => err.fmt(f),
         }
     }
 }
