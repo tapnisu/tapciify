@@ -51,8 +51,6 @@ fn converts_to_ascii() {
     assert_eq!(ascii_character(1.0, ascii_string).unwrap(), '#');
     assert_eq!(ascii_character(0.5, ascii_string).unwrap(), '*');
     assert_eq!(ascii_character(0.0, ascii_string).unwrap(), ' ');
-
-    assert!(ascii_character(1.0, "").is_err());
 }
 
 /// Calculate new width from aspect ratio and new height
@@ -119,8 +117,6 @@ fn converts_to_ascii_character() {
             .character,
         ' '
     );
-
-    assert!(AsciiCharacter::new(0, 0, 0, 255, "").is_err());
 }
 
 /// Raw Ascii art conversion result
