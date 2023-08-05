@@ -215,7 +215,7 @@ impl AsciiConverter {
 
     /// Convert image to raw ASCII art
     #[cfg(not(feature = "parallelism"))]
-    pub fn convert_raw(&self) -> RawAsciiArt {
+    pub fn convert_raw(&self) -> Result<RawAsciiArt, AsciiStringError> {
         let width = if self.width == 0 {
             calc_new_width(
                 self.height,
@@ -246,9 +246,9 @@ impl AsciiConverter {
 
         let characters = chunks
             .map(|raw| AsciiCharacter::new(raw[0], raw[1], raw[2], raw[3], &self.ascii_string))
-            .collect::<Vec<AsciiCharacter>>();
+            .collect::<Result<Vec<AsciiCharacter>, AsciiStringError>>()?;
 
-        RawAsciiArt::new(characters, width, height, self.colored)
+        Ok(RawAsciiArt::new(characters, width, height, self.colored))
     }
 
     /// Convert image to ASCII art
@@ -288,8 +288,8 @@ impl AsciiConverter {
 
     /// Convert image to ASCII art
     #[cfg(not(feature = "parallelism"))]
-    pub fn convert(self) -> AsciiArt {
-        let raw_ascii_art = AsciiConverter::convert_raw(&self);
+    pub fn convert(self) -> Result<AsciiArt, AsciiStringError> {
+        let raw_ascii_art = AsciiConverter::convert_raw(&self)?;
 
         let characters = raw_ascii_art
             .characters
@@ -313,12 +313,12 @@ impl AsciiConverter {
             .collect::<Vec<String>>()
             .join("\n");
 
-        AsciiArt::new(
+        Ok(AsciiArt::new(
             text,
             raw_ascii_art.width,
             raw_ascii_art.height,
             raw_ascii_art.colored,
-        )
+        ))
     }
 }
 
