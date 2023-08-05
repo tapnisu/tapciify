@@ -109,7 +109,9 @@ impl Player {
     pub fn play_frames(&self) -> Result<(), PlayerError> {
         let mut first_frame = false;
 
-        for image_path in get_paths(self.images_paths.clone()) {
+        let images_paths = get_paths(self.images_paths.clone());
+
+        for image_path in images_paths {
             let start = Instant::now();
             let img = image::open(&image_path)?;
 
@@ -141,10 +143,11 @@ impl Player {
     /// Convert paths to of ASCII arts
     #[cfg(feature = "parallelism")]
     fn pre_render(&self) -> Result<Vec<AsciiArt>, PlayerError> {
-        let pb = ProgressBar::new(self.images_paths.len().try_into().unwrap());
+        let images_paths = get_paths(self.images_paths.clone());
 
-        let frames = self
-            .images_paths
+        let pb = ProgressBar::new(images_paths.len().try_into().unwrap());
+
+        let frames = images_paths
             .par_iter()
             .map(|path| -> Result<AsciiArt, PlayerError> {
                 let img = image::open(path)?;
@@ -171,10 +174,11 @@ impl Player {
     /// Convert paths to of ASCII arts
     #[cfg(not(feature = "parallelism"))]
     fn pre_render(&self) -> Result<Vec<AsciiArt>, PlayerError> {
-        let pb = ProgressBar::new(self.images_paths.len().try_into().unwrap());
+        let images_paths = get_paths(self.images_paths.clone());
 
-        let frames = self
-            .images_paths
+        let pb = ProgressBar::new(images_paths.len().try_into().unwrap());
+
+        let frames = images_paths
             .iter()
             .map(|path| -> Result<AsciiArt, PlayerError> {
                 let img = image::open(path)?;
