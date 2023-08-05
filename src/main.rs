@@ -2,7 +2,7 @@ pub mod ascii;
 pub mod cli;
 pub mod player;
 
-use clap::Parser;
+use clap::{error::ErrorKind, CommandFactory, Parser};
 use cli::Cli;
 use player::{calculate_frame_time, Player};
 
@@ -30,9 +30,7 @@ fn main() -> Result<(), clap::Error> {
 
     match result {
         Ok(_) => (),
-        Err(err) => {
-            println!("{}", err);
-        }
+        Err(err) => Cli::command().error(ErrorKind::InvalidValue, err).exit(),
     }
 
     Ok(())
