@@ -345,7 +345,7 @@ fn renders_frame() {
         ..Default::default()
     };
 
-    ascii_converter.convert_raw();
+    assert!(ascii_converter.convert_raw().is_ok())
 }
 
 #[test]
@@ -359,5 +359,5 @@ fn renders_colored_frame() {
         ..Default::default()
     };
 
-    ascii_converter.convert_raw();
+    assert!(ascii_converter.convert_raw().is_ok())
 }
