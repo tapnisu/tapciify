@@ -4,8 +4,7 @@ use crate::ascii::{
 use crossterm::{cursor::MoveUp, execute};
 use image::ImageError;
 use indicatif::ProgressBar;
-
-use std::{io::stdout, time::Instant};
+use std::{fmt, io::stdout, time::Instant};
 
 #[cfg(feature = "parallelism")]
 use rayon::prelude::*;
@@ -86,6 +85,15 @@ impl From<AsciiStringError> for PlayerError {
 impl From<ImageError> for PlayerError {
     fn from(e: ImageError) -> Self {
         PlayerError::ImageError(e)
+    }
+}
+
+impl fmt::Display for PlayerError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            PlayerError::AsciiStringError(err) => err.fmt(f),
+            PlayerError::ImageError(err) => err.fmt(f),
+        }
     }
 }
 
