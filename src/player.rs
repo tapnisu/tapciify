@@ -10,11 +10,11 @@ use std::{fmt, io::stdout, time::Instant};
 #[cfg(feature = "parallelism")]
 use rayon::prelude::*;
 
-#[cfg(target_family = "windows")]
+#[cfg(not(target_family = "unix"))]
 use glob::glob;
 
-/// Add glob support for paths parsing on windows
-#[cfg(target_family = "windows")]
+/// Add glob support for paths parsing on non unix
+#[cfg(not(target_family = "unix"))]
 #[cfg(feature = "parallelism")]
 pub fn get_paths(input: Vec<String>) -> Vec<String> {
     input
@@ -28,8 +28,8 @@ pub fn get_paths(input: Vec<String>) -> Vec<String> {
         .collect()
 }
 
-/// Add glob support for paths parsing on windows
-#[cfg(target_family = "windows")]
+/// Add glob support for paths parsing on non unix
+#[cfg(not(target_family = "unix"))]
 #[cfg(not(feature = "parallelism"))]
 pub fn get_paths(input: Vec<String>) -> Vec<String> {
     input
@@ -43,8 +43,8 @@ pub fn get_paths(input: Vec<String>) -> Vec<String> {
         .collect()
 }
 
-/// Add glob support for paths parsing on windows
-#[cfg(not(target_family = "windows"))]
+/// Add glob support for paths parsing on non unix
+#[cfg(target_family = "unix")]
 pub fn get_paths(input: Vec<String>) -> Vec<String> {
     input
 }
