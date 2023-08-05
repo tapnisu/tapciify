@@ -1,6 +1,9 @@
 use colored::Colorize;
 use image::DynamicImage;
-use std::cmp::{max, min};
+use std::{
+    cmp::{max, min},
+    fmt,
+};
 
 #[cfg(feature = "parallelism")]
 use rayon::prelude::*;
@@ -24,21 +27,32 @@ fn calculates_lightness() {
     assert_eq!(get_lightness(255, 255, 255, 51), 0.2);
 }
 
-/// Convert lightness of pixel to symbol
-pub fn ascii_character(lightness: f32, ascii_string: &str) -> char {
+#[derive(Debug, Clone)]
+pub struct AsciiStringError;
+
+impl fmt::Display for AsciiStringError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "lightness is out of ASCII string")
+    }
+}
+
+/// Convert lightness of pixel to ASCII character
+pub fn ascii_character(lightness: f32, ascii_string: &str) -> Result<char, AsciiStringError> {
     ascii_string
         .chars()
-        .nth(((ascii_string.chars().count() - 1) as f32 * lightness) as usize)
-        .unwrap()
+        .nth(((ascii_string.len() - 1) as f32 * lightness) as usize)
+        .ok_or(AsciiStringError)
 }
 
 #[test]
 fn converts_to_ascii() {
     let ascii_string = " *#";
 
-    assert_eq!(ascii_character(1.0, ascii_string), '#');
-    assert_eq!(ascii_character(0.5, ascii_string), '*');
-    assert_eq!(ascii_character(0.0, ascii_string), ' ');
+    assert_eq!(ascii_character(1.0, ascii_string).unwrap(), '#');
+    assert_eq!(ascii_character(0.5, ascii_string).unwrap(), '*');
+    assert_eq!(ascii_character(0.0, ascii_string).unwrap(), ' ');
+
+    assert!(ascii_character(1.0, "").is_err());
 }
 
 /// Calculate new width from aspect ratio and new height
@@ -64,7 +78,7 @@ impl AsciiCharacter {
     pub fn new(r: u8, g: u8, b: u8, a: u8, ascii_string: &str) -> AsciiCharacter {
         let lightness = get_lightness(r, g, b, a);
 
-        let character = ascii_character(lightness, ascii_string);
+        let character = ascii_character(lightness, ascii_string).unwrap();
 
         AsciiCharacter {
             character,
