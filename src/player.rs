@@ -1,17 +1,20 @@
-use crate::ascii::{AsciiConverter, AsciiArt, DEFAULT_ASCII_STRING, DEFAULT_FONT_RATIO};
+use crate::ascii::{
+    AsciiArt, AsciiConverter, AsciiConverterError, AsciiStringError, SizeError,
+    DEFAULT_ASCII_STRING, DEFAULT_FONT_RATIO,
+};
 use crossterm::{cursor::MoveUp, execute};
+use image::ImageError;
 use indicatif::ProgressBar;
-
-use std::{io::stdout, time::Instant};
+use std::{fmt, io::stdout, time::Instant};
 
 #[cfg(feature = "parallelism")]
 use rayon::prelude::*;
 
-#[cfg(target_family = "windows")]
+#[cfg(not(target_family = "unix"))]
 use glob::glob;
 
-/// Add glob support for paths parsing on windows
-#[cfg(target_family = "windows")]
+/// Add glob support for paths parsing on non unix
+#[cfg(not(target_family = "unix"))]
 #[cfg(feature = "parallelism")]
 pub fn get_paths(input: Vec<String>) -> Vec<String> {
     input
@@ -25,8 +28,8 @@ pub fn get_paths(input: Vec<String>) -> Vec<String> {
         .collect()
 }
 
-/// Add glob support for paths parsing on windows
-#[cfg(target_family = "windows")]
+/// Add glob support for paths parsing on non unix
+#[cfg(not(target_family = "unix"))]
 #[cfg(not(feature = "parallelism"))]
 pub fn get_paths(input: Vec<String>) -> Vec<String> {
     input
@@ -40,8 +43,8 @@ pub fn get_paths(input: Vec<String>) -> Vec<String> {
         .collect()
 }
 
-/// Add glob support for paths parsing on windows
-#[cfg(not(target_family = "windows"))]
+/// Add glob support for paths parsing on non unix
+#[cfg(target_family = "unix")]
 pub fn get_paths(input: Vec<String>) -> Vec<String> {
     input
 }
@@ -56,6 +59,7 @@ pub fn calculate_frame_time(frame_rate: Option<f64>) -> u64 {
 }
 
 /// Player to convert and play frames
+#[derive(Debug, Clone)]
 pub struct Player {
     pub images_paths: Vec<String>,
     pub width: u32,
@@ -67,6 +71,53 @@ pub struct Player {
     pub font_ratio: f64,
 }
 
+#[derive(Debug)]
+pub enum PlayerError {
+    ImageError(ImageError),
+
+    AsciiConverterError(AsciiConverterError),
+
+    AsciiStringError(AsciiStringError),
+    SizeError(SizeError),
+}
+
+impl From<ImageError> for PlayerError {
+    fn from(e: ImageError) -> Self {
+        PlayerError::ImageError(e)
+    }
+}
+
+impl From<AsciiConverterError> for PlayerError {
+    fn from(e: AsciiConverterError) -> Self {
+        PlayerError::AsciiConverterError(e)
+    }
+}
+
+impl From<AsciiStringError> for PlayerError {
+    fn from(e: AsciiStringError) -> Self {
+        PlayerError::AsciiStringError(e)
+    }
+}
+
+impl From<SizeError> for PlayerError {
+    fn from(e: SizeError) -> Self {
+        PlayerError::SizeError(e)
+    }
+}
+
+impl fmt::Display for PlayerError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            PlayerError::ImageError(err) => err.fmt(f),
+
+            PlayerError::AsciiConverterError(err) => err.fmt(f),
+
+            PlayerError::AsciiStringError(err) => err.fmt(f),
+            PlayerError::SizeError(err) => err.fmt(f),
+        }
+    }
+}
+
 impl Player {
     /// Reverse ASCII string if true
     pub fn reverse_ascii_string(&mut self) -> String {
@@ -76,13 +127,14 @@ impl Player {
     }
 
     /// Play paths as ASCII arts
-    pub fn play_frames(&self) {
+    pub fn play_frames(&self) -> Result<(), PlayerError> {
         let mut first_frame = false;
 
-        for image_path in get_paths(self.images_paths.clone()) {
+        let images_paths = get_paths(self.images_paths.clone());
+
+        for image_path in images_paths {
             let start = Instant::now();
-            let img = image::open(&image_path)
-                .unwrap_or_else(|_| panic!("Failed to read file: {}", image_path));
+            let img = image::open(&image_path)?;
 
             let ascii_image = AsciiConverter {
                 img,
@@ -92,7 +144,7 @@ impl Player {
                 colored: self.colored,
                 font_ratio: self.font_ratio,
             }
-            .convert();
+            .convert()?;
 
             if first_frame {
                 execute!(stdout(), MoveUp((ascii_image.height).try_into().unwrap()))
@@ -105,63 +157,77 @@ impl Player {
 
             while self.frame_time > start.elapsed().as_millis().try_into().unwrap() {}
         }
+
+        Ok(())
     }
 
     /// Convert paths to of ASCII arts
     #[cfg(feature = "parallelism")]
-    fn pre_render(&self) -> Vec<AsciiArt> {
-        let pb = ProgressBar::new(self.images_paths.len().try_into().unwrap());
+    fn pre_render(&self) -> Result<Vec<AsciiArt>, PlayerError> {
+        let images_paths = get_paths(self.images_paths.clone());
 
-        self.images_paths
+        let pb = ProgressBar::new(images_paths.len().try_into().unwrap());
+
+        let frames = images_paths
             .par_iter()
-            .map(|path| {
+            .map(|path| -> Result<AsciiArt, PlayerError> {
+                let img = image::open(path)?;
+
                 let ascii_image = AsciiConverter {
-                    img: image::open(path).unwrap(),
+                    img,
                     width: self.width,
                     height: self.height,
                     ascii_string: self.ascii_string.to_owned(),
                     colored: self.colored,
                     font_ratio: self.font_ratio,
                 }
-                .convert();
+                .convert()?;
 
                 pb.inc(1);
 
-                ascii_image
+                Ok(ascii_image)
             })
-            .collect::<Vec<AsciiArt>>()
+            .collect::<Result<Vec<AsciiArt>, PlayerError>>()?;
+
+        Ok(frames)
     }
 
     /// Convert paths to of ASCII arts
     #[cfg(not(feature = "parallelism"))]
-    fn pre_render(&self) -> Vec<AsciiArt> {
-        let pb = ProgressBar::new(self.images_paths.len().try_into().unwrap());
+    fn pre_render(&self) -> Result<Vec<AsciiArt>, PlayerError> {
+        let images_paths = get_paths(self.images_paths.clone());
 
-        self.images_paths
+        let pb = ProgressBar::new(images_paths.len().try_into().unwrap());
+
+        let frames = images_paths
             .iter()
-            .map(|path| {
+            .map(|path| -> Result<AsciiArt, PlayerError> {
+                let img = image::open(path)?;
+
                 let ascii_image = AsciiConverter {
-                    img: image::open(path).unwrap(),
+                    img,
                     width: self.width,
                     height: self.height,
                     ascii_string: self.ascii_string.to_owned(),
                     colored: self.colored,
                     font_ratio: self.font_ratio,
                 }
-                .convert();
+                .convert()?;
 
                 pb.inc(1);
 
-                ascii_image
+                Ok(ascii_image)
             })
-            .collect::<Vec<AsciiArt>>()
+            .collect::<Result<Vec<AsciiArt>, PlayerError>>()?;
+
+        Ok(frames)
     }
 
     /// Convert paths to of ASCII arts and play them
-    pub fn play_pre_rendered_frames(&self) {
+    pub fn play_pre_rendered_frames(&self) -> Result<(), PlayerError> {
         let mut first_frame = false;
 
-        Self::pre_render(self).iter().for_each(|ascii_image| {
+        Self::pre_render(self)?.iter().for_each(|ascii_image| {
             let start = Instant::now();
 
             if first_frame {
@@ -175,10 +241,12 @@ impl Player {
 
             while self.frame_time > start.elapsed().as_millis().try_into().unwrap() {}
         });
+
+        Ok(())
     }
 
     /// Play frames
-    pub fn play(self) {
+    pub fn play(self) -> Result<(), PlayerError> {
         if self.pre_render {
             return Self::play_pre_rendered_frames(&self);
         }
@@ -210,4 +278,5 @@ fn plays_frames() {
         ..Default::default()
     }
     .play()
+    .unwrap()
 }

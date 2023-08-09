@@ -2,11 +2,11 @@ pub mod ascii;
 pub mod cli;
 pub mod player;
 
-use clap::Parser;
+use clap::{error::ErrorKind, CommandFactory, Parser};
 use cli::Cli;
 use player::{calculate_frame_time, Player};
 
-fn main() {
+fn main() -> Result<(), clap::Error> {
     let cli = Cli::parse();
 
     let frame_time = calculate_frame_time(cli.frame_rate);
@@ -26,5 +26,12 @@ fn main() {
         player.reverse_ascii_string();
     }
 
-    player.play();
+    let result = player.play();
+
+    match result {
+        Ok(_) => (),
+        Err(err) => Cli::command().error(ErrorKind::InvalidValue, err).exit(),
+    }
+
+    Ok(())
 }
