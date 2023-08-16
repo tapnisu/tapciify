@@ -42,7 +42,7 @@ tapciify -i frames/* -w videoWidth -f 24
 
 ## Examples
 
-| Original                                               | ASCII                                      | ASCII colored                                    |
-| ------------------------------------------------------ | ------------------------------------------ | ------------------------------------------------ |
-| ![Original Image](assets/original.png)                 | ![Ascii image](assets/ascii.png)           | ![Ascii colored image](assets/ascii_colored.png) |
-| `Original image (Shima Rin from Laid-Back Camp manga)` | `tapciify -i ./assets/original.png -w 100` | `tapciify -i ./assets/original.png -w 100 -c`    |
+| Original                                         | ASCII                                      | ASCII colored                                              |
+| ------------------------------------------------ | ------------------------------------------ | ---------------------------------------------------------- |
+| ![Original Image](assets/examples/original.webp) | ![Ascii image](assets/examples/ascii.webp) | ![Ascii colored image](assets/examples/colored-ascii.webp) |
+| `Original image`                                 | `tapciify -i ./assets/original.png -w 100` | `tapciify -i ./assets/original.png -w 100 -c`              |
