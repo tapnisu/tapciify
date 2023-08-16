@@ -21,12 +21,12 @@ jobs:
       - name: Build
         run: cargo build --verbose
       - name: Build without parallelism
-        run: cargo build --no-default-features -F player -F glob
+        run: cargo build --no-default-features -F player
       - name: Run tests
         run: cargo test --verbose
       - name: Clippy
         run: cargo clippy --verbose
       - name: Clippy without parallelism
-        run: cargo clippy --no-default-features -F player -F glob --verbose
+        run: cargo clippy --no-default-features -F player --verbose
       - name: Audit
         run: cargo audit
