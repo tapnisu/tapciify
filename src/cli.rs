@@ -1,17 +1,14 @@
 use crate::ascii::{DEFAULT_ASCII_STRING, DEFAULT_FONT_RATIO};
 use clap::{ArgGroup, Parser};
 
-#[cfg(not(target_family = "unix"))]
-#[cfg(feature = "glob")]
+#[cfg(target_family = "windows")]
 #[cfg(feature = "parallelism")]
 use rayon::prelude::*;
 
-#[cfg(not(target_family = "unix"))]
-#[cfg(feature = "glob")]
+#[cfg(target_family = "windows")]
 use glob::glob;
 
-#[cfg(not(target_family = "unix"))]
-#[cfg(feature = "glob")]
+#[cfg(target_family = "windows")]
 use clap::{error::ErrorKind, CommandFactory};
 
 #[derive(Parser, Debug, Clone)]
@@ -54,8 +51,7 @@ pub struct Cli {
 }
 
 /// Add glob support for paths parsing on non unix
-#[cfg(not(target_family = "unix"))]
-#[cfg(feature = "glob")]
+#[cfg(target_family = "windows")]
 #[cfg(feature = "parallelism")]
 pub fn glob_to_paths(patterns: Vec<String>) -> Vec<String> {
     patterns
@@ -83,7 +79,6 @@ pub fn glob_to_paths(patterns: Vec<String>) -> Vec<String> {
 
 /// Add glob support for paths parsing on non unix
 #[cfg(not(target_family = "unix"))]
-#[cfg(feature = "glob")]
 #[cfg(not(feature = "parallelism"))]
 pub fn glob_to_paths(patterns: Vec<String>) -> Vec<String> {
     patterns
@@ -110,7 +105,7 @@ pub fn glob_to_paths(patterns: Vec<String>) -> Vec<String> {
 }
 
 /// Add glob support for paths parsing on non unix
-#[cfg(not(feature = "glob"))]
+#[cfg(not(target_family = "windows"))]
 pub fn glob_to_paths(patterns: Vec<String>) -> Vec<String> {
     patterns
 }
