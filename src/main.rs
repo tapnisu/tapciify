@@ -1,6 +1,6 @@
-pub mod ascii;
-pub mod cli;
-pub mod player;
+mod ascii;
+mod cli;
+mod player;
 
 use clap::{error::ErrorKind, CommandFactory, Parser};
 use cli::Cli;

@@ -73,47 +73,47 @@ pub struct Player {
 
 #[derive(Debug)]
 pub enum PlayerError {
-    ImageError(ImageError),
+    Image(ImageError),
 
-    AsciiConverterError(AsciiConverterError),
+    AsciiConverter(AsciiConverterError),
 
-    AsciiStringError(AsciiStringError),
-    SizeError(SizeError),
+    AsciiString(AsciiStringError),
+    Size(SizeError),
 }
 
 impl From<ImageError> for PlayerError {
     fn from(e: ImageError) -> Self {
-        PlayerError::ImageError(e)
+        PlayerError::Image(e)
     }
 }
 
 impl From<AsciiConverterError> for PlayerError {
     fn from(e: AsciiConverterError) -> Self {
-        PlayerError::AsciiConverterError(e)
+        PlayerError::AsciiConverter(e)
     }
 }
 
 impl From<AsciiStringError> for PlayerError {
     fn from(e: AsciiStringError) -> Self {
-        PlayerError::AsciiStringError(e)
+        PlayerError::AsciiString(e)
     }
 }
 
 impl From<SizeError> for PlayerError {
     fn from(e: SizeError) -> Self {
-        PlayerError::SizeError(e)
+        PlayerError::Size(e)
     }
 }
 
 impl fmt::Display for PlayerError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            PlayerError::ImageError(err) => err.fmt(f),
+            PlayerError::Image(err) => err.fmt(f),
 
-            PlayerError::AsciiConverterError(err) => err.fmt(f),
+            PlayerError::AsciiConverter(err) => err.fmt(f),
 
-            PlayerError::AsciiStringError(err) => err.fmt(f),
-            PlayerError::SizeError(err) => err.fmt(f),
+            PlayerError::AsciiString(err) => err.fmt(f),
+            PlayerError::Size(err) => err.fmt(f),
         }
     }
 }
