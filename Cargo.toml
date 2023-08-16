@@ -30,7 +30,7 @@ default = ["full"]
 full = ["parallelism", "player", "glob"]
 parallelism = ["dep:rayon"]
 player = ["dep:clap", "dep:crossterm", "dep:indicatif"]
-glob = ["dep:glob"]
+glob = ["dep:glob"]                                     # Only for non unix
 
 [[bin]]
 name = "tapciify"

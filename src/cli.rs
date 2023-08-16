@@ -1,13 +1,16 @@
 use crate::ascii::{DEFAULT_ASCII_STRING, DEFAULT_FONT_RATIO};
 use clap::{ArgGroup, Parser};
 
+#[cfg(not(target_family = "unix"))]
 #[cfg(feature = "glob")]
 #[cfg(feature = "parallelism")]
 use rayon::prelude::*;
 
+#[cfg(not(target_family = "unix"))]
 #[cfg(feature = "glob")]
 use glob::glob;
 
+#[cfg(not(target_family = "unix"))]
 #[cfg(feature = "glob")]
 use clap::{error::ErrorKind, CommandFactory};
 
@@ -51,6 +54,7 @@ pub struct Cli {
 }
 
 /// Add glob support for paths parsing on non unix
+#[cfg(not(target_family = "unix"))]
 #[cfg(feature = "glob")]
 #[cfg(feature = "parallelism")]
 pub fn glob_to_paths(patterns: Vec<String>) -> Vec<String> {
@@ -78,6 +82,7 @@ pub fn glob_to_paths(patterns: Vec<String>) -> Vec<String> {
 }
 
 /// Add glob support for paths parsing on non unix
+#[cfg(not(target_family = "unix"))]
 #[cfg(feature = "glob")]
 #[cfg(not(feature = "parallelism"))]
 pub fn glob_to_paths(patterns: Vec<String>) -> Vec<String> {
