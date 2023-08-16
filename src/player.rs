@@ -10,45 +10,6 @@ use std::{fmt, io::stdout, time::Instant};
 #[cfg(feature = "parallelism")]
 use rayon::prelude::*;
 
-#[cfg(not(target_family = "unix"))]
-use glob::glob;
-
-/// Add glob support for paths parsing on non unix
-#[cfg(not(target_family = "unix"))]
-#[cfg(feature = "parallelism")]
-pub fn get_paths(input: Vec<String>) -> Vec<String> {
-    input
-        .par_iter()
-        .flat_map(|glob_p| {
-            glob(glob_p)
-                .expect("Failed to read glob pattern")
-                .map(|path| path.unwrap().display().to_string())
-                .collect::<Vec<String>>()
-        })
-        .collect()
-}
-
-/// Add glob support for paths parsing on non unix
-#[cfg(not(target_family = "unix"))]
-#[cfg(not(feature = "parallelism"))]
-pub fn get_paths(input: Vec<String>) -> Vec<String> {
-    input
-        .iter()
-        .flat_map(|glob_p| {
-            glob(glob_p)
-                .expect("Failed to read glob pattern")
-                .map(|path| path.unwrap().display().to_string())
-                .collect::<Vec<String>>()
-        })
-        .collect()
-}
-
-/// Add glob support for paths parsing on non unix
-#[cfg(target_family = "unix")]
-pub fn get_paths(input: Vec<String>) -> Vec<String> {
-    input
-}
-
 // Calculate frame time (1 / frame rate)
 pub fn calculate_frame_time(frame_rate: Option<f64>) -> u64 {
     if let Some(frame_rate) = frame_rate {
@@ -119,22 +80,20 @@ impl fmt::Display for PlayerError {
 }
 
 impl Player {
-    /// Reverse ASCII string if true
-    pub fn reverse_ascii_string(&mut self) -> String {
+    /// Reverse ASCII string
+    pub fn reverse_ascii_string(&mut self) -> &mut Self {
         self.ascii_string = self.ascii_string.chars().rev().collect();
 
-        self.ascii_string.clone()
+        self
     }
 
     /// Play paths as ASCII arts
     pub fn play_frames(&self) -> Result<(), PlayerError> {
         let mut first_frame = false;
 
-        let images_paths = get_paths(self.images_paths.clone());
-
-        for image_path in images_paths {
+        for image_path in &self.images_paths {
             let start = Instant::now();
-            let img = image::open(&image_path)?;
+            let img = image::open(image_path)?;
 
             let ascii_image = AsciiConverter {
                 img,
@@ -164,11 +123,10 @@ impl Player {
     /// Convert paths to of ASCII arts
     #[cfg(feature = "parallelism")]
     fn pre_render(&self) -> Result<Vec<AsciiArt>, PlayerError> {
-        let images_paths = get_paths(self.images_paths.clone());
+        let pb = ProgressBar::new(self.images_paths.len().try_into().unwrap());
 
-        let pb = ProgressBar::new(images_paths.len().try_into().unwrap());
-
-        let frames = images_paths
+        let frames = self
+            .images_paths
             .par_iter()
             .map(|path| -> Result<AsciiArt, PlayerError> {
                 let img = image::open(path)?;
@@ -195,11 +153,9 @@ impl Player {
     /// Convert paths to of ASCII arts
     #[cfg(not(feature = "parallelism"))]
     fn pre_render(&self) -> Result<Vec<AsciiArt>, PlayerError> {
-        let images_paths = get_paths(self.images_paths.clone());
+        let pb = ProgressBar::new(self.images_paths.len().try_into().unwrap());
 
-        let pb = ProgressBar::new(images_paths.len().try_into().unwrap());
-
-        let frames = images_paths
+        let frames = self.images_paths
             .iter()
             .map(|path| -> Result<AsciiArt, PlayerError> {
                 let img = image::open(path)?;
