@@ -42,7 +42,7 @@ tapciify -i frames/* -w videoWidth -f 24
 
 ## Examples
 
-| Original                                         | ASCII                                      | ASCII colored                                              |
-| ------------------------------------------------ | ------------------------------------------ | ---------------------------------------------------------- |
-| ![Original Image](assets/examples/original.webp) | ![Ascii image](assets/examples/ascii.webp) | ![Ascii colored image](assets/examples/colored-ascii.webp) |
-| `Original image`                                 | `tapciify -i ./assets/original.png -w 100` | `tapciify -i ./assets/original.png -w 100 -c`              |
+| Original                                         | ASCII                                                   | ASCII colored                                              |
+| ------------------------------------------------ | ------------------------------------------------------- | ---------------------------------------------------------- |
+| ![Original Image](assets/examples/original.webp) | ![Ascii image](assets/examples/ascii.webp)              | ![Ascii colored image](assets/examples/colored-ascii.webp) |
+| `Original image`                                 | `tapciify.exe -i ./assets/examples/original.webp -w 64` | `tapciify.exe -i ./assets/examples/original.webp -w 64 -c` |
