@@ -79,7 +79,7 @@ pub fn glob_to_paths(patterns: Vec<String>) -> Vec<String> {
 
 /// Add glob support for paths parsing on non unix
 #[cfg(feature = "glob")]
-#[cfg(feature = "parallelism")]
+#[cfg(not(feature = "parallelism"))]
 pub fn glob_to_paths(patterns: Vec<String>) -> Vec<String> {
     patterns
         .iter()

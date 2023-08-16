@@ -27,9 +27,10 @@ glob = { version = "0.3", optional = true }
 
 [features]
 default = ["full"]
-full = ["parallelism", "player"]
+full = ["parallelism", "player", "glob"]
 parallelism = ["dep:rayon"]
 player = ["dep:clap", "dep:crossterm", "dep:indicatif"]
+glob = ["dep:glob"]
 
 [[bin]]
 name = "tapciify"
