@@ -3,7 +3,7 @@ mod cli;
 mod player;
 
 use clap::{error::ErrorKind, CommandFactory, Parser};
-use cli::Cli;
+use cli::{glob_to_paths, Cli};
 use player::{calculate_frame_time, Player};
 
 fn main() -> Result<(), clap::Error> {
@@ -11,8 +11,10 @@ fn main() -> Result<(), clap::Error> {
 
     let frame_time = calculate_frame_time(cli.frame_rate);
 
+    let paths = glob_to_paths(cli.input);
+
     let mut player = Player {
-        images_paths: cli.input,
+        images_paths: paths,
         width: cli.width.unwrap_or(0),
         height: cli.height.unwrap_or(0),
         ascii_string: cli.ascii_string,

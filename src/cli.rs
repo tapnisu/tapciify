@@ -1,6 +1,16 @@
 use crate::ascii::{DEFAULT_ASCII_STRING, DEFAULT_FONT_RATIO};
 use clap::{ArgGroup, Parser};
 
+#[cfg(feature = "glob")]
+#[cfg(feature = "parallelism")]
+use rayon::prelude::*;
+
+#[cfg(feature = "glob")]
+use glob::glob;
+
+#[cfg(feature = "glob")]
+use clap::{error::ErrorKind, CommandFactory};
+
 #[derive(Parser, Debug, Clone)]
 #[clap(author, version, about, long_about = None)]
 #[clap(group(
@@ -38,4 +48,64 @@ pub struct Cli {
     /// Font ratio: width / height
     #[clap(long="ratio", default_value_t = DEFAULT_FONT_RATIO)]
     pub font_ratio: f64,
+}
+
+/// Add glob support for paths parsing on non unix
+#[cfg(feature = "glob")]
+#[cfg(feature = "parallelism")]
+pub fn glob_to_paths(patterns: Vec<String>) -> Vec<String> {
+    patterns
+        .par_iter()
+        .flat_map(|glob_p| {
+            let paths = glob(glob_p);
+
+            if let Err(err) = paths {
+                Cli::command().error(ErrorKind::InvalidValue, err).exit()
+            }
+
+            paths
+                .unwrap()
+                .map(|path| {
+                    if let Err(err) = path {
+                        Cli::command().error(ErrorKind::InvalidValue, err).exit()
+                    }
+
+                    path.unwrap().display().to_string()
+                })
+                .collect::<Vec<String>>()
+        })
+        .collect::<Vec<String>>()
+}
+
+/// Add glob support for paths parsing on non unix
+#[cfg(feature = "glob")]
+#[cfg(feature = "parallelism")]
+pub fn glob_to_paths(patterns: Vec<String>) -> Vec<String> {
+    patterns
+        .iter()
+        .flat_map(|glob_p| {
+            let paths = glob(glob_p);
+
+            if let Err(err) = paths {
+                Cli::command().error(ErrorKind::InvalidValue, err).exit()
+            }
+
+            paths
+                .unwrap()
+                .map(|path| {
+                    if let Err(err) = path {
+                        Cli::command().error(ErrorKind::InvalidValue, err).exit()
+                    }
+
+                    path.unwrap().display().to_string()
+                })
+                .collect::<Vec<String>>()
+        })
+        .collect::<Vec<String>>()
+}
+
+/// Add glob support for paths parsing on non unix
+#[cfg(not(feature = "glob"))]
+pub fn glob_to_paths(patterns: Vec<String>) -> Vec<String> {
+    patterns
 }
