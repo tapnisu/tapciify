@@ -42,6 +42,9 @@ pub struct Cli {
     /// String to represent lightness of pixels
     #[clap(short, long, default_value_t = DEFAULT_ASCII_STRING.to_string())]
     pub ascii_string: String,
+    /// Use █ symbol for ASCII string
+    #[clap(long, action)]
+    pub pixels: bool,
     /// Reverse the ASCII string
     #[clap(short, long, action)]
     pub reverse: bool,
