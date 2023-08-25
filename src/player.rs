@@ -155,7 +155,8 @@ impl Player {
     fn pre_render(&self) -> Result<Vec<AsciiArt>, PlayerError> {
         let pb = ProgressBar::new(self.images_paths.len().try_into().unwrap());
 
-        let frames = self.images_paths
+        let frames = self
+            .images_paths
             .iter()
             .map(|path| -> Result<AsciiArt, PlayerError> {
                 let img = image::open(path)?;
@@ -229,7 +230,7 @@ impl Default for Player {
 #[test]
 fn plays_frames() {
     Player {
-        images_paths: vec!["./assets/logo.png".to_string()],
+        images_paths: vec!["./assets/examples/original.webp".to_string()],
         width: 128,
         ..Default::default()
     }

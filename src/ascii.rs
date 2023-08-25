@@ -373,7 +373,7 @@ impl Default for AsciiConverter {
 
 #[test]
 fn renders_frame() {
-    let img = image::open("./assets/logo.png").unwrap();
+    let img = image::open("./assets/examples/original.webp").unwrap();
 
     let ascii_converter = AsciiConverter {
         img,
@@ -386,7 +386,7 @@ fn renders_frame() {
 
 #[test]
 fn renders_colored_frame() {
-    let img = image::open("./assets/logo.png").unwrap();
+    let img = image::open("./assets/examples/original.webp").unwrap();
 
     let ascii_converter = AsciiConverter {
         img,
