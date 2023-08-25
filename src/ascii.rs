@@ -40,7 +40,7 @@ impl fmt::Display for AsciiStringError {
 pub fn ascii_character(lightness: f32, ascii_string: &str) -> Result<char, AsciiStringError> {
     ascii_string
         .chars()
-        .nth(((ascii_string.len() - 1) as f32 * lightness) as usize)
+        .nth(((ascii_string.chars().count() - 1) as f32 * lightness) as usize)
         .ok_or(AsciiStringError)
 }
 
