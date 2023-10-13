@@ -35,6 +35,9 @@ pub struct Cli {
     /// Render, and then show
     #[clap(short, long, action)]
     pub pre_render: bool,
+    /// Loop frames
+    #[clap(short, long = "loop", action)]
+    pub looped: bool,
 
     /// Makes frames colorful
     #[clap(short, long, action)]

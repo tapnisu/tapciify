@@ -28,6 +28,7 @@ pub struct Player {
     pub frame_time: u64,
     pub pre_render: bool,
     pub font_ratio: f64,
+    pub looped: bool,
 }
 
 #[derive(Debug)]
@@ -89,30 +90,35 @@ impl Player {
     pub fn play_frames(&self) -> Result<(), PlayerError> {
         let mut first_frame = false;
 
-        for image_path in &self.images_paths {
-            let start = Instant::now();
-            let img = image::open(image_path)?;
+        loop {
+            for image_path in &self.images_paths {
+                let start = Instant::now();
+                let img = image::open(image_path)?;
 
-            let ascii_image = AsciiConverter {
-                img,
-                width: self.width,
-                height: self.height,
-                ascii_string: self.ascii_string.to_owned(),
-                colored: self.colored,
-                font_ratio: self.font_ratio,
+                let ascii_image = AsciiConverter {
+                    img,
+                    width: self.width,
+                    height: self.height,
+                    ascii_string: self.ascii_string.to_owned(),
+                    colored: self.colored,
+                    font_ratio: self.font_ratio,
+                }
+                .convert()?;
+
+                if first_frame {
+                    execute!(stdout(), MoveUp((ascii_image.height).try_into().unwrap()))
+                        .unwrap_or_default();
+                } else {
+                    first_frame = true;
+                }
+
+                println!("{}", ascii_image.text);
+
+                while self.frame_time > start.elapsed().as_millis().try_into().unwrap() {}
             }
-            .convert()?;
-
-            if first_frame {
-                execute!(stdout(), MoveUp((ascii_image.height).try_into().unwrap()))
-                    .unwrap_or_default();
-            } else {
-                first_frame = true;
+            if !self.looped {
+                break;
             }
-
-            println!("{}", ascii_image.text);
-
-            while self.frame_time > start.elapsed().as_millis().try_into().unwrap() {}
         }
 
         Ok(())
@@ -182,20 +188,26 @@ impl Player {
     pub fn play_pre_rendered_frames(&self) -> Result<(), PlayerError> {
         let mut first_frame = false;
 
-        Self::pre_render(self)?.iter().for_each(|ascii_image| {
-            let start = Instant::now();
+        loop {
+            Self::pre_render(self)?.iter().for_each(|ascii_image| {
+                let start = Instant::now();
 
-            if first_frame {
-                execute!(stdout(), MoveUp((ascii_image.height).try_into().unwrap()))
-                    .unwrap_or_default();
-            } else {
-                first_frame = true;
+                if first_frame {
+                    execute!(stdout(), MoveUp((ascii_image.height).try_into().unwrap()))
+                        .unwrap_or_default();
+                } else {
+                    first_frame = true;
+                }
+
+                println!("{}", ascii_image.text);
+
+                while self.frame_time > start.elapsed().as_millis().try_into().unwrap() {}
+            });
+
+            if !self.looped {
+                break;
             }
-
-            println!("{}", ascii_image.text);
-
-            while self.frame_time > start.elapsed().as_millis().try_into().unwrap() {}
-        });
+        }
 
         Ok(())
     }
@@ -221,6 +233,7 @@ impl Default for Player {
             frame_time: 0,
             pre_render: false,
             font_ratio: DEFAULT_FONT_RATIO,
+            looped: false,
         }
     }
 }
