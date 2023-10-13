@@ -188,8 +188,10 @@ impl Player {
     pub fn play_pre_rendered_frames(&self) -> Result<(), PlayerError> {
         let mut first_frame = false;
 
+        let frames = Self::pre_render(self)?;
+
         loop {
-            Self::pre_render(self)?.iter().for_each(|ascii_image| {
+            frames.iter().for_each(|ascii_image| {
                 let start = Instant::now();
 
                 if first_frame {
