@@ -31,7 +31,7 @@ fn main() -> Result<(), clap::Error> {
         frame_time,
         pre_render: cli.pre_render,
         font_ratio: cli.font_ratio,
-        looped: cli.looped
+        looped: cli.looped,
     };
 
     if cli.reverse {
