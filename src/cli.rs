@@ -103,7 +103,7 @@ pub fn glob_to_paths(patterns: Vec<String>) -> Vec<String> {
                         Cli::command().error(ErrorKind::InvalidValue, err).exit()
                     }
 
-                    path.unwrap().display().to_owned()
+                    path.unwrap().display().to_string()
                 })
                 .collect::<Vec<String>>()
         })
