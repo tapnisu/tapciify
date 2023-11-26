@@ -43,37 +43,37 @@ pub enum PlayerError {
 
 impl From<ImageError> for PlayerError {
     fn from(e: ImageError) -> Self {
-        PlayerError::Image(e)
+        Self::Image(e)
     }
 }
 
 impl From<AsciiConverterError> for PlayerError {
     fn from(e: AsciiConverterError) -> Self {
-        PlayerError::AsciiConverter(e)
+        Self::AsciiConverter(e)
     }
 }
 
 impl From<AsciiStringError> for PlayerError {
     fn from(e: AsciiStringError) -> Self {
-        PlayerError::AsciiString(e)
+        Self::AsciiString(e)
     }
 }
 
 impl From<SizeError> for PlayerError {
     fn from(e: SizeError) -> Self {
-        PlayerError::Size(e)
+        Self::Size(e)
     }
 }
 
 impl fmt::Display for PlayerError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            PlayerError::Image(err) => err.fmt(f),
+            Self::Image(err) => err.fmt(f),
 
-            PlayerError::AsciiConverter(err) => err.fmt(f),
+            Self::AsciiConverter(err) => err.fmt(f),
 
-            PlayerError::AsciiString(err) => err.fmt(f),
-            PlayerError::Size(err) => err.fmt(f),
+            Self::AsciiString(err) => err.fmt(f),
+            Self::Size(err) => err.fmt(f),
         }
     }
 }
@@ -116,6 +116,7 @@ impl Player {
 
                 while self.frame_time > start.elapsed().as_millis().try_into().unwrap() {}
             }
+
             if !self.looped {
                 break;
             }
@@ -226,7 +227,7 @@ impl Player {
 
 impl Default for Player {
     fn default() -> Player {
-        Player {
+        Self {
             images_paths: vec![],
             width: 0,
             height: 0,
@@ -243,7 +244,7 @@ impl Default for Player {
 #[test]
 fn plays_frames() {
     Player {
-        images_paths: vec!["./assets/examples/original.webp".to_string()],
+        images_paths: vec!["./assets/examples/original.webp".to_owned()],
         width: 128,
         ..Default::default()
     }

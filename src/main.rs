@@ -15,7 +15,7 @@ fn main() -> Result<(), clap::Error> {
     let height = cli.height.unwrap_or(0);
 
     let (ascii_string, colored) = if cli.pixels {
-        ("█".to_string(), true)
+        ("█".to_owned(), true)
     } else {
         (cli.ascii_string, cli.colored)
     };

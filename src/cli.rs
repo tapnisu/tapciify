@@ -43,7 +43,7 @@ pub struct Cli {
     #[clap(short, long, action)]
     pub colored: bool,
     /// String to represent lightness of pixels
-    #[clap(short, long, default_value_t = DEFAULT_ASCII_STRING.to_string())]
+    #[clap(short, long, default_value_t = DEFAULT_ASCII_STRING.to_owned())]
     pub ascii_string: String,
     /// Use █ symbol for ASCII string
     #[clap(long, action)]
@@ -103,7 +103,7 @@ pub fn glob_to_paths(patterns: Vec<String>) -> Vec<String> {
                         Cli::command().error(ErrorKind::InvalidValue, err).exit()
                     }
 
-                    path.unwrap().display().to_string()
+                    path.unwrap().display().to_owned()
                 })
                 .collect::<Vec<String>>()
         })
