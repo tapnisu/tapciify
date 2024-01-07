@@ -31,7 +31,7 @@ In this example I set framerate to 24 (but you can use any another)
 1. Make frames from video into dir:
 
 ```bash
-mkdir frames; ffmpeg -i badapple.mkv -r 24 frames/%08d.jpeg
+mkdir frames; ffmpeg -i badapple.mkv frames/%08d.jpeg
 ```
 
 2. Run:
