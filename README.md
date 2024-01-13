@@ -30,19 +30,19 @@ In this example I set framerate to 24 (but you can use any another)
 
 1. Make frames from video into dir:
 
-```bash
-mkdir frames; ffmpeg -i badapple.mkv frames/%08d.jpeg
-```
+   ```bash
+   mkdir frames; ffmpeg -i badapple.mkv frames/%08d.jpeg
+   ```
 
 2. Run:
 
-```bash
-tapciify -i frames/* -w videoWidth -f 24
-```
+   ```bash
+   tapciify -i frames/* -w videoWidth -f 24
+   ```
 
 ## Examples
 
 | Original                                         | ASCII                                               | ASCII colored                                              | Pixels                                                       |
 | ------------------------------------------------ | --------------------------------------------------- | ---------------------------------------------------------- | ------------------------------------------------------------ |
-| ![Original Image](assets/examples/original.webp) | ![ASCII image](assets/examples/ascii.webp)          | ![ASCII colored image](assets/examples/ascii-colored.webp) | ![Image using pixels (█)](assets/examples/ascii-pixels.webp)       |
+| ![Original Image](assets/examples/original.webp) | ![ASCII image](assets/examples/ascii.webp)          | ![ASCII colored image](assets/examples/ascii-colored.webp) | ![Image using pixels (█)](assets/examples/ascii-pixels.webp) |
 | `Original image`                                 | `tapciify -i ./assets/examples/original.webp -w 64` | `tapciify -i ./assets/examples/original.webp -w 64 -c`     | `tapciify -i ./assets/examples/original.webp -w 64 --pixels` |
