@@ -5,7 +5,7 @@ use std::{
     fmt,
 };
 
-#[cfg(feature = "parallelism")]
+#[cfg(feature = "rayon")]
 use rayon::prelude::*;
 
 pub const DEFAULT_ASCII_STRING: &str = " .,:;+*?%S#@";
@@ -202,7 +202,7 @@ pub struct AsciiConverter {
 
 impl AsciiConverter {
     /// Convert image to raw ASCII art
-    #[cfg(feature = "parallelism")]
+    #[cfg(feature = "rayon")]
     pub fn convert_raw(&self) -> Result<RawAsciiArt, AsciiConverterError> {
         if self.width == 0 && self.height == 0 {
             return Err(AsciiConverterError::SizeError(SizeError));
@@ -244,7 +244,7 @@ impl AsciiConverter {
     }
 
     /// Convert image to raw ASCII art
-    #[cfg(not(feature = "parallelism"))]
+    #[cfg(not(feature = "rayon"))]
     pub fn convert_raw(&self) -> Result<RawAsciiArt, AsciiStringError> {
         let width = if self.width == 0 {
             calc_new_width(
@@ -282,7 +282,7 @@ impl AsciiConverter {
     }
 
     /// Convert image to ASCII art
-    #[cfg(feature = "parallelism")]
+    #[cfg(feature = "rayon")]
     pub fn convert(self) -> Result<AsciiArt, AsciiConverterError> {
         let raw_ascii_art = AsciiConverter::convert_raw(&self)?;
 
@@ -317,7 +317,7 @@ impl AsciiConverter {
     }
 
     /// Convert image to ASCII art
-    #[cfg(not(feature = "parallelism"))]
+    #[cfg(not(feature = "rayon"))]
     pub fn convert(self) -> Result<AsciiArt, AsciiStringError> {
         let raw_ascii_art = AsciiConverter::convert_raw(&self)?;
 

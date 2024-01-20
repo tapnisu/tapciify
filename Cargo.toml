@@ -29,9 +29,11 @@ glob = { version = "0.3", optional = true }
 
 [features]
 default = ["full"]
-full = ["parallelism", "player"]
+full = ["rayon", "player"]
 
 parallelism = ["dep:rayon"]
+multithreading = ["dep:rayon"]
+rayon = ["dep:rayon"]
 
 player = ["dep:clap", "dep:crossterm", "dep:indicatif", "dep:glob"]
 

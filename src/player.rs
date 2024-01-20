@@ -7,7 +7,7 @@ use image::ImageError;
 use indicatif::ProgressBar;
 use std::{fmt, io::stdout, time::Instant};
 
-#[cfg(feature = "parallelism")]
+#[cfg(feature = "rayon")]
 use rayon::prelude::*;
 
 // Calculate frame time (1 / frame rate)
@@ -126,7 +126,7 @@ impl Player {
     }
 
     /// Convert paths to of ASCII arts
-    #[cfg(feature = "parallelism")]
+    #[cfg(feature = "rayon")]
     fn pre_render(&self) -> Result<Vec<AsciiArt>, PlayerError> {
         let pb = ProgressBar::new(self.images_paths.len().try_into().unwrap());
 
@@ -156,7 +156,7 @@ impl Player {
     }
 
     /// Convert paths to of ASCII arts
-    #[cfg(not(feature = "parallelism"))]
+    #[cfg(not(feature = "rayon"))]
     fn pre_render(&self) -> Result<Vec<AsciiArt>, PlayerError> {
         let pb = ProgressBar::new(self.images_paths.len().try_into().unwrap());
 

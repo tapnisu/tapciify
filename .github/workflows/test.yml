@@ -20,13 +20,13 @@ jobs:
         run: cargo install cargo-audit
       - name: Build
         run: cargo build --verbose
-      - name: Build without parallelism
+      - name: Build without rayon
         run: cargo build --no-default-features -F player
       - name: Run tests
         run: cargo test --verbose
       - name: Clippy
         run: cargo clippy --verbose
-      - name: Clippy without parallelism
+      - name: Clippy without rayon
         run: cargo clippy --no-default-features -F player --verbose
       - name: Audit
         run: cargo audit

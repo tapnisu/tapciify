@@ -2,7 +2,7 @@ use crate::ascii::{DEFAULT_ASCII_STRING, DEFAULT_FONT_RATIO};
 use clap::{ArgGroup, Parser};
 
 #[cfg(target_family = "windows")]
-#[cfg(feature = "parallelism")]
+#[cfg(feature = "rayon")]
 use rayon::prelude::*;
 
 #[cfg(target_family = "windows")]
@@ -58,7 +58,7 @@ pub struct Cli {
 
 /// Add glob support for paths parsing on non unix
 #[cfg(target_family = "windows")]
-#[cfg(feature = "parallelism")]
+#[cfg(feature = "rayon")]
 pub fn glob_to_paths(patterns: Vec<String>) -> Vec<String> {
     patterns
         .par_iter()
@@ -85,7 +85,7 @@ pub fn glob_to_paths(patterns: Vec<String>) -> Vec<String> {
 
 /// Add glob support for paths parsing on non unix
 #[cfg(not(target_family = "unix"))]
-#[cfg(not(feature = "parallelism"))]
+#[cfg(not(feature = "rayon"))]
 pub fn glob_to_paths(patterns: Vec<String>) -> Vec<String> {
     patterns
         .iter()
