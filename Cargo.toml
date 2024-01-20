@@ -25,13 +25,15 @@ indicatif = { version = "0.17", optional = true }
 rayon = { version = "1", optional = true }
 
 [target.'cfg(windows)'.dependencies]
-glob = "0.3"
+glob = { version = "0.3", optional = true }
 
 [features]
 default = ["full"]
 full = ["parallelism", "player"]
+
 parallelism = ["dep:rayon"]
-player = ["dep:clap", "dep:crossterm", "dep:indicatif"]
+
+player = ["dep:clap", "dep:crossterm", "dep:indicatif", "dep:glob"]
 
 [[bin]]
 name = "tapciify"
