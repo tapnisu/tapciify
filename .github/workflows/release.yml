@@ -50,6 +50,6 @@ jobs:
         with:
           bin: tapciify
           tar: none
-          zip: all
+          zip: none
           target: ${{ matrix.target }}
           token: ${{ secrets.GITHUB_TOKEN }}
