@@ -243,11 +243,16 @@ impl Default for Player {
 
 #[test]
 fn plays_frames() {
-    Player {
-        images_paths: vec!["./assets/examples/original.webp".to_owned()],
-        width: 128,
-        ..Default::default()
-    }
-    .play()
-    .unwrap()
+    let path = "./assets/examples/original.webp";
+
+    assert!(
+        Player {
+            images_paths: vec![path.to_owned()],
+            width: 128,
+            ..Default::default()
+        }
+        .play()
+        .is_ok(),
+        "Playing image {path} failed"
+    )
 }

@@ -21,10 +21,49 @@ pub fn get_lightness(r: u8, g: u8, b: u8, a: u8) -> f32 {
 
 #[test]
 fn calculates_lightness() {
-    assert_eq!(get_lightness(255, 255, 255, 255), 1.0);
-    assert_eq!(get_lightness(0, 0, 0, 255), 0.0);
-    assert_eq!(get_lightness(255, 255, 255, 0), 0.0);
-    assert_eq!(get_lightness(255, 255, 255, 51), 0.2);
+    assert_eq!(
+        get_lightness(255, 255, 255, 255),
+        1.0,
+        "Expected lightness for rgba({}, {}, {}, {}) to be {}",
+        255,
+        255,
+        255,
+        255,
+        1
+    );
+
+    assert_eq!(
+        get_lightness(0, 0, 0, 255),
+        0.0,
+        "Expected lightness for rgba({}, {}, {}, {}) to be {}",
+        0,
+        0,
+        0,
+        255,
+        0
+    );
+
+    assert_eq!(
+        get_lightness(255, 255, 255, 0),
+        0.0,
+        "Expected lightness for rgba({}, {}, {}, {}) to be {}",
+        255,
+        255,
+        255,
+        255,
+        0
+    );
+
+    assert_eq!(
+        get_lightness(255, 255, 255, 51),
+        0.2,
+        "Expected lightness for rgba({}, {}, {}, {}) to be {}",
+        255,
+        255,
+        255,
+        51,
+        0.2
+    );
 }
 
 #[derive(Debug, Clone)]
@@ -48,9 +87,32 @@ pub fn ascii_character(lightness: f32, ascii_string: &str) -> Result<char, Ascii
 fn converts_to_ascii() {
     let ascii_string = " *#";
 
-    assert_eq!(ascii_character(1.0, ascii_string).unwrap(), '#');
-    assert_eq!(ascii_character(0.5, ascii_string).unwrap(), '*');
-    assert_eq!(ascii_character(0.0, ascii_string).unwrap(), ' ');
+    assert_eq!(
+        ascii_character(1.0, ascii_string).unwrap(),
+        '#',
+        "Expected ASCII character in ASCII string \"{}\" for lightness {} to be {}",
+        1.0,
+        ascii_string,
+        '#'
+    );
+
+    assert_eq!(
+        ascii_character(0.5, ascii_string).unwrap(),
+        '*',
+        "Expected ASCII character in ASCII string \"{}\" for lightness {} to be {}",
+        0.5,
+        ascii_string,
+        '*'
+    );
+
+    assert_eq!(
+        ascii_character(0.0, ascii_string).unwrap(),
+        ' ',
+        "Expected ASCII character in ASCII string \"{}\" for lightness {} to be {}",
+        1.0,
+        ascii_string,
+        ' '
+    );
 }
 
 /// Calculate new width from aspect ratio and new height
@@ -103,18 +165,38 @@ fn converts_to_ascii_character() {
         AsciiCharacter::new(255, 255, 255, 255, ascii_string)
             .unwrap()
             .character,
+        '#',
+        "Expected ASCII character for rgba({}, {}, {}, {}) to be {}",
+        255,
+        255,
+        255,
+        255,
         '#'
     );
+
     assert_eq!(
         AsciiCharacter::new(255, 255, 255, 0, ascii_string)
             .unwrap()
             .character,
+        ' ',
+        "Expected ASCII character for rgba({}, {}, {}, {}) to be {}",
+        255,
+        255,
+        255,
+        0,
         ' '
     );
+
     assert_eq!(
         AsciiCharacter::new(0, 0, 0, 255, ascii_string)
             .unwrap()
             .character,
+        ' ',
+        "Expected ASCII character for rgba({}, {}, {}, {}) to be {}",
+        0,
+        0,
+        0,
+        255,
         ' '
     );
 }
@@ -378,7 +460,8 @@ impl Default for AsciiConverter {
 
 #[test]
 fn renders_frame() {
-    let img = image::open("./assets/examples/original.webp").unwrap();
+    let path = "./assets/examples/original.webp";
+    let img = image::open(path).unwrap();
 
     let ascii_converter = AsciiConverter {
         img,
@@ -386,12 +469,17 @@ fn renders_frame() {
         ..Default::default()
     };
 
-    assert!(ascii_converter.convert_raw().is_ok())
+    assert!(
+        ascii_converter.convert_raw().is_ok(),
+        "Converting image \"{}\" failed",
+        path
+    )
 }
 
 #[test]
 fn renders_colored_frame() {
-    let img = image::open("./assets/examples/original.webp").unwrap();
+    let path = "./assets/examples/original.webp";
+    let img = image::open(path).unwrap();
 
     let ascii_converter = AsciiConverter {
         img,
@@ -400,5 +488,9 @@ fn renders_colored_frame() {
         ..Default::default()
     };
 
-    assert!(ascii_converter.convert_raw().is_ok())
+    assert!(
+        ascii_converter.convert_raw().is_ok(),
+        "Converting image \"{}\" failed",
+        path
+    )
 }
