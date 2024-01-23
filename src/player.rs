@@ -42,45 +42,45 @@ pub enum PlayerError {
 }
 
 impl From<ImageError> for PlayerError {
-    fn from(e: ImageError) -> Self {
-        Self::Image(e)
+    fn from(e: ImageError) -> PlayerError {
+        PlayerError::Image(e)
     }
 }
 
 impl From<AsciiConverterError> for PlayerError {
-    fn from(e: AsciiConverterError) -> Self {
-        Self::AsciiConverter(e)
+    fn from(e: AsciiConverterError) -> PlayerError {
+        PlayerError::AsciiConverter(e)
     }
 }
 
 impl From<AsciiStringError> for PlayerError {
-    fn from(e: AsciiStringError) -> Self {
-        Self::AsciiString(e)
+    fn from(e: AsciiStringError) -> PlayerError {
+        PlayerError::AsciiString(e)
     }
 }
 
 impl From<SizeError> for PlayerError {
-    fn from(e: SizeError) -> Self {
-        Self::Size(e)
+    fn from(e: SizeError) -> PlayerError {
+        PlayerError::Size(e)
     }
 }
 
 impl fmt::Display for PlayerError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            Self::Image(err) => err.fmt(f),
+            PlayerError::Image(err) => err.fmt(f),
 
-            Self::AsciiConverter(err) => err.fmt(f),
+            PlayerError::AsciiConverter(err) => err.fmt(f),
 
-            Self::AsciiString(err) => err.fmt(f),
-            Self::Size(err) => err.fmt(f),
+            PlayerError::AsciiString(err) => err.fmt(f),
+            PlayerError::Size(err) => err.fmt(f),
         }
     }
 }
 
 impl Player {
     /// Reverse ASCII string
-    pub fn reverse_ascii_string(&mut self) -> &mut Self {
+    pub fn reverse_ascii_string(&mut self) -> &mut Player {
         self.ascii_string = self.ascii_string.chars().rev().collect();
 
         self
@@ -189,7 +189,7 @@ impl Player {
     pub fn play_pre_rendered_frames(&self) -> Result<(), PlayerError> {
         let mut first_frame = false;
 
-        let frames = Self::pre_render(self)?;
+        let frames = Player::pre_render(self)?;
 
         loop {
             frames.iter().for_each(|ascii_image| {
@@ -218,16 +218,16 @@ impl Player {
     /// Play frames
     pub fn play(self) -> Result<(), PlayerError> {
         if self.pre_render {
-            return Self::play_pre_rendered_frames(&self);
+            return Player::play_pre_rendered_frames(&self);
         }
 
-        Self::play_frames(&self)
+        Player::play_frames(&self)
     }
 }
 
 impl Default for Player {
     fn default() -> Player {
-        Self {
+        Player {
             images_paths: vec![],
             width: 0,
             height: 0,

@@ -74,12 +74,18 @@ pub struct AsciiCharacter {
 }
 
 impl AsciiCharacter {
-    pub fn new(r: u8, g: u8, b: u8, a: u8, ascii_string: &str) -> Result<Self, AsciiStringError> {
+    pub fn new(
+        r: u8,
+        g: u8,
+        b: u8,
+        a: u8,
+        ascii_string: &str,
+    ) -> Result<AsciiCharacter, AsciiStringError> {
         let lightness = get_lightness(r, g, b, a);
 
         let character = ascii_character(lightness, ascii_string)?;
 
-        Ok(Self {
+        Ok(AsciiCharacter {
             character,
             r,
             g,
@@ -123,8 +129,13 @@ pub struct RawAsciiArt {
 }
 
 impl RawAsciiArt {
-    pub fn new(characters: Vec<AsciiCharacter>, width: u32, height: u32, colored: bool) -> Self {
-        Self {
+    pub fn new(
+        characters: Vec<AsciiCharacter>,
+        width: u32,
+        height: u32,
+        colored: bool,
+    ) -> RawAsciiArt {
+        RawAsciiArt {
             characters,
             width,
             height,
@@ -143,8 +154,8 @@ pub struct AsciiArt {
 }
 
 impl AsciiArt {
-    pub fn new(text: String, width: u32, height: u32, colored: bool) -> Self {
-        Self {
+    pub fn new(text: String, width: u32, height: u32, colored: bool) -> AsciiArt {
+        AsciiArt {
             text,
             width,
             height,
@@ -169,22 +180,22 @@ pub enum AsciiConverterError {
 }
 
 impl From<AsciiStringError> for AsciiConverterError {
-    fn from(e: AsciiStringError) -> Self {
-        Self::AsciiStringError(e)
+    fn from(e: AsciiStringError) -> AsciiConverterError {
+        AsciiConverterError::AsciiStringError(e)
     }
 }
 
 impl From<SizeError> for AsciiConverterError {
-    fn from(e: SizeError) -> Self {
-        Self::SizeError(e)
+    fn from(e: SizeError) -> AsciiConverterError {
+        AsciiConverterError::SizeError(e)
     }
 }
 
 impl fmt::Display for AsciiConverterError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            Self::AsciiStringError(err) => err.fmt(f),
-            Self::SizeError(err) => err.fmt(f),
+            AsciiConverterError::AsciiStringError(err) => err.fmt(f),
+            AsciiConverterError::SizeError(err) => err.fmt(f),
         }
     }
 }
@@ -353,8 +364,8 @@ impl AsciiConverter {
 }
 
 impl Default for AsciiConverter {
-    fn default() -> Self {
-        Self {
+    fn default() -> AsciiConverter {
+        AsciiConverter {
             img: DynamicImage::new_rgba16(0, 0),
             width: 0,
             height: 0,
