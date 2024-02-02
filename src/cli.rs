@@ -1,5 +1,6 @@
 use crate::ascii::{DEFAULT_ASCII_STRING, DEFAULT_FONT_RATIO};
 use clap::{ArgGroup, Parser};
+use std::fmt;
 
 #[cfg(target_family = "windows")]
 #[cfg(feature = "rayon")]
@@ -7,16 +8,14 @@ use rayon::prelude::*;
 
 #[cfg(target_family = "windows")]
 use glob::glob;
-
-#[cfg(target_family = "windows")]
-use clap::{error::ErrorKind, CommandFactory};
+use glob::{GlobError, PatternError};
 
 #[derive(Parser, Debug, Clone)]
 #[clap(author, version, about, long_about = None)]
 #[clap(group(
     ArgGroup::new("size")
-        .required(true)
-        .args(&["width", "height"]),
+    .required(true)
+    .args(&["width", "height"]),
 ))]
 pub struct Cli {
     /// Input files to convert to ASCII art
@@ -56,62 +55,71 @@ pub struct Cli {
     pub font_ratio: f64,
 }
 
+#[derive(Debug)]
+pub enum GlobToPathsError {
+    PatternError(PatternError),
+    GlobError(GlobError),
+}
+
+impl From<PatternError> for GlobToPathsError {
+    fn from(e: PatternError) -> GlobToPathsError {
+        GlobToPathsError::PatternError(e)
+    }
+}
+
+impl From<GlobError> for GlobToPathsError {
+    fn from(e: GlobError) -> GlobToPathsError {
+        GlobToPathsError::GlobError(e)
+    }
+}
+
+impl fmt::Display for GlobToPathsError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            GlobToPathsError::PatternError(err) => err.fmt(f),
+            GlobToPathsError::GlobError(err) => err.fmt(f),
+        }
+    }
+}
+
 /// Add glob support for paths parsing on non unix
 #[cfg(target_family = "windows")]
 #[cfg(feature = "rayon")]
-pub fn glob_to_paths(patterns: Vec<String>) -> Vec<String> {
+pub fn glob_to_paths(patterns: Vec<String>) -> Result<Vec<String>, GlobToPathsError> {
     patterns
         .into_par_iter()
-        .flat_map(|glob_p| {
-            let paths = glob(&glob_p);
-
-            if let Err(err) = paths {
-                Cli::command().error(ErrorKind::InvalidValue, err).exit()
-            }
-
-            paths
-                .unwrap()
-                .map(|path| {
-                    if let Err(err) = path {
-                        Cli::command().error(ErrorKind::InvalidValue, err).exit()
-                    }
-
-                    path.unwrap().display().to_string()
-                })
-                .collect::<Vec<String>>()
+        .map(|glob_p| -> Result<Vec<String>, GlobToPathsError> {
+            glob(&glob_p)?
+                .map(|path| Ok(path?.display().to_string()))
+                .collect()
         })
-        .collect::<Vec<String>>()
+        .flat_map(|result| match result {
+            Ok(vec) => vec.into_iter().map(Ok).collect(),
+            Err(er) => vec![Err(er)],
+        })
+        .collect()
 }
 
 /// Add glob support for paths parsing on non unix
 #[cfg(not(target_family = "unix"))]
 #[cfg(not(feature = "rayon"))]
-pub fn glob_to_paths(patterns: Vec<String>) -> Vec<String> {
+pub fn glob_to_paths(patterns: Vec<String>) -> Result<Vec<String>, GlobToPathsError> {
     patterns
         .into_iter()
-        .flat_map(|glob_p| {
-            let paths = glob(&glob_p);
-
-            if let Err(err) = paths {
-                Cli::command().error(ErrorKind::InvalidValue, err).exit()
-            }
-
-            paths
-                .unwrap()
-                .map(|path| {
-                    if let Err(err) = path {
-                        Cli::command().error(ErrorKind::InvalidValue, err).exit()
-                    }
-
-                    path.unwrap().display().to_string()
-                })
-                .collect::<Vec<String>>()
+        .map(|glob_p| -> Result<Vec<String>, GlobToPathsError> {
+            glob(&glob_p)?
+                .map(|path| Ok(path?.display().to_string()))
+                .collect()
         })
-        .collect::<Vec<String>>()
+        .flat_map(|result| match result {
+            Ok(vec) => vec.into_iter().map(Ok).collect(),
+            Err(er) => vec![Err(er)],
+        })
+        .collect()
 }
 
 /// Add glob support for paths parsing on non unix
 #[cfg(not(target_family = "windows"))]
-pub fn glob_to_paths(patterns: Vec<String>) -> Vec<String> {
-    patterns
+pub fn glob_to_paths(patterns: Vec<String>) -> Result<Vec<String>, GlobToPathsError> {
+    Ok(patterns)
 }

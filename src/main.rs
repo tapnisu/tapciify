@@ -9,7 +9,8 @@ use player::{calculate_frame_time, Player};
 fn main() -> Result<(), clap::Error> {
     let cli = Cli::parse();
 
-    let images_paths = glob_to_paths(cli.input);
+    let images_paths = glob_to_paths(cli.input)
+        .unwrap_or_else(|err| Cli::command().error(ErrorKind::InvalidValue, err).exit());
 
     let width = cli.width.unwrap_or(0);
     let height = cli.height.unwrap_or(0);
