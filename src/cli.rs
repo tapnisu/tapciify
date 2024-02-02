@@ -90,7 +90,7 @@ pub fn glob_to_paths(patterns: Vec<String>) -> Vec<String> {
     patterns
         .into_iter()
         .flat_map(|glob_p| {
-            let paths = glob(glob_p);
+            let paths = glob(&glob_p);
 
             if let Err(err) = paths {
                 Cli::command().error(ErrorKind::InvalidValue, err).exit()
