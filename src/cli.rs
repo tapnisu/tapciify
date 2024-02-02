@@ -61,9 +61,9 @@ pub struct Cli {
 #[cfg(feature = "rayon")]
 pub fn glob_to_paths(patterns: Vec<String>) -> Vec<String> {
     patterns
-        .par_iter()
+        .into_par_iter()
         .flat_map(|glob_p| {
-            let paths = glob(glob_p);
+            let paths = glob(&glob_p);
 
             if let Err(err) = paths {
                 Cli::command().error(ErrorKind::InvalidValue, err).exit()
@@ -88,7 +88,7 @@ pub fn glob_to_paths(patterns: Vec<String>) -> Vec<String> {
 #[cfg(not(feature = "rayon"))]
 pub fn glob_to_paths(patterns: Vec<String>) -> Vec<String> {
     patterns
-        .iter()
+        .into_iter()
         .flat_map(|glob_p| {
             let paths = glob(glob_p);
 

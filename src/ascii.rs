@@ -381,7 +381,7 @@ impl AsciiConverter {
 
         let characters = raw_ascii_art
             .characters
-            .par_iter()
+            .into_par_iter()
             .map(|ascii_character| {
                 if self.colored {
                     ascii_character
@@ -416,7 +416,7 @@ impl AsciiConverter {
 
         let characters = raw_ascii_art
             .characters
-            .iter()
+            .into_iter()
             .map(|ascii_character| {
                 if self.colored {
                     ascii_character
