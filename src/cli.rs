@@ -1,5 +1,6 @@
 use crate::ascii::{DEFAULT_ASCII_STRING, DEFAULT_FONT_RATIO};
 use clap::{ArgGroup, Parser};
+use glob::{GlobError, PatternError};
 use std::fmt;
 
 #[cfg(target_family = "windows")]
@@ -7,7 +8,7 @@ use std::fmt;
 use rayon::prelude::*;
 
 #[cfg(target_family = "windows")]
-use glob::{glob, GlobError, PatternError};
+use glob::glob;
 
 #[derive(Parser, Debug, Clone)]
 #[clap(author, version, about, long_about = None)]
