@@ -7,8 +7,7 @@ use std::fmt;
 use rayon::prelude::*;
 
 #[cfg(target_family = "windows")]
-use glob::glob;
-use glob::{GlobError, PatternError};
+use glob::{glob, GlobError, PatternError};
 
 #[derive(Parser, Debug, Clone)]
 #[clap(author, version, about, long_about = None)]
