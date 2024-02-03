@@ -19,8 +19,11 @@ pub fn calculate_frame_time(frame_rate: Option<f64>) -> u64 {
 
 /// Player to convert and play frames
 #[derive(Debug, Clone)]
-pub struct Player {
-    pub images_paths: Vec<String>,
+pub struct Player {}
+
+/// Options of player to convert and play frames
+#[derive(Debug, Clone)]
+pub struct PlayerOptions {
     pub width: u32,
     pub height: u32,
     pub ascii_string: String,
@@ -80,30 +83,31 @@ impl fmt::Display for PlayerError {
 
 impl Player {
     /// Reverse ASCII string
-    pub fn reverse_ascii_string(&mut self) -> &mut Player {
-        self.ascii_string = self.ascii_string.chars().rev().collect();
-
-        self
+    pub fn reverse_ascii_string(ascii_string: String) -> String {
+        ascii_string.chars().rev().collect()
     }
 
     /// Play paths as ASCII arts
-    pub fn play_frames(&self) -> Result<(), PlayerError> {
+    pub fn play_frames(
+        images_paths: &Vec<String>,
+        options: &PlayerOptions,
+    ) -> Result<(), PlayerError> {
         let mut first_frame = false;
 
         loop {
-            for image_path in &self.images_paths {
+            for image_path in images_paths {
                 let start = Instant::now();
                 let img = image::open(image_path)?;
 
-                let options = AsciiConverterOptions {
-                    width: self.width,
-                    height: self.height,
-                    ascii_string: self.ascii_string.to_owned(),
-                    colored: self.colored,
-                    font_ratio: self.font_ratio,
+                let converter_options = AsciiConverterOptions {
+                    width: options.width,
+                    height: options.height,
+                    ascii_string: options.ascii_string.to_owned(),
+                    colored: options.colored,
+                    font_ratio: options.font_ratio,
                 };
 
-                let ascii_image = AsciiConverter::convert(&img, &options)?;
+                let ascii_image = AsciiConverter::convert(&img, &converter_options)?;
 
                 if first_frame {
                     execute!(stdout(), MoveUp((ascii_image.height).try_into().unwrap()))
@@ -114,10 +118,10 @@ impl Player {
 
                 println!("{}", ascii_image.text);
 
-                while self.frame_time > start.elapsed().as_millis().try_into().unwrap() {}
+                while options.frame_time > start.elapsed().as_millis().try_into().unwrap() {}
             }
 
-            if !self.looped {
+            if !options.looped {
                 break;
             }
         }
@@ -127,21 +131,23 @@ impl Player {
 
     /// Convert paths to of ASCII arts
     #[cfg(feature = "rayon")]
-    fn pre_render(&self) -> Result<Vec<AsciiArt>, PlayerError> {
-        let pb = ProgressBar::new(self.images_paths.len().try_into().unwrap());
+    fn pre_render(
+        images_paths: Vec<String>,
+        options: &PlayerOptions,
+    ) -> Result<Vec<AsciiArt>, PlayerError> {
+        let pb = ProgressBar::new(images_paths.len().try_into().unwrap());
 
-        let frames = self
-            .images_paths
-            .par_iter()
+        let frames = images_paths
+            .into_par_iter()
             .map(|path| -> Result<AsciiArt, PlayerError> {
                 let img = image::open(path)?;
 
                 let options = AsciiConverterOptions {
-                    width: self.width,
-                    height: self.height,
-                    ascii_string: self.ascii_string.to_owned(),
-                    colored: self.colored,
-                    font_ratio: self.font_ratio,
+                    width: options.width,
+                    height: options.height,
+                    ascii_string: options.ascii_string.to_owned(),
+                    colored: options.colored,
+                    font_ratio: options.font_ratio,
                 };
 
                 let ascii_image = AsciiConverter::convert(&img, &options)?;
@@ -157,21 +163,23 @@ impl Player {
 
     /// Convert paths to of ASCII arts
     #[cfg(not(feature = "rayon"))]
-    fn pre_render(&self) -> Result<Vec<AsciiArt>, PlayerError> {
-        let pb = ProgressBar::new(self.images_paths.len().try_into().unwrap());
+    fn pre_render(
+        images_paths: Vec<String>,
+        options: &PlayerOptions,
+    ) -> Result<Vec<AsciiArt>, PlayerError> {
+        let pb = ProgressBar::new(images_paths.len().try_into().unwrap());
 
-        let frames = self
-            .images_paths
-            .iter()
+        let frames = images_paths
+            .into_iter()
             .map(|path| -> Result<AsciiArt, PlayerError> {
                 let img = image::open(path)?;
 
                 let options = AsciiConverterOptions {
-                    width: self.width,
-                    height: self.height,
-                    ascii_string: self.ascii_string.to_owned(),
-                    colored: self.colored,
-                    font_ratio: self.font_ratio,
+                    width: options.width,
+                    height: options.height,
+                    ascii_string: options.ascii_string.to_owned(),
+                    colored: options.colored,
+                    font_ratio: options.font_ratio,
                 };
 
                 let ascii_image = AsciiConverter::convert(&img, &options)?;
@@ -186,10 +194,13 @@ impl Player {
     }
 
     /// Convert paths to of ASCII arts and play them
-    pub fn play_pre_rendered_frames(&self) -> Result<(), PlayerError> {
+    pub fn play_pre_rendered_frames(
+        images_paths: Vec<String>,
+        options: &PlayerOptions,
+    ) -> Result<(), PlayerError> {
         let mut first_frame = false;
 
-        let frames = Player::pre_render(self)?;
+        let frames = Player::pre_render(images_paths, options)?;
 
         loop {
             frames.iter().for_each(|ascii_image| {
@@ -204,10 +215,10 @@ impl Player {
 
                 println!("{}", ascii_image.text);
 
-                while self.frame_time > start.elapsed().as_millis().try_into().unwrap() {}
+                while options.frame_time > start.elapsed().as_millis().try_into().unwrap() {}
             });
 
-            if !self.looped {
+            if !options.looped {
                 break;
             }
         }
@@ -216,19 +227,18 @@ impl Player {
     }
 
     /// Play frames
-    pub fn play(self) -> Result<(), PlayerError> {
-        if self.pre_render {
-            return Player::play_pre_rendered_frames(&self);
+    pub fn play(images_paths: Vec<String>, options: &PlayerOptions) -> Result<(), PlayerError> {
+        if options.pre_render {
+            return Player::play_pre_rendered_frames(images_paths, options);
         }
 
-        Player::play_frames(&self)
+        Player::play_frames(&images_paths, options)
     }
 }
 
-impl Default for Player {
-    fn default() -> Player {
-        Player {
-            images_paths: vec![],
+impl Default for PlayerOptions {
+    fn default() -> PlayerOptions {
+        PlayerOptions {
             width: 0,
             height: 0,
             ascii_string: DEFAULT_ASCII_STRING.to_owned(),
@@ -245,14 +255,13 @@ impl Default for Player {
 fn plays_frames() {
     let path = "./assets/examples/original.webp";
 
+    let options = PlayerOptions {
+        width: 128,
+        ..Default::default()
+    };
+
     assert!(
-        Player {
-            images_paths: vec![path.to_owned()],
-            width: 128,
-            ..Default::default()
-        }
-        .play()
-        .is_ok(),
+        Player::play(vec![path.to_owned()], &options).is_ok(),
         "Playing image {path} failed"
     )
 }
