@@ -438,7 +438,7 @@ impl AsciiConverter {
             .collect::<Vec<String>>();
 
         let text = characters
-            ._chunks(raw_ascii_art.width.try_into().unwrap())
+            .chunks(raw_ascii_art.width.try_into().unwrap())
             .map(|line| line.join(""))
             .collect::<Vec<String>>()
             .join("\n");
