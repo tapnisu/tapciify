@@ -4,7 +4,7 @@ mod player;
 
 use clap::{error::ErrorKind, CommandFactory, Parser};
 use cli::{glob_to_paths, Cli};
-use player::{calculate_frame_time, Player, PlayerOptions};
+use player::{calculate_frame_time, AsciiPlayer, AsciiPlayerOptions};
 
 fn main() -> Result<(), clap::Error> {
     let cli = Cli::parse();
@@ -20,7 +20,7 @@ fn main() -> Result<(), clap::Error> {
     } else {
         (
             if cli.reverse {
-                Player::reverse_ascii_string(cli.ascii_string)
+                AsciiPlayer::reverse_ascii_string(cli.ascii_string)
             } else {
                 cli.ascii_string
             },
@@ -30,7 +30,7 @@ fn main() -> Result<(), clap::Error> {
 
     let frame_time = calculate_frame_time(cli.frame_rate);
 
-    let options = PlayerOptions {
+    let options = AsciiPlayerOptions {
         width,
         height,
         ascii_string,
@@ -41,7 +41,7 @@ fn main() -> Result<(), clap::Error> {
         looped: cli.looped,
     };
 
-    let result = Player::play(images_paths, &options);
+    let result = AsciiPlayer::play(images_paths, &options);
 
     if let Err(err) = result {
         Cli::command().error(ErrorKind::InvalidValue, err).exit()

@@ -12,18 +12,16 @@ use rayon::prelude::*;
 
 // Calculate frame time (1 / frame rate)
 pub fn calculate_frame_time(frame_rate: Option<f64>) -> u64 {
-    frame_rate
-        .map(|frame_rate| (1000f64 / frame_rate) as u64)
-        .unwrap_or(0)
+    frame_rate.map_or(0, |frame_rate| (1000f64 / frame_rate) as u64)
 }
 
 /// Player to convert and play frames
 #[derive(Debug, Clone)]
-pub struct Player {}
+pub struct AsciiPlayer {}
 
 /// Options of player to convert and play frames
 #[derive(Debug, Clone)]
-pub struct PlayerOptions {
+pub struct AsciiPlayerOptions {
     pub width: u32,
     pub height: u32,
     pub ascii_string: String,
@@ -35,7 +33,7 @@ pub struct PlayerOptions {
 }
 
 #[derive(Debug)]
-pub enum PlayerError {
+pub enum AsciiPlayerError {
     Image(ImageError),
 
     AsciiConverter(AsciiConverterError),
@@ -44,44 +42,44 @@ pub enum PlayerError {
     Size(SizeError),
 }
 
-impl From<ImageError> for PlayerError {
-    fn from(e: ImageError) -> PlayerError {
-        PlayerError::Image(e)
+impl From<ImageError> for AsciiPlayerError {
+    fn from(e: ImageError) -> AsciiPlayerError {
+        AsciiPlayerError::Image(e)
     }
 }
 
-impl From<AsciiConverterError> for PlayerError {
-    fn from(e: AsciiConverterError) -> PlayerError {
-        PlayerError::AsciiConverter(e)
+impl From<AsciiConverterError> for AsciiPlayerError {
+    fn from(e: AsciiConverterError) -> AsciiPlayerError {
+        AsciiPlayerError::AsciiConverter(e)
     }
 }
 
-impl From<AsciiStringError> for PlayerError {
-    fn from(e: AsciiStringError) -> PlayerError {
-        PlayerError::AsciiString(e)
+impl From<AsciiStringError> for AsciiPlayerError {
+    fn from(e: AsciiStringError) -> AsciiPlayerError {
+        AsciiPlayerError::AsciiString(e)
     }
 }
 
-impl From<SizeError> for PlayerError {
-    fn from(e: SizeError) -> PlayerError {
-        PlayerError::Size(e)
+impl From<SizeError> for AsciiPlayerError {
+    fn from(e: SizeError) -> AsciiPlayerError {
+        AsciiPlayerError::Size(e)
     }
 }
 
-impl fmt::Display for PlayerError {
+impl fmt::Display for AsciiPlayerError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            PlayerError::Image(err) => err.fmt(f),
+            AsciiPlayerError::Image(err) => err.fmt(f),
 
-            PlayerError::AsciiConverter(err) => err.fmt(f),
+            AsciiPlayerError::AsciiConverter(err) => err.fmt(f),
 
-            PlayerError::AsciiString(err) => err.fmt(f),
-            PlayerError::Size(err) => err.fmt(f),
+            AsciiPlayerError::AsciiString(err) => err.fmt(f),
+            AsciiPlayerError::Size(err) => err.fmt(f),
         }
     }
 }
 
-impl Player {
+impl AsciiPlayer {
     /// Reverse ASCII string
     pub fn reverse_ascii_string(ascii_string: String) -> String {
         ascii_string.chars().rev().collect()
@@ -90,8 +88,8 @@ impl Player {
     /// Play paths as ASCII arts
     pub fn play_frames(
         images_paths: &Vec<String>,
-        options: &PlayerOptions,
-    ) -> Result<(), PlayerError> {
+        options: &AsciiPlayerOptions,
+    ) -> Result<(), AsciiPlayerError> {
         let mut first_frame = false;
 
         loop {
@@ -133,13 +131,13 @@ impl Player {
     #[cfg(feature = "rayon")]
     fn pre_render(
         images_paths: Vec<String>,
-        options: &PlayerOptions,
-    ) -> Result<Vec<AsciiArt>, PlayerError> {
+        options: &AsciiPlayerOptions,
+    ) -> Result<Vec<AsciiArt>, AsciiPlayerError> {
         let pb = ProgressBar::new(images_paths.len().try_into().unwrap());
 
         let frames = images_paths
             .into_par_iter()
-            .map(|path| -> Result<AsciiArt, PlayerError> {
+            .map(|path| -> Result<AsciiArt, AsciiPlayerError> {
                 let img = image::open(path)?;
 
                 let options = AsciiConverterOptions {
@@ -156,7 +154,7 @@ impl Player {
 
                 Ok(ascii_image)
             })
-            .collect::<Result<Vec<AsciiArt>, PlayerError>>()?;
+            .collect::<Result<Vec<AsciiArt>, AsciiPlayerError>>()?;
 
         Ok(frames)
     }
@@ -165,13 +163,13 @@ impl Player {
     #[cfg(not(feature = "rayon"))]
     fn pre_render(
         images_paths: Vec<String>,
-        options: &PlayerOptions,
-    ) -> Result<Vec<AsciiArt>, PlayerError> {
+        options: &AsciiPlayerOptions,
+    ) -> Result<Vec<AsciiArt>, AsciiPlayerError> {
         let pb = ProgressBar::new(images_paths.len().try_into().unwrap());
 
         let frames = images_paths
             .into_iter()
-            .map(|path| -> Result<AsciiArt, PlayerError> {
+            .map(|path| -> Result<AsciiArt, AsciiPlayerError> {
                 let img = image::open(path)?;
 
                 let options = AsciiConverterOptions {
@@ -188,7 +186,7 @@ impl Player {
 
                 Ok(ascii_image)
             })
-            .collect::<Result<Vec<AsciiArt>, PlayerError>>()?;
+            .collect::<Result<Vec<AsciiArt>, AsciiPlayerError>>()?;
 
         Ok(frames)
     }
@@ -196,11 +194,11 @@ impl Player {
     /// Convert paths to of ASCII arts and play them
     pub fn play_pre_rendered_frames(
         images_paths: Vec<String>,
-        options: &PlayerOptions,
-    ) -> Result<(), PlayerError> {
+        options: &AsciiPlayerOptions,
+    ) -> Result<(), AsciiPlayerError> {
         let mut first_frame = false;
 
-        let frames = Player::pre_render(images_paths, options)?;
+        let frames = AsciiPlayer::pre_render(images_paths, options)?;
 
         loop {
             frames.iter().for_each(|ascii_image| {
@@ -227,18 +225,18 @@ impl Player {
     }
 
     /// Play frames
-    pub fn play(images_paths: Vec<String>, options: &PlayerOptions) -> Result<(), PlayerError> {
+    pub fn play(images_paths: Vec<String>, options: &AsciiPlayerOptions) -> Result<(), AsciiPlayerError> {
         if options.pre_render {
-            return Player::play_pre_rendered_frames(images_paths, options);
+            return AsciiPlayer::play_pre_rendered_frames(images_paths, options);
         }
 
-        Player::play_frames(&images_paths, options)
+        AsciiPlayer::play_frames(&images_paths, options)
     }
 }
 
-impl Default for PlayerOptions {
-    fn default() -> PlayerOptions {
-        PlayerOptions {
+impl Default for AsciiPlayerOptions {
+    fn default() -> AsciiPlayerOptions {
+        AsciiPlayerOptions {
             width: 0,
             height: 0,
             ascii_string: DEFAULT_ASCII_STRING.to_owned(),
@@ -255,13 +253,13 @@ impl Default for PlayerOptions {
 fn plays_frames() {
     let path = "./assets/examples/original.webp";
 
-    let options = PlayerOptions {
+    let options = AsciiPlayerOptions {
         width: 128,
         ..Default::default()
     };
 
     assert!(
-        Player::play(vec![path.to_owned()], &options).is_ok(),
+        AsciiPlayer::play(vec![path.to_owned()], &options).is_ok(),
         "Playing image {path} failed"
     )
 }
