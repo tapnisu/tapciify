@@ -109,8 +109,8 @@ impl AsciiPlayer {
         loop {
             for image_path in images_paths.iter() {
                 let start = Instant::now();
-                let img = image::open(image_path)?;
 
+                let img = image::open(image_path)?;
                 let ascii_image = AsciiConverter::convert(&img, &converter_options)?;
 
                 if first_frame {
@@ -145,9 +145,8 @@ impl AsciiPlayer {
 
         let frames = images_paths
             .into_par_iter()
-            .map(|path| -> Result<AsciiArt, AsciiPlayerError> {
+            .map(|path| {
                 let img = image::open(path)?;
-
                 let ascii_image = AsciiConverter::convert(&img, &converter_options)?;
 
                 pb.inc(1);
@@ -171,9 +170,8 @@ impl AsciiPlayer {
 
         let frames = images_paths
             .into_iter()
-            .map(|path| -> Result<AsciiArt, AsciiPlayerError> {
+            .map(|path| {
                 let img = image::open(path)?;
-
                 let ascii_image = AsciiConverter::convert(&img, &converter_options)?;
 
                 pb.inc(1);
