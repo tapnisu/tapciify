@@ -1,6 +1,6 @@
 use crate::ascii::{
-    AsciiArt, AsciiConverter, AsciiConverterError, AsciiStringError, SizeError,
-    DEFAULT_ASCII_STRING, DEFAULT_FONT_RATIO,
+    AsciiArt, AsciiConverter, AsciiConverterError, AsciiConverterOptions, AsciiStringError,
+    SizeError, DEFAULT_ASCII_STRING, DEFAULT_FONT_RATIO,
 };
 use crossterm::{cursor::MoveUp, execute};
 use image::ImageError;
@@ -95,15 +95,15 @@ impl Player {
                 let start = Instant::now();
                 let img = image::open(image_path)?;
 
-                let ascii_image = AsciiConverter {
-                    img,
+                let options = AsciiConverterOptions {
                     width: self.width,
                     height: self.height,
                     ascii_string: self.ascii_string.to_owned(),
                     colored: self.colored,
                     font_ratio: self.font_ratio,
-                }
-                .convert()?;
+                };
+
+                let ascii_image = AsciiConverter::convert(&img, &options)?;
 
                 if first_frame {
                     execute!(stdout(), MoveUp((ascii_image.height).try_into().unwrap()))
@@ -136,15 +136,15 @@ impl Player {
             .map(|path| -> Result<AsciiArt, PlayerError> {
                 let img = image::open(path)?;
 
-                let ascii_image = AsciiConverter {
-                    img,
+                let options = AsciiConverterOptions {
                     width: self.width,
                     height: self.height,
                     ascii_string: self.ascii_string.to_owned(),
                     colored: self.colored,
                     font_ratio: self.font_ratio,
-                }
-                .convert()?;
+                };
+
+                let ascii_image = AsciiConverter::convert(&img, &options)?;
 
                 pb.inc(1);
 
@@ -166,15 +166,15 @@ impl Player {
             .map(|path| -> Result<AsciiArt, PlayerError> {
                 let img = image::open(path)?;
 
-                let ascii_image = AsciiConverter {
-                    img,
+                let options = AsciiConverterOptions {
                     width: self.width,
                     height: self.height,
                     ascii_string: self.ascii_string.to_owned(),
                     colored: self.colored,
                     font_ratio: self.font_ratio,
-                }
-                .convert()?;
+                };
+
+                let ascii_image = AsciiConverter::convert(&img, &options)?;
 
                 pb.inc(1);
 

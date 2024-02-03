@@ -284,8 +284,11 @@ impl fmt::Display for AsciiConverterError {
 
 /// Converter of images to ASCII art
 #[derive(Debug, Clone)]
-pub struct AsciiConverter {
-    pub img: DynamicImage,
+pub struct AsciiConverter {}
+
+/// Options for converter of images to ASCII art
+#[derive(Debug, Clone)]
+pub struct AsciiConverterOptions {
     pub width: u32,
     pub height: u32,
     pub ascii_string: String,
@@ -296,94 +299,95 @@ pub struct AsciiConverter {
 impl AsciiConverter {
     /// Convert image to raw ASCII art
     #[cfg(feature = "rayon")]
-    pub fn convert_raw(&self) -> Result<RawAsciiArt, AsciiConverterError> {
-        if self.width == 0 && self.height == 0 {
+    pub fn convert_raw(
+        img: &DynamicImage,
+        options: &AsciiConverterOptions,
+    ) -> Result<RawAsciiArt, AsciiConverterError> {
+        if options.width == 0 && options.height == 0 {
             return Err(AsciiConverterError::SizeError(SizeError));
         }
 
-        let width = if self.width == 0 {
+        let width = if options.width == 0 {
             calc_new_width(
-                self.height,
-                self.img.width(),
-                self.img.height(),
-                self.font_ratio,
+                options.height,
+                img.width(),
+                img.height(),
+                options.font_ratio,
             )
         } else {
-            self.width
+            options.width
         };
 
-        let height = if self.height == 0 {
-            calc_new_height(
-                self.width,
-                self.img.width(),
-                self.img.height(),
-                self.font_ratio,
-            )
+        let height = if options.height == 0 {
+            calc_new_height(options.width, img.width(), img.height(), options.font_ratio)
         } else {
-            self.height
+            options.height
         };
 
-        let img_buffer = self
-            .img
+        let img_buffer = img
             .resize_exact(width, height, image::imageops::FilterType::Triangle)
             .to_rgba8();
         let chunks = img_buffer.as_raw().par_chunks(4);
 
         let characters = chunks
-            .map(|raw| AsciiCharacter::new(raw[0], raw[1], raw[2], raw[3], &self.ascii_string))
+            .map(|raw| AsciiCharacter::new(raw[0], raw[1], raw[2], raw[3], &options.ascii_string))
             .collect::<Result<Vec<AsciiCharacter>, AsciiStringError>>()?;
 
-        Ok(RawAsciiArt::new(characters, width, height, self.colored))
+        Ok(RawAsciiArt::new(characters, width, height, options.colored))
     }
 
     /// Convert image to raw ASCII art
     #[cfg(not(feature = "rayon"))]
-    pub fn convert_raw(&self) -> Result<RawAsciiArt, AsciiStringError> {
-        let width = if self.width == 0 {
+    pub fn convert_raw(
+        img: &DynamicImage,
+        options: &AsciiConverterOptions,
+    ) -> Result<RawAsciiArt, AsciiConverterError> {
+        if options.width == 0 && options.height == 0 {
+            return Err(AsciiConverterError::SizeError(SizeError));
+        }
+
+        let width = if options.width == 0 {
             calc_new_width(
-                self.height,
-                self.img.width(),
-                self.img.height(),
-                self.font_ratio,
+                options.height,
+                img.width(),
+                img.height(),
+                options.font_ratio,
             )
         } else {
-            self.width
+            options.width
         };
 
-        let height = if self.height == 0 {
-            calc_new_height(
-                self.width,
-                self.img.width(),
-                self.img.height(),
-                self.font_ratio,
-            )
+        let height = if options.height == 0 {
+            calc_new_height(options.width, img.width(), img.height(), options.font_ratio)
         } else {
-            self.height
+            options.height
         };
 
-        let img_buffer = self
-            .img
+        let img_buffer = img
             .resize_exact(width, height, image::imageops::FilterType::Triangle)
             .to_rgba8();
         let chunks = img_buffer.as_raw().chunks(4);
 
         let characters = chunks
-            .map(|raw| AsciiCharacter::new(raw[0], raw[1], raw[2], raw[3], &self.ascii_string))
+            .map(|raw| AsciiCharacter::new(raw[0], raw[1], raw[2], raw[3], &options.ascii_string))
             .collect::<Result<Vec<AsciiCharacter>, AsciiStringError>>()?;
 
-        Ok(RawAsciiArt::new(characters, width, height, self.colored))
+        Ok(RawAsciiArt::new(characters, width, height, options.colored))
     }
 
     /// Convert image to ASCII art
     #[cfg(feature = "rayon")]
-    pub fn convert(self) -> Result<AsciiArt, AsciiConverterError> {
-        let raw_ascii_art = AsciiConverter::convert_raw(&self)?;
+    pub fn convert(
+        img: &DynamicImage,
+        options: &AsciiConverterOptions,
+    ) -> Result<AsciiArt, AsciiConverterError> {
+        let raw_ascii_art = AsciiConverter::convert_raw(img, options)?;
 
         let characters = raw_ascii_art
             .characters
             .into_par_iter()
             .map(|ascii_character| {
-                if self.colored {
+                if options.colored {
                     ascii_character
                         .character
                         .to_string()
@@ -411,14 +415,17 @@ impl AsciiConverter {
 
     /// Convert image to ASCII art
     #[cfg(not(feature = "rayon"))]
-    pub fn convert(self) -> Result<AsciiArt, AsciiStringError> {
-        let raw_ascii_art = AsciiConverter::convert_raw(&self)?;
+    pub fn convert(
+        img: &DynamicImage,
+        options: &AsciiConverterOptions,
+    ) -> Result<AsciiArt, AsciiConverterError> {
+        let raw_ascii_art = AsciiConverter::convert_raw(img, options)?;
 
         let characters = raw_ascii_art
             .characters
             .into_iter()
             .map(|ascii_character| {
-                if self.colored {
+                if options.colored {
                     ascii_character
                         .character
                         .to_string()
@@ -431,7 +438,7 @@ impl AsciiConverter {
             .collect::<Vec<String>>();
 
         let text = characters
-            .chunks(raw_ascii_art.width.try_into().unwrap())
+            ._chunks(raw_ascii_art.width.try_into().unwrap())
             .map(|line| line.join(""))
             .collect::<Vec<String>>()
             .join("\n");
@@ -445,10 +452,9 @@ impl AsciiConverter {
     }
 }
 
-impl Default for AsciiConverter {
-    fn default() -> AsciiConverter {
-        AsciiConverter {
-            img: DynamicImage::new_rgba16(0, 0),
+impl Default for AsciiConverterOptions {
+    fn default() -> AsciiConverterOptions {
+        AsciiConverterOptions {
             width: 0,
             height: 0,
             ascii_string: DEFAULT_ASCII_STRING.to_owned(),
@@ -463,14 +469,13 @@ fn renders_frame() {
     let path = "./assets/examples/original.webp";
     let img = image::open(path).unwrap();
 
-    let ascii_converter = AsciiConverter {
-        img,
+    let options = AsciiConverterOptions {
         width: 128,
         ..Default::default()
     };
 
     assert!(
-        ascii_converter.convert_raw().is_ok(),
+        AsciiConverter::convert_raw(&img, &options).is_ok(),
         "Converting image \"{}\" failed",
         path
     )
@@ -481,15 +486,14 @@ fn renders_colored_frame() {
     let path = "./assets/examples/original.webp";
     let img = image::open(path).unwrap();
 
-    let ascii_converter = AsciiConverter {
-        img,
+    let options = AsciiConverterOptions {
         width: 128,
         colored: true,
         ..Default::default()
     };
 
     assert!(
-        ascii_converter.convert_raw().is_ok(),
+        AsciiConverter::convert_raw(&img, &options).is_ok(),
         "Converting image \"{}\" failed",
         path
     )
