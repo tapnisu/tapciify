@@ -41,7 +41,7 @@ fn main() -> Result<(), clap::Error> {
         looped: cli.looped,
     };
 
-    let result = AsciiPlayer::play(images_paths, &options);
+    let result = AsciiPlayer::play(images_paths, options);
 
     if let Err(err) = result {
         Cli::command().error(ErrorKind::InvalidValue, err).exit()
