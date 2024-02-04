@@ -142,6 +142,7 @@ impl AsciiPlayer {
 
         let converter_options = AsciiConverterOptions::from(options);
 
+        #[cfg(feature = "rayon")]
         let iter = images_paths.into_par_iter();
         #[cfg(not(feature = "rayon"))]
         let iter = images_paths.into_iter();
