@@ -217,6 +217,23 @@ impl AsciiPlayer {
     }
 
     /// Play frames
+    ///
+    /// Calls [`AsciiPlayer::play_frames`] or [`AsciiPlayer::play_pre_rendered_frames`], depending on [`AsciiPlayerOptions`]
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use tapciify::{AsciiPlayer, AsciiPlayerOptions};
+    ///
+    /// let path = "./assets/examples/original.webp";
+    ///
+    /// let options = AsciiPlayerOptions {
+    ///     width: 128,
+    ///     ..Default::default()
+    /// };
+    ///
+    /// assert!(AsciiPlayer::play(vec![path.to_owned()], options).is_ok())
+    /// ```
     pub fn play(
         images_paths: Vec<String>,
         options: AsciiPlayerOptions,
@@ -242,19 +259,4 @@ impl Default for AsciiPlayerOptions {
             looped: false,
         }
     }
-}
-
-#[test]
-fn plays_frames() {
-    let path = "./assets/examples/original.webp";
-
-    let options = AsciiPlayerOptions {
-        width: 128,
-        ..Default::default()
-    };
-
-    assert!(
-        AsciiPlayer::play(vec![path.to_owned()], options).is_ok(),
-        "Playing image {path} failed"
-    )
 }

@@ -1,3 +1,9 @@
+//! Functions for converting images into ASCII
+//!
+//! Useful functions
+//! - [`AsciiConverter::convert`]
+//! - [`AsciiConverter::convert_raw`]
+
 use colored::Colorize;
 use image::DynamicImage;
 use std::{
@@ -51,7 +57,8 @@ impl fmt::Display for AsciiStringError {
 /// # Examples
 ///
 /// ```rust
-/// use tapciify::{ascii_character, AsciiStringError};
+/// # use tapciify::AsciiStringError;
+/// use tapciify::ascii_character;
 ///
 /// let ascii_string = " *#";
 ///
@@ -98,7 +105,8 @@ impl AsciiCharacter {
     /// # Examples
     ///
     /// ```rust
-    /// use tapciify::{AsciiCharacter, AsciiStringError};
+    /// # use tapciify::AsciiStringError;
+    /// use tapciify::AsciiCharacter;
     ///
     /// let ascii_string = " *#";
     ///
@@ -230,6 +238,47 @@ pub struct AsciiConverterOptions {
 
 impl AsciiConverter {
     /// Convert image to raw ASCII art
+    ///
+    /// # Examples
+    ///
+    /// Regular:
+    ///
+    /// ```rust
+    /// # use image::ImageError;
+    /// use tapciify::{AsciiConverter, AsciiConverterOptions};
+    ///
+    /// let path = "./assets/examples/original.webp";
+    /// let img = image::open(path)?;
+    ///
+    /// let options = AsciiConverterOptions {
+    ///     width: 128,
+    ///     ..Default::default()
+    /// };
+    ///
+    /// assert!(AsciiConverter::convert_raw(&img, &options).is_ok());
+    ///
+    /// # Ok::<(), ImageError>(())
+    /// ````
+    ///
+    /// Colored:
+    ///
+    /// ```rust
+    /// # use image::ImageError;
+    /// use tapciify::{AsciiConverter, AsciiConverterOptions};
+    ///
+    /// let path = "./assets/examples/original.webp";
+    /// let img = image::open(path)?;
+    ///
+    /// let options = AsciiConverterOptions {
+    ///     width: 128,
+    ///     colored: true,
+    ///     ..Default::default()
+    /// };
+    ///
+    /// assert!(AsciiConverter::convert_raw(&img, &options).is_ok());
+    ///
+    /// # Ok::<(), ImageError>(())
+    /// ````
     #[cfg(feature = "rayon")]
     pub fn convert_raw(
         img: &DynamicImage,
@@ -394,39 +443,4 @@ impl Default for AsciiConverterOptions {
             font_ratio: DEFAULT_FONT_RATIO,
         }
     }
-}
-
-#[test]
-fn renders_frame() {
-    let path = "./assets/examples/original.webp";
-    let img = image::open(path).unwrap();
-
-    let options = AsciiConverterOptions {
-        width: 128,
-        ..Default::default()
-    };
-
-    assert!(
-        AsciiConverter::convert_raw(&img, &options).is_ok(),
-        "Converting image \"{}\" failed",
-        path
-    )
-}
-
-#[test]
-fn renders_colored_frame() {
-    let path = "./assets/examples/original.webp";
-    let img = image::open(path).unwrap();
-
-    let options = AsciiConverterOptions {
-        width: 128,
-        colored: true,
-        ..Default::default()
-    };
-
-    assert!(
-        AsciiConverter::convert_raw(&img, &options).is_ok(),
-        "Converting image \"{}\" failed",
-        path
-    )
 }
