@@ -84,38 +84,22 @@ impl fmt::Display for GlobToPathsError {
 
 /// Add glob support for paths parsing on non unix
 #[cfg(target_family = "windows")]
-#[cfg(feature = "rayon")]
 pub fn glob_to_paths(patterns: Vec<String>) -> Result<Vec<String>, GlobToPathsError> {
-    patterns
-        .into_par_iter()
-        .map(|glob_p| -> Result<Vec<String>, GlobToPathsError> {
-            glob(&glob_p)?
-                .map(|path| Ok(path?.display().to_string()))
-                .collect()
-        })
-        .flat_map(|result| match result {
-            Ok(vec) => vec.into_iter().map(Ok).collect(),
-            Err(er) => vec![Err(er)],
-        })
-        .collect()
-}
+    #[cfg(feature = "rayon")]
+    let iter = patterns.into_par_iter();
+    #[cfg(not(feature = "rayon"))]
+    let iter = patterns.into_iter();
 
-/// Add glob support for paths parsing on non unix
-#[cfg(not(target_family = "unix"))]
-#[cfg(not(feature = "rayon"))]
-pub fn glob_to_paths(patterns: Vec<String>) -> Result<Vec<String>, GlobToPathsError> {
-    patterns
-        .into_iter()
-        .map(|glob_p| -> Result<Vec<String>, GlobToPathsError> {
-            glob(&glob_p)?
-                .map(|path| Ok(path?.display().to_string()))
-                .collect()
-        })
-        .flat_map(|result| match result {
-            Ok(vec) => vec.into_iter().map(Ok).collect(),
-            Err(er) => vec![Err(er)],
-        })
-        .collect()
+    iter.map(|glob_p| -> Result<Vec<String>, GlobToPathsError> {
+        glob(&glob_p)?
+            .map(|path| Ok(path?.display().to_string()))
+            .collect()
+    })
+    .flat_map(|result| match result {
+        Ok(vec) => vec.into_iter().map(Ok).collect(),
+        Err(er) => vec![Err(er)],
+    })
+    .collect()
 }
 
 /// Add glob support for paths parsing on non unix
