@@ -12,58 +12,29 @@ pub const DEFAULT_ASCII_STRING: &str = " .,:;+*?%S#@";
 pub const DEFAULT_FONT_RATIO: f64 = 11.0 / 24.0;
 
 /// Calculate lightness (from 0.0 to 1.0)
+///
+/// # Examples
+///
+/// ```rust
+/// use tapciify::get_lightness;
+///
+/// let result = get_lightness(255, 255, 255, 255);
+/// assert_eq!(result, 1.0);
+///
+/// let result = get_lightness(0, 0, 0, 255);
+/// assert_eq!(result, 0.0);
+///
+/// let result = get_lightness(255, 255, 255, 0);
+/// assert_eq!(result, 0.0);
+///
+/// let result = get_lightness(255, 255, 255, 51);
+/// assert_eq!(result, 0.2);
+/// ````
 pub fn get_lightness(r: u8, g: u8, b: u8, a: u8) -> f32 {
     let max = max(max(r, g), b);
     let min = min(min(r, g), b);
 
     ((max as f32 + min as f32) * a as f32) / 130050.0 // 130050 - we need to divide by 512, and divide by 255 from alpha
-}
-
-#[test]
-fn calculates_lightness() {
-    assert_eq!(
-        get_lightness(255, 255, 255, 255),
-        1.0,
-        "Expected lightness for rgba({}, {}, {}, {}) to be {}",
-        255,
-        255,
-        255,
-        255,
-        1
-    );
-
-    assert_eq!(
-        get_lightness(0, 0, 0, 255),
-        0.0,
-        "Expected lightness for rgba({}, {}, {}, {}) to be {}",
-        0,
-        0,
-        0,
-        255,
-        0
-    );
-
-    assert_eq!(
-        get_lightness(255, 255, 255, 0),
-        0.0,
-        "Expected lightness for rgba({}, {}, {}, {}) to be {}",
-        255,
-        255,
-        255,
-        255,
-        0
-    );
-
-    assert_eq!(
-        get_lightness(255, 255, 255, 51),
-        0.2,
-        "Expected lightness for rgba({}, {}, {}, {}) to be {}",
-        255,
-        255,
-        255,
-        51,
-        0.2
-    );
 }
 
 #[derive(Debug, Clone)]
@@ -76,43 +47,29 @@ impl fmt::Display for AsciiStringError {
 }
 
 /// Convert lightness of pixel to ASCII character
+///
+/// # Examples
+///
+/// ```rust
+/// use tapciify::{ascii_character, AsciiStringError};
+///
+/// let ascii_string = " *#";
+///
+/// let result = ascii_character(1.0, ascii_string)?;
+/// assert_eq!(result, '#');
+///
+/// let result = ascii_character(0.5, ascii_string)?;
+/// assert_eq!(result, '*');
+///
+/// let result = ascii_character(0.0, ascii_string)?;
+/// assert_eq!(result, ' ');
+/// # Ok::<(), AsciiStringError>(())
+/// `````
 pub fn ascii_character(lightness: f32, ascii_string: &str) -> Result<char, AsciiStringError> {
     ascii_string
         .chars()
         .nth(((ascii_string.chars().count() - 1) as f32 * lightness) as usize)
         .ok_or(AsciiStringError)
-}
-
-#[test]
-fn converts_to_ascii() {
-    let ascii_string = " *#";
-
-    assert_eq!(
-        ascii_character(1.0, ascii_string).unwrap(),
-        '#',
-        "Expected ASCII character in ASCII string \"{}\" for lightness {} to be {}",
-        1.0,
-        ascii_string,
-        '#'
-    );
-
-    assert_eq!(
-        ascii_character(0.5, ascii_string).unwrap(),
-        '*',
-        "Expected ASCII character in ASCII string \"{}\" for lightness {} to be {}",
-        0.5,
-        ascii_string,
-        '*'
-    );
-
-    assert_eq!(
-        ascii_character(0.0, ascii_string).unwrap(),
-        ' ',
-        "Expected ASCII character in ASCII string \"{}\" for lightness {} to be {}",
-        1.0,
-        ascii_string,
-        ' '
-    );
 }
 
 /// Calculate new width from aspect ratio and new height
@@ -136,6 +93,25 @@ pub struct AsciiCharacter {
 }
 
 impl AsciiCharacter {
+    /// Convert RGBA and ASCII string into [`AsciiCharacter`]
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use tapciify::{AsciiCharacter, AsciiStringError};
+    ///
+    /// let ascii_string = " *#";
+    ///
+    /// let result = AsciiCharacter::new(255, 255, 255, 255, ascii_string)?;
+    /// assert_eq!(result.character, '#');
+    ///
+    /// let result = AsciiCharacter::new(255, 255, 255, 0, ascii_string)?;
+    /// assert_eq!(result.character, ' ');
+    ///
+    /// let result = AsciiCharacter::new(0, 0, 0, 255, ascii_string)?;
+    /// assert_eq!(result.character, ' ');
+    /// # Ok::<(), AsciiStringError>(())
+    /// `````
     pub fn new(
         r: u8,
         g: u8,
@@ -155,50 +131,6 @@ impl AsciiCharacter {
             a,
         })
     }
-}
-
-#[test]
-fn converts_to_ascii_character() {
-    let ascii_string = " *#";
-
-    assert_eq!(
-        AsciiCharacter::new(255, 255, 255, 255, ascii_string)
-            .unwrap()
-            .character,
-        '#',
-        "Expected ASCII character for rgba({}, {}, {}, {}) to be {}",
-        255,
-        255,
-        255,
-        255,
-        '#'
-    );
-
-    assert_eq!(
-        AsciiCharacter::new(255, 255, 255, 0, ascii_string)
-            .unwrap()
-            .character,
-        ' ',
-        "Expected ASCII character for rgba({}, {}, {}, {}) to be {}",
-        255,
-        255,
-        255,
-        0,
-        ' '
-    );
-
-    assert_eq!(
-        AsciiCharacter::new(0, 0, 0, 255, ascii_string)
-            .unwrap()
-            .character,
-        ' ',
-        "Expected ASCII character for rgba({}, {}, {}, {}) to be {}",
-        0,
-        0,
-        0,
-        255,
-        ' '
-    );
 }
 
 /// Raw Ascii art conversion result
