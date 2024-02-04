@@ -279,7 +279,6 @@ impl AsciiConverter {
     ///
     /// # Ok::<(), ImageError>(())
     /// ````
-    #[cfg(feature = "rayon")]
     pub fn convert_raw(
         img: &DynamicImage,
         options: &AsciiConverterOptions,
@@ -308,45 +307,10 @@ impl AsciiConverter {
         let img_buffer = img
             .resize_exact(width, height, image::imageops::FilterType::Triangle)
             .to_rgba8();
+
+        #[cfg(feature = "rayon")]
         let chunks = img_buffer.as_raw().par_chunks(4);
-
-        let characters = chunks
-            .map(|raw| AsciiCharacter::new(raw[0], raw[1], raw[2], raw[3], &options.ascii_string))
-            .collect::<Result<Vec<AsciiCharacter>, AsciiStringError>>()?;
-
-        Ok(RawAsciiArt::new(characters, width, height, options.colored))
-    }
-
-    /// Convert image to raw ASCII art
-    #[cfg(not(feature = "rayon"))]
-    pub fn convert_raw(
-        img: &DynamicImage,
-        options: &AsciiConverterOptions,
-    ) -> Result<RawAsciiArt, AsciiConverterError> {
-        if options.width == 0 && options.height == 0 {
-            return Err(AsciiConverterError::SizeError(SizeError));
-        }
-
-        let width = if options.width == 0 {
-            calc_new_width(
-                options.height,
-                img.width(),
-                img.height(),
-                options.font_ratio,
-            )
-        } else {
-            options.width
-        };
-
-        let height = if options.height == 0 {
-            calc_new_height(options.width, img.width(), img.height(), options.font_ratio)
-        } else {
-            options.height
-        };
-
-        let img_buffer = img
-            .resize_exact(width, height, image::imageops::FilterType::Triangle)
-            .to_rgba8();
+        #[cfg(not(feature = "rayon"))]
         let chunks = img_buffer.as_raw().chunks(4);
 
         let characters = chunks
@@ -357,16 +321,18 @@ impl AsciiConverter {
     }
 
     /// Convert image to ASCII art
-    #[cfg(feature = "rayon")]
     pub fn convert(
         img: &DynamicImage,
         options: &AsciiConverterOptions,
     ) -> Result<AsciiArt, AsciiConverterError> {
         let raw_ascii_art = AsciiConverter::convert_raw(img, options)?;
 
-        let characters = raw_ascii_art
-            .characters
-            .into_par_iter()
+        #[cfg(feature = "rayon")]
+        let iter = raw_ascii_art.characters.into_par_iter();
+        #[cfg(not(feature = "rayon"))]
+        let iter = raw_ascii_art.characters.into_iter();
+
+        let characters = iter
             .map(|ascii_character| {
                 if options.colored {
                     ascii_character
@@ -380,46 +346,12 @@ impl AsciiConverter {
             })
             .collect::<Vec<String>>();
 
-        let text = characters
-            .par_chunks(raw_ascii_art.width.try_into().unwrap())
-            .map(|line| line.join(""))
-            .collect::<Vec<String>>()
-            .join("\n");
+        #[cfg(feature = "rayon")]
+        let chunks = characters.par_chunks(raw_ascii_art.width.try_into().unwrap());
+        #[cfg(not(feature = "rayon"))]
+        let chunks = characters.chunks(raw_ascii_art.width.try_into().unwrap());
 
-        Ok(AsciiArt::new(
-            text,
-            raw_ascii_art.width,
-            raw_ascii_art.height,
-            raw_ascii_art.colored,
-        ))
-    }
-
-    /// Convert image to ASCII art
-    #[cfg(not(feature = "rayon"))]
-    pub fn convert(
-        img: &DynamicImage,
-        options: &AsciiConverterOptions,
-    ) -> Result<AsciiArt, AsciiConverterError> {
-        let raw_ascii_art = AsciiConverter::convert_raw(img, options)?;
-
-        let characters = raw_ascii_art
-            .characters
-            .into_iter()
-            .map(|ascii_character| {
-                if options.colored {
-                    ascii_character
-                        .character
-                        .to_string()
-                        .truecolor(ascii_character.r, ascii_character.g, ascii_character.b)
-                        .to_string()
-                } else {
-                    ascii_character.character.to_string()
-                }
-            })
-            .collect::<Vec<String>>();
-
-        let text = characters
-            .chunks(raw_ascii_art.width.try_into().unwrap())
+        let text = chunks
             .map(|line| line.join(""))
             .collect::<Vec<String>>()
             .join("\n");

@@ -134,7 +134,6 @@ impl AsciiPlayer {
     }
 
     /// Convert paths to of ASCII arts
-    #[cfg(feature = "rayon")]
     fn pre_render(
         images_paths: Vec<String>,
         options: AsciiPlayerOptions,
@@ -143,33 +142,11 @@ impl AsciiPlayer {
 
         let converter_options = AsciiConverterOptions::from(options);
 
-        let frames = images_paths
-            .into_par_iter()
-            .map(|path| {
-                let img = image::open(path)?;
-                let ascii_image = AsciiConverter::convert(&img, &converter_options)?;
+        let iter = images_paths.into_par_iter();
+        #[cfg(not(feature = "rayon"))]
+        let iter = images_paths.into_iter();
 
-                pb.inc(1);
-
-                Ok(ascii_image)
-            })
-            .collect::<Result<Vec<AsciiArt>, AsciiPlayerError>>()?;
-
-        Ok(frames)
-    }
-
-    /// Convert paths to of ASCII arts
-    #[cfg(not(feature = "rayon"))]
-    fn pre_render(
-        images_paths: Vec<String>,
-        options: AsciiPlayerOptions,
-    ) -> Result<Vec<AsciiArt>, AsciiPlayerError> {
-        let pb = ProgressBar::new(images_paths.len().try_into().unwrap());
-
-        let converter_options = AsciiConverterOptions::from(options);
-
-        let frames = images_paths
-            .into_iter()
+        let frames = iter
             .map(|path| {
                 let img = image::open(path)?;
                 let ascii_image = AsciiConverter::convert(&img, &converter_options)?;
