@@ -83,25 +83,21 @@ impl fmt::Display for GlobToPathsError {
 }
 
 /// Add glob support for paths parsing on Windows
+#[cfg(target_family = "windows")]
 pub fn glob_to_paths(patterns: Vec<String>) -> Result<Vec<String>, GlobToPathsError> {
-    #[cfg(target_family = "windows")]
-    let patterns = {
-        #[cfg(feature = "rayon")]
-        let iter = patterns.into_par_iter();
-        #[cfg(not(feature = "rayon"))]
-        let iter = patterns.into_iter();
+    #[cfg(feature = "rayon")]
+    let iter = patterns.into_par_iter();
+    #[cfg(not(feature = "rayon"))]
+    let iter = patterns.into_iter();
 
-        iter.map(|glob_p| -> Result<Vec<String>, GlobToPathsError> {
-            glob(&glob_p)?
-                .map(|path| Ok(path?.display().to_string()))
-                .collect()
-        })
-        .flat_map(|result| match result {
-            Ok(vec) => vec.into_iter().map(Ok).collect(),
-            Err(er) => vec![Err(er)],
-        })
-        .collect()
-    };
-
-    Ok(patterns)
+    iter.map(|glob_p| -> Result<Vec<String>, GlobToPathsError> {
+        glob(&glob_p)?
+            .map(|path| Ok(path?.display().to_string()))
+            .collect()
+    })
+    .flat_map(|result| match result {
+        Ok(vec) => vec.into_iter().map(Ok).collect(),
+        Err(er) => vec![Err(er)],
+    })
+    .collect()
 }

@@ -3,14 +3,17 @@ mod cli;
 mod player;
 
 use clap::{error::ErrorKind, CommandFactory, Parser};
-use cli::{glob_to_paths, Cli};
+use cli::Cli;
 use player::{calculate_frame_time, AsciiPlayer, AsciiPlayerOptions};
 
 fn main() -> Result<(), clap::Error> {
     let cli = Cli::parse();
 
-    let images_paths = glob_to_paths(cli.input)
+    #[cfg(target_family = "windows")]
+    let images_paths = cli::glob_to_paths(cli.input)
         .unwrap_or_else(|err| Cli::command().error(ErrorKind::InvalidValue, err).exit());
+    #[cfg(not(target_family = "windows"))]
+    let images_paths = cli.input;
 
     let width = cli.width.unwrap_or(0);
     let height = cli.height.unwrap_or(0);
