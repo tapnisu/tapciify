@@ -1,14 +1,16 @@
 use crate::ascii::{DEFAULT_ASCII_STRING, DEFAULT_FONT_RATIO};
 use clap::{ArgGroup, Parser};
+
+#[cfg(target_family = "windows")]
+use glob::glob;
+#[cfg(target_family = "windows")]
 use glob::{GlobError, PatternError};
+#[cfg(target_family = "windows")]
 use std::fmt;
 
 #[cfg(target_family = "windows")]
 #[cfg(feature = "rayon")]
 use rayon::prelude::*;
-
-#[cfg(target_family = "windows")]
-use glob::glob;
 
 /// Parse command arguments for tapciify CLI
 #[derive(Parser, Debug, Clone)]
