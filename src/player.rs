@@ -10,9 +10,9 @@ use std::{fmt, io::stdout, time::Instant};
 #[cfg(feature = "rayon")]
 use rayon::prelude::*;
 
-// Calculate frame time (1 / frame rate)
-pub fn calculate_frame_time(frame_rate: Option<f64>) -> u64 {
-    frame_rate.map_or(0, |frame_rate| (1000f64 / frame_rate) as u64)
+// Calculate frame time (1 / framerate)
+pub fn calculate_frame_time(framerate: Option<f64>) -> u64 {
+    framerate.map_or(0, |framerate| (1000f64 / framerate) as u64)
 }
 
 /// Player to convert and play frames

@@ -29,8 +29,8 @@ pub struct Cli {
     pub height: Option<u32>,
 
     /// Framerate for showing images
-    #[clap(short, long = "fps", long = "framerate", value_name = "framerate")]
-    pub frame_rate: Option<f64>,
+    #[clap(short, long)]
+    pub framerate: Option<f64>,
     /// Render, and then show
     #[clap(short, long, action)]
     pub pre_render: bool,
@@ -82,28 +82,26 @@ impl fmt::Display for GlobToPathsError {
     }
 }
 
-/// Add glob support for paths parsing on non unix
-#[cfg(target_family = "windows")]
+/// Add glob support for paths parsing on Windows
 pub fn glob_to_paths(patterns: Vec<String>) -> Result<Vec<String>, GlobToPathsError> {
-    #[cfg(feature = "rayon")]
-    let iter = patterns.into_par_iter();
-    #[cfg(not(feature = "rayon"))]
-    let iter = patterns.into_iter();
+    #[cfg(target_family = "windows")]
+    let patterns = {
+        #[cfg(feature = "rayon")]
+        let iter = patterns.into_par_iter();
+        #[cfg(not(feature = "rayon"))]
+        let iter = patterns.into_iter();
 
-    iter.map(|glob_p| -> Result<Vec<String>, GlobToPathsError> {
-        glob(&glob_p)?
-            .map(|path| Ok(path?.display().to_string()))
-            .collect()
-    })
-    .flat_map(|result| match result {
-        Ok(vec) => vec.into_iter().map(Ok).collect(),
-        Err(er) => vec![Err(er)],
-    })
-    .collect()
-}
+        iter.map(|glob_p| -> Result<Vec<String>, GlobToPathsError> {
+            glob(&glob_p)?
+                .map(|path| Ok(path?.display().to_string()))
+                .collect()
+        })
+        .flat_map(|result| match result {
+            Ok(vec) => vec.into_iter().map(Ok).collect(),
+            Err(er) => vec![Err(er)],
+        })
+        .collect()
+    };
 
-/// Add glob support for paths parsing on non unix
-#[cfg(not(target_family = "windows"))]
-pub fn glob_to_paths(patterns: Vec<String>) -> Result<Vec<String>, GlobToPathsError> {
     Ok(patterns)
 }

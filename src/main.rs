@@ -28,7 +28,7 @@ fn main() -> Result<(), clap::Error> {
         )
     };
 
-    let frame_time = calculate_frame_time(cli.frame_rate);
+    let frame_time = calculate_frame_time(cli.framerate);
 
     let options = AsciiPlayerOptions {
         width,
