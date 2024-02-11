@@ -102,7 +102,7 @@ impl AsciiPlayer {
         images_paths: Vec<String>,
         options: AsciiPlayerOptions,
     ) -> Result<(), AsciiPlayerError> {
-        let mut first_frame = false;
+        let mut first_frame = true;
 
         let converter_options = AsciiConverterOptions::from(options.to_owned());
 
@@ -113,11 +113,11 @@ impl AsciiPlayer {
                 let img = image::open(image_path)?;
                 let ascii_image = AsciiConverter::convert(&img, &converter_options)?;
 
-                if first_frame {
+                if !first_frame {
                     execute!(stdout(), MoveUp((ascii_image.height).try_into().unwrap()))
                         .unwrap_or_default();
                 } else {
-                    first_frame = true;
+                    first_frame = false;
                 }
 
                 println!("{}", ascii_image.text);
@@ -166,7 +166,7 @@ impl AsciiPlayer {
         images_paths: Vec<String>,
         options: AsciiPlayerOptions,
     ) -> Result<(), AsciiPlayerError> {
-        let mut first_frame = false;
+        let mut first_frame = true;
 
         let frames = AsciiPlayer::pre_render(images_paths, options.to_owned())?;
 
@@ -174,11 +174,11 @@ impl AsciiPlayer {
             frames.iter().for_each(|ascii_image| {
                 let start = Instant::now();
 
-                if first_frame {
+                if !first_frame {
                     execute!(stdout(), MoveUp((ascii_image.height).try_into().unwrap()))
                         .unwrap_or_default();
                 } else {
-                    first_frame = true;
+                    first_frame = false;
                 }
 
                 println!("{}", ascii_image.text);
