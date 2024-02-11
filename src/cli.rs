@@ -10,6 +10,7 @@ use rayon::prelude::*;
 #[cfg(target_family = "windows")]
 use glob::glob;
 
+/// Parse command arguments for tapciify CLI
 #[derive(Parser, Debug, Clone)]
 #[clap(author, version, about, long_about = None)]
 #[clap(group(
@@ -55,24 +56,28 @@ pub struct Cli {
     pub font_ratio: f64,
 }
 
+#[cfg(target_family = "windows")]
 #[derive(Debug)]
 pub enum GlobToPathsError {
     PatternError(PatternError),
     GlobError(GlobError),
 }
 
+#[cfg(target_family = "windows")]
 impl From<PatternError> for GlobToPathsError {
     fn from(e: PatternError) -> GlobToPathsError {
         GlobToPathsError::PatternError(e)
     }
 }
 
+#[cfg(target_family = "windows")]
 impl From<GlobError> for GlobToPathsError {
     fn from(e: GlobError) -> GlobToPathsError {
         GlobToPathsError::GlobError(e)
     }
 }
 
+#[cfg(target_family = "windows")]
 impl fmt::Display for GlobToPathsError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
