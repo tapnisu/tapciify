@@ -57,7 +57,6 @@ impl fmt::Display for AsciiStringError {
 /// # Examples
 ///
 /// ```rust
-/// # use tapciify::AsciiStringError;
 /// use tapciify::ascii_character;
 ///
 /// let ascii_string = " *#";
@@ -70,7 +69,7 @@ impl fmt::Display for AsciiStringError {
 ///
 /// let result = ascii_character(0.0, ascii_string)?;
 /// assert_eq!(result, ' ');
-/// # Ok::<(), AsciiStringError>(())
+/// # Ok::<(), tapciify::AsciiStringError>(())
 /// `````
 pub fn ascii_character(lightness: f32, ascii_string: &str) -> Result<char, AsciiStringError> {
     ascii_string
@@ -105,7 +104,6 @@ impl AsciiCharacter {
     /// # Examples
     ///
     /// ```rust
-    /// # use tapciify::AsciiStringError;
     /// use tapciify::AsciiCharacter;
     ///
     /// let ascii_string = " *#";
@@ -118,7 +116,7 @@ impl AsciiCharacter {
     ///
     /// let result = AsciiCharacter::new(0, 0, 0, 255, ascii_string)?;
     /// assert_eq!(result.character, ' ');
-    /// # Ok::<(), AsciiStringError>(())
+    /// # Ok::<(), tapciify::AsciiStringError>(())
     /// `````
     pub fn new(
         r: u8,
@@ -244,7 +242,6 @@ impl AsciiConverter {
     /// Regular:
     ///
     /// ```rust
-    /// # use image::ImageError;
     /// use tapciify::{AsciiConverter, AsciiConverterOptions};
     ///
     /// let path = "./assets/examples/original.webp";
@@ -257,13 +254,12 @@ impl AsciiConverter {
     ///
     /// assert!(AsciiConverter::convert_raw(&img, &options).is_ok());
     ///
-    /// # Ok::<(), ImageError>(())
+    /// # Ok::<(), image::ImageError>(())
     /// ````
     ///
     /// Colored:
     ///
     /// ```rust
-    /// # use image::ImageError;
     /// use tapciify::{AsciiConverter, AsciiConverterOptions};
     ///
     /// let path = "./assets/examples/original.webp";
@@ -277,7 +273,7 @@ impl AsciiConverter {
     ///
     /// assert!(AsciiConverter::convert_raw(&img, &options).is_ok());
     ///
-    /// # Ok::<(), ImageError>(())
+    /// # Ok::<(), image::ImageError>(())
     /// ````
     pub fn convert_raw(
         img: &DynamicImage,

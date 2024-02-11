@@ -83,6 +83,16 @@ impl fmt::Display for GlobToPathsError {
 }
 
 /// Add glob support for paths parsing on Windows
+///
+/// # Examples
+///
+/// ```rust
+/// use tapciify::cli::glob_to_paths;
+///
+/// let result = glob_to_paths(vec!["assets\\examples\\*.webp".to_owned()])?;
+/// assert_eq!(result, vec!["assets\\examples\\ascii-colored.webp", "assets\\examples\\ascii-pixels.webp", "assets\\examples\\ascii.webp", "assets\\examples\\original.webp"]);
+/// # Ok::<(), tapciify::cli::GlobToPathsError>(())
+/// `````
 #[cfg(target_family = "windows")]
 pub fn glob_to_paths(patterns: Vec<String>) -> Result<Vec<String>, GlobToPathsError> {
     #[cfg(feature = "rayon")]

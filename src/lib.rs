@@ -8,6 +8,9 @@ pub mod ascii;
 #[cfg(feature = "player")]
 pub mod player;
 
+#[cfg(feature = "player")]
+pub mod cli;
+
 pub use ascii::*;
 #[cfg(feature = "player")]
 pub use player::*;
