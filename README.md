@@ -1,4 +1,4 @@
-<p align="center"><img width="300" src="./assets/logo.webp"/></p>
+<p align="center"><img width="300" src="assets/logo.webp"/></p>
 
 <h1 align="center">Tapciify</h1>
 
