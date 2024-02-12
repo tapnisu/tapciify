@@ -10,7 +10,17 @@ use std::{fmt, io::stdout, time::Instant};
 #[cfg(feature = "rayon")]
 use rayon::prelude::*;
 
-// Calculate frame time (1 / framerate)
+/// Calculate frame time in millis (1 / framerate)
+///
+/// # Examples
+///
+/// ```rust
+/// use tapciify::calculate_frame_time;
+///
+/// let result = calculate_frame_time(Some(20.0));
+///
+/// assert_eq!(result, 50)
+/// ```
 pub fn calculate_frame_time(framerate: Option<f64>) -> u64 {
     framerate.map_or(0, |framerate| (1000f64 / framerate) as u64)
 }
