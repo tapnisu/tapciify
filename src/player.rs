@@ -1,9 +1,9 @@
 use crate::{
     ascii::{
         AsciiArt, AsciiConverter, AsciiConverterError, AsciiConverterOptions, AsciiStringError,
-        SizeError, DEFAULT_ASCII_STRING,
+        DEFAULT_ASCII_STRING,
     },
-    image_resizing::{resize, ImageResizingOptions, DEFAULT_FONT_RATIO},
+    resizing::{resize, ResizingOptions, DEFAULT_FONT_RATIO},
 };
 use crossterm::{cursor::MoveUp, execute};
 use image::ImageError;
@@ -69,9 +69,9 @@ impl From<AsciiPlayerOptions> for AsciiConverterOptions {
     }
 }
 
-impl From<AsciiPlayerOptions> for ImageResizingOptions {
-    fn from(o: AsciiPlayerOptions) -> ImageResizingOptions {
-        ImageResizingOptions {
+impl From<AsciiPlayerOptions> for ResizingOptions {
+    fn from(o: AsciiPlayerOptions) -> ResizingOptions {
+        ResizingOptions {
             width: o.width,
             height: o.height,
             font_ratio: o.font_ratio,
@@ -83,11 +83,8 @@ impl From<AsciiPlayerOptions> for ImageResizingOptions {
 #[derive(Debug)]
 pub enum AsciiPlayerError {
     Image(ImageError),
-
     AsciiConverter(AsciiConverterError),
-
     AsciiString(AsciiStringError),
-    Size(SizeError),
 }
 
 impl From<ImageError> for AsciiPlayerError {
@@ -108,21 +105,12 @@ impl From<AsciiStringError> for AsciiPlayerError {
     }
 }
 
-impl From<SizeError> for AsciiPlayerError {
-    fn from(e: SizeError) -> AsciiPlayerError {
-        AsciiPlayerError::Size(e)
-    }
-}
-
 impl fmt::Display for AsciiPlayerError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             AsciiPlayerError::Image(err) => err.fmt(f),
-
             AsciiPlayerError::AsciiConverter(err) => err.fmt(f),
-
             AsciiPlayerError::AsciiString(err) => err.fmt(f),
-            AsciiPlayerError::Size(err) => err.fmt(f),
         }
     }
 }
@@ -148,7 +136,7 @@ impl AsciiPlayer {
 
                 let img = resize(
                     &image::open(image_path)?,
-                    &ImageResizingOptions {
+                    &ResizingOptions {
                         width: options.width,
                         height: options.height,
                         font_ratio: options.font_ratio,
@@ -195,7 +183,7 @@ impl AsciiPlayer {
             .map(|path| {
                 let img = resize(
                     &image::open(path)?,
-                    &ImageResizingOptions {
+                    &ResizingOptions {
                         width: options.width,
                         height: options.height,
                         font_ratio: options.font_ratio,

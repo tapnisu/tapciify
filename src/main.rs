@@ -1,7 +1,7 @@
 mod ascii;
 mod cli;
-mod image_resizing;
 mod player;
+mod resizing;
 
 use clap::{error::ErrorKind, CommandFactory, Parser};
 use cli::Cli;

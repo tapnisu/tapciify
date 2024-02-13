@@ -1,5 +1,5 @@
 use tapciify::{
-    image_resizing::{resize, ImageResizingOptions},
+    resizing::{resize, ResizingOptions},
     AsciiConverter, AsciiConverterOptions,
 };
 
@@ -8,7 +8,7 @@ fn main() {
 
     let img = resize(
         &orig_img,
-        &ImageResizingOptions {
+        &ResizingOptions {
             width: Some(64),
             ..Default::default()
         },
