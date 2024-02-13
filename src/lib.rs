@@ -50,7 +50,7 @@
 //! ```
 
 pub mod ascii;
-pub mod resizing;
+pub mod resize;
 
 #[cfg(feature = "player")]
 pub mod player;
@@ -61,7 +61,7 @@ pub mod cli;
 #[doc(inline)]
 pub use ascii::*;
 #[doc(inline)]
-pub use resizing::{CustomRatioResize, DEFAULT_FONT_RATIO};
+pub use resize::{CustomRatioResize, DEFAULT_FONT_RATIO};
 
 #[doc(inline)]
 #[cfg(feature = "player")]
