@@ -8,7 +8,7 @@ use crate::{
 use crossterm::{cursor::MoveUp, execute};
 use image::ImageError;
 use indicatif::ProgressBar;
-use std::{fmt, io::stdout, time::Instant};
+use std::{error::Error, fmt, io::stdout, time::Instant};
 
 #[cfg(feature = "rayon")]
 use rayon::prelude::*;
@@ -114,6 +114,8 @@ impl fmt::Display for AsciiPlayerError {
         }
     }
 }
+
+impl Error for AsciiPlayerError {}
 
 impl AsciiPlayer {
     /// Reverse ASCII string

@@ -2,11 +2,9 @@ use crate::{ascii::DEFAULT_ASCII_STRING, resizing::DEFAULT_FONT_RATIO};
 use clap::Parser;
 
 #[cfg(target_family = "windows")]
-use glob::glob;
+use glob::{glob, GlobError, PatternError};
 #[cfg(target_family = "windows")]
-use glob::{GlobError, PatternError};
-#[cfg(target_family = "windows")]
-use std::fmt;
+use std::{error::Error, fmt};
 
 #[cfg(target_family = "windows")]
 #[cfg(feature = "rayon")]
@@ -73,6 +71,8 @@ impl From<GlobError> for GlobToPathsError {
         GlobToPathsError::GlobError(e)
     }
 }
+
+impl Error for GlobToPathsError {}
 
 #[cfg(target_family = "windows")]
 impl fmt::Display for GlobToPathsError {

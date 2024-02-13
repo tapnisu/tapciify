@@ -8,6 +8,7 @@ use colored::Colorize;
 use image::DynamicImage;
 use std::{
     cmp::{max, min},
+    error::Error,
     fmt,
 };
 
@@ -50,6 +51,8 @@ impl fmt::Display for AsciiStringError {
         write!(f, "lightness is out of ASCII string")
     }
 }
+
+impl Error for AsciiStringError {}
 
 /// Convert lightness of pixel to ASCII character
 ///
@@ -199,6 +202,8 @@ impl From<SizeError> for AsciiConverterError {
         AsciiConverterError::SizeError(e)
     }
 }
+
+impl Error for AsciiConverterError {}
 
 impl fmt::Display for AsciiConverterError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {

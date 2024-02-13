@@ -1,10 +1,11 @@
+use std::error::Error;
 use tapciify::{
     resizing::{resize, ResizingOptions},
     AsciiConverter, AsciiConverterOptions,
 };
 
-fn main() {
-    let orig_img = image::open("./assets/examples/original.webp").unwrap();
+fn main() -> Result<(), Box<dyn Error>> {
+    let orig_img = image::open("./assets/examples/original.webp")?;
 
     let img = resize(
         &orig_img,
@@ -16,7 +17,9 @@ fn main() {
 
     let options = AsciiConverterOptions::default();
 
-    let result = AsciiConverter::convert(&img, &options).unwrap();
+    let result = AsciiConverter::convert(&img, &options)?;
 
     println!("{}", result.text);
+
+    Ok(())
 }
