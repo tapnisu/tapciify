@@ -2,16 +2,20 @@ mod ascii;
 mod cli;
 mod player;
 
-use clap::{error::ErrorKind, CommandFactory, Parser};
+use clap::{
+    error::{ContextKind, ContextValue, ErrorKind},
+    CommandFactory, Parser,
+};
 use cli::Cli;
 use player::{calculate_frame_time, AsciiPlayer, AsciiPlayerOptions};
 
 fn main() -> Result<(), clap::Error> {
     let cli = Cli::parse();
+    let mut cmd = Cli::command();
 
     #[cfg(target_family = "windows")]
     let images_paths = cli::glob_to_paths(cli.input)
-        .unwrap_or_else(|err| Cli::command().error(ErrorKind::InvalidValue, err).exit());
+        .unwrap_or_else(|err| command.error(ErrorKind::InvalidValue, err).exit());
     #[cfg(not(target_family = "windows"))]
     let images_paths = cli.input;
 
@@ -47,7 +51,7 @@ fn main() -> Result<(), clap::Error> {
     let result = AsciiPlayer::play(images_paths, options);
 
     if let Err(err) = result {
-        Cli::command().error(ErrorKind::InvalidValue, err).exit()
+        cmd.error(ErrorKind::InvalidValue, err).exit()
     }
 
     Ok(())

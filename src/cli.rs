@@ -1,5 +1,5 @@
 use crate::ascii::{DEFAULT_ASCII_STRING, DEFAULT_FONT_RATIO};
-use clap::{ArgGroup, Parser};
+use clap::Parser;
 
 #[cfg(target_family = "windows")]
 use glob::glob;
@@ -15,11 +15,6 @@ use rayon::prelude::*;
 /// Parse command arguments for tapciify CLI
 #[derive(Parser, Debug, Clone)]
 #[clap(author, version, about, long_about = None)]
-#[clap(group(
-    ArgGroup::new("size")
-    .required(true)
-    .args(&["width", "height"]),
-))]
 pub struct Cli {
     /// Input files to convert to ASCII art
     #[clap(short, long, num_args = 1.., required=true)]
