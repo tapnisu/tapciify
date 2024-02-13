@@ -3,6 +3,7 @@
 //! Useful functions, when using as lib
 //! - [`AsciiConverter::convert`]
 //! - [`AsciiConverter::convert_raw`]
+//! - [`image_resizing::resize`]
 //!
 //! ## Installation
 //!

@@ -1,14 +1,14 @@
 use tapciify::{
-    image_resizing::{resize_img, ImageResizingOptions},
+    image_resizing::{resize, ImageResizingOptions},
     AsciiConverter, AsciiConverterOptions,
 };
 
 fn main() {
     let orig_img = image::open("./assets/examples/original.webp").unwrap();
 
-    let img = resize_img(
+    let img = resize(
         &orig_img,
-        ImageResizingOptions {
+        &ImageResizingOptions {
             width: Some(64),
             ..Default::default()
         },

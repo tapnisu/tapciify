@@ -31,7 +31,9 @@ impl Default for ImageResizingOptions {
     }
 }
 
-pub fn resize_img(img: &DynamicImage, options: ImageResizingOptions) -> DynamicImage {
+/// Resize [`DynamicImage`] to your sizes
+/// When both `width` and `height` are None, will return the original [`DynamicImage`]
+pub fn resize(img: &DynamicImage, options: &ImageResizingOptions) -> DynamicImage {
     if options.width.is_none() && options.height.is_none() {
         return img.clone();
     }

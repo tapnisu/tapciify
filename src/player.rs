@@ -3,7 +3,7 @@ use crate::{
         AsciiArt, AsciiConverter, AsciiConverterError, AsciiConverterOptions, AsciiStringError,
         SizeError, DEFAULT_ASCII_STRING,
     },
-    image_resizing::{resize_img, ImageResizingOptions, DEFAULT_FONT_RATIO},
+    image_resizing::{resize, ImageResizingOptions, DEFAULT_FONT_RATIO},
 };
 use crossterm::{cursor::MoveUp, execute};
 use image::ImageError;
@@ -146,9 +146,9 @@ impl AsciiPlayer {
             for image_path in images_paths.iter() {
                 let start = Instant::now();
 
-                let img = resize_img(
+                let img = resize(
                     &image::open(image_path)?,
-                    ImageResizingOptions {
+                    &ImageResizingOptions {
                         width: options.width,
                         height: options.height,
                         font_ratio: options.font_ratio,
@@ -193,9 +193,9 @@ impl AsciiPlayer {
 
         let frames = iter
             .map(|path| {
-                let img = resize_img(
+                let img = resize(
                     &image::open(path)?,
-                    ImageResizingOptions {
+                    &ImageResizingOptions {
                         width: options.width,
                         height: options.height,
                         font_ratio: options.font_ratio,
