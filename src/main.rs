@@ -38,6 +38,7 @@ fn main() -> Result<(), clap::Error> {
             pre_render: cli.pre_render,
             font_ratio: cli.font_ratio,
             looped: cli.looped,
+            ..Default::default()
         },
     );
 

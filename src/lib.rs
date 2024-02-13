@@ -3,6 +3,7 @@
 //! Useful functions, when using as lib
 //! - [`AsciiConverter::convert`]
 //! - [`AsciiConverter::convert_raw`]
+//! - [`CustomRatioResize`]
 //!
 //! ## Installation
 //!
@@ -60,7 +61,7 @@ pub mod cli;
 #[doc(inline)]
 pub use ascii::*;
 #[doc(inline)]
-pub use resizing::{ratio_resize, ResizingOptions, DEFAULT_FONT_RATIO};
+pub use resizing::{CustomRatioResize, DEFAULT_FONT_RATIO};
 
 #[doc(inline)]
 #[cfg(feature = "player")]

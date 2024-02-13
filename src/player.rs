@@ -3,10 +3,10 @@ use crate::{
         AsciiArt, AsciiConverter, AsciiConverterError, AsciiConverterOptions, AsciiStringError,
         DEFAULT_ASCII_STRING,
     },
-    ratio_resize, ResizingOptions, DEFAULT_FONT_RATIO,
+    CustomRatioResize, DEFAULT_FONT_RATIO,
 };
 use crossterm::{cursor::MoveUp, execute};
-use image::ImageError;
+use image::{imageops::FilterType, ImageError};
 use indicatif::ProgressBar;
 use std::{error::Error, fmt, io::stdout, time::Instant};
 
@@ -43,6 +43,7 @@ pub struct AsciiPlayerOptions {
     pub pre_render: bool,
     pub font_ratio: f64,
     pub looped: bool,
+    pub filter: FilterType,
 }
 
 impl Default for AsciiPlayerOptions {
@@ -56,6 +57,7 @@ impl Default for AsciiPlayerOptions {
             pre_render: false,
             font_ratio: DEFAULT_FONT_RATIO,
             looped: false,
+            filter: FilterType::Triangle,
         }
     }
 }
@@ -65,17 +67,6 @@ impl From<AsciiPlayerOptions> for AsciiConverterOptions {
         AsciiConverterOptions {
             ascii_string: o.ascii_string,
             colored: o.colored,
-        }
-    }
-}
-
-impl From<AsciiPlayerOptions> for ResizingOptions {
-    fn from(o: AsciiPlayerOptions) -> ResizingOptions {
-        ResizingOptions {
-            width: o.width,
-            height: o.height,
-            font_ratio: o.font_ratio,
-            ..Default::default()
         }
     }
 }
@@ -125,7 +116,7 @@ impl AsciiPlayer {
 
     /// Play paths as ASCII arts
     pub fn play_frames(
-        images_paths: &[String],
+        paths: &[String],
         options: &AsciiPlayerOptions,
     ) -> Result<(), AsciiPlayerError> {
         let mut first_frame = true;
@@ -133,17 +124,14 @@ impl AsciiPlayer {
         let converter_options = AsciiConverterOptions::from(options.clone());
 
         loop {
-            for image_path in images_paths.iter() {
+            for path in paths.iter() {
                 let start = Instant::now();
 
-                let img = ratio_resize(
-                    &image::open(image_path)?,
-                    &ResizingOptions {
-                        width: options.width,
-                        height: options.height,
-                        font_ratio: options.font_ratio,
-                        ..Default::default()
-                    },
+                let img = image::open(path)?.resize_custom_ratio(
+                    options.width,
+                    options.height,
+                    options.font_ratio,
+                    options.filter,
                 );
                 let ascii_image = AsciiConverter::convert(&img, &converter_options)?;
 
@@ -169,28 +157,25 @@ impl AsciiPlayer {
 
     /// Convert paths to of ASCII arts
     fn pre_render(
-        images_paths: &[String],
+        paths: &[String],
         options: &AsciiPlayerOptions,
     ) -> Result<Vec<AsciiArt>, AsciiPlayerError> {
-        let pb = ProgressBar::new(images_paths.len().try_into().unwrap());
+        let pb = ProgressBar::new(paths.len().try_into().unwrap());
 
         let converter_options = AsciiConverterOptions::from(options.clone());
 
         #[cfg(feature = "rayon")]
-        let iter = images_paths.into_par_iter();
+        let iter = paths.into_par_iter();
         #[cfg(not(feature = "rayon"))]
-        let iter = images_paths.into_iter();
+        let iter = paths.into_iter();
 
         let frames = iter
             .map(|path| {
-                let img = ratio_resize(
-                    &image::open(path)?,
-                    &ResizingOptions {
-                        width: options.width,
-                        height: options.height,
-                        font_ratio: options.font_ratio,
-                        ..Default::default()
-                    },
+                let img = image::open(path)?.resize_custom_ratio(
+                    options.width,
+                    options.height,
+                    options.font_ratio,
+                    options.filter,
                 );
                 let ascii_image = AsciiConverter::convert(&img, &converter_options)?;
 
