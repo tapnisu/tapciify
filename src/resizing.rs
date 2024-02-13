@@ -24,22 +24,18 @@ pub trait CustomRatioResize {
 
 impl CustomRatioResize for DynamicImage {
     /// Resize [`DynamicImage`] to your sizes
-    /// When both `width` and `height` are None, will return the original [`DynamicImage`]
+    /// When both `width` and `height` are [`None`], will return the original [`DynamicImage`]
     ///
     /// # Examples
     ///
     /// ```rust
-    /// use tapciify::{ratio_resize, ResizingOptions};
+    /// use image::imageops::FilterType;
+    /// use tapciify::{CustomRatioResize, DEFAULT_FONT_RATIO};
     ///
-    /// let img = image::open("./assets/examples/original.webp").unwrap();
+    /// let img = image::open("./assets/examples/original.webp")?;
     ///
-    /// let result = ratio_resize(
-    ///     &img,
-    ///     &ResizingOptions {
-    ///         width: Some(64),
-    ///         ..Default::default()
-    ///     },
-    /// );
+    /// let result = img.resize_custom_ratio(Some(64), None, DEFAULT_FONT_RATIO, FilterType::Triangle);
+    /// # Ok::<(), image::ImageError>(())
     /// ```
     fn resize_custom_ratio(
         &self,
