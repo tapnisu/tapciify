@@ -4,19 +4,19 @@
 //! - [`AsciiConverter::convert`]
 //! - [`AsciiConverter::convert_raw`]
 //!
-//! ## Install
+//! ## Installation
 //!
 //! ```bash
 //! cargo install tapciify
 //! ```
 //!
-//! ## View image
+//! ## Converting image
 //!
 //! 1. Run: `tapciify -i imagePath -w imageWidth` for image.
 //!
 //! 2. Run: `tapciify -i imagePath -w imageWidth -r` for reversed colors.
 //!
-//! ## View video
+//! ## Converting video
 //!
 //! In this example I set framerate to 24 (but you can use any another)
 //!
@@ -33,6 +33,20 @@
 //!    ```bash
 //!    tapciify -i frames/* -w videoWidth -f 24
 //!    ```
+//!
+//! # Examples
+//!
+//! ## Demo
+//!
+//! ```rust
+#![doc = include_str!("../examples/demo.rs")]
+//! ```
+//!
+//! ## Colored
+//!
+//! ```rust
+#![doc = include_str!("../examples/demo.rs")]
+//! ```
 
 pub mod ascii;
 #[cfg(feature = "player")]
