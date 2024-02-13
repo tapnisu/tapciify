@@ -1,3 +1,9 @@
+//! # Examples
+//!
+//! ```rust
+#![doc = include_str!("../examples/player.rs")]
+//! ```
+
 use crate::{
     ascii::{
         AsciiArt, AsciiConverter, AsciiConverterError, AsciiConverterOptions, AsciiStringError,
@@ -49,8 +55,8 @@ pub struct AsciiPlayerOptions {
 impl Default for AsciiPlayerOptions {
     fn default() -> AsciiPlayerOptions {
         AsciiPlayerOptions {
-            width: Some(0),
-            height: Some(0),
+            width: None,
+            height: None,
             ascii_string: DEFAULT_ASCII_STRING.to_owned(),
             colored: false,
             frame_time: 0,
@@ -136,7 +142,7 @@ impl AsciiPlayer {
                 let ascii_image = AsciiConverter::convert(&img, &converter_options)?;
 
                 if !first_frame {
-                    execute!(stdout(), MoveUp((ascii_image.height).try_into().unwrap()))
+                    execute!(stdout(), MoveUp(ascii_image.height.try_into().unwrap()))
                         .unwrap_or_default();
                 } else {
                     first_frame = false;
@@ -202,7 +208,7 @@ impl AsciiPlayer {
                 let start = Instant::now();
 
                 if !first_frame {
-                    execute!(stdout(), MoveUp((ascii_image.height).try_into().unwrap()))
+                    execute!(stdout(), MoveUp(ascii_image.height.try_into().unwrap()))
                         .unwrap_or_default();
                 } else {
                     first_frame = false;

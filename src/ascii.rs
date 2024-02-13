@@ -1,8 +1,22 @@
-//! Functions for converting images into ASCII
+//! # Examples
 //!
-//! Useful functions
-//! - [`AsciiConverter::convert`]
-//! - [`AsciiConverter::convert_raw`]
+//! ## Demo
+//!
+//! ```rust
+#![doc = include_str!("../examples/demo.rs")]
+//! ```
+//!
+//! ## Colored
+//!
+//! ```rust
+#![doc = include_str!("../examples/demo.rs")]
+//! ```
+//!
+//! ## Using player
+//!
+//! ```rust
+#![doc = include_str!("../examples/player.rs")]
+//! ```
 
 use colored::Colorize;
 use image::DynamicImage;
