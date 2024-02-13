@@ -12,8 +12,8 @@ fn main() -> Result<(), clap::Error> {
     let mut cmd = Cli::command();
 
     #[cfg(target_family = "windows")]
-    let images_paths = cli::glob_to_paths(cli.input)
-        .unwrap_or_else(|err| command.error(ErrorKind::InvalidValue, err).exit());
+    let images_paths = cli::glob_to_paths(&cli.input)
+        .unwrap_or_else(|err| cmd.error(ErrorKind::InvalidValue, err).exit());
     #[cfg(not(target_family = "windows"))]
     let images_paths = cli.input;
 

@@ -105,14 +105,14 @@ impl fmt::Display for GlobToPathsError {
 /// # Ok::<(), tapciify::cli::GlobToPathsError>(())
 /// `````
 #[cfg(target_family = "windows")]
-pub fn glob_to_paths(patterns: Vec<String>) -> Result<Vec<String>, GlobToPathsError> {
+pub fn glob_to_paths(patterns: &[String]) -> Result<Vec<String>, GlobToPathsError> {
     #[cfg(feature = "rayon")]
     let iter = patterns.into_par_iter();
     #[cfg(not(feature = "rayon"))]
     let iter = patterns.into_iter();
 
     iter.map(|glob_p| -> Result<Vec<String>, GlobToPathsError> {
-        glob(&glob_p)?
+        glob(glob_p)?
             .map(|path| Ok(path?.display().to_string()))
             .collect()
     })
