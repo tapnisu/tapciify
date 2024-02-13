@@ -234,7 +234,6 @@ impl AsciiConverter {
     /// let img = image::open(path)?;
     ///
     /// let options = AsciiConverterOptions {
-    ///     width: 128,
     ///     ..Default::default()
     /// };
     ///
@@ -252,7 +251,6 @@ impl AsciiConverter {
     /// let img = image::open(path)?;
     ///
     /// let options = AsciiConverterOptions {
-    ///     width: 128,
     ///     colored: true,
     ///     ..Default::default()
     /// };

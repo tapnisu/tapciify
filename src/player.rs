@@ -255,14 +255,14 @@ impl AsciiPlayer {
     /// ```rust
     /// use tapciify::{AsciiPlayer, AsciiPlayerOptions};
     ///
-    /// let path = "./assets/examples/original.webp";
+    /// let paths = vec!["./assets/examples/original.webp".to_owned()];
     ///
     /// let options = AsciiPlayerOptions {
-    ///     width: 128,
+    ///     width: Some(128),
     ///     ..Default::default()
     /// };
     ///
-    /// assert!(AsciiPlayer::play(vec![path.to_owned()], options).is_ok())
+    /// assert!(AsciiPlayer::play(&paths, &options).is_ok())
     /// ```
     pub fn play(
         images_paths: &[String],
