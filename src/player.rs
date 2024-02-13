@@ -127,7 +127,7 @@ impl AsciiPlayer {
     ) -> Result<(), AsciiPlayerError> {
         let mut first_frame = true;
 
-        let converter_options = AsciiConverterOptions::from(options.clone());
+        let converter_options = AsciiConverterOptions::from(options.to_owned());
 
         loop {
             for path in paths.iter() {
@@ -168,7 +168,7 @@ impl AsciiPlayer {
     ) -> Result<Vec<AsciiArt>, AsciiPlayerError> {
         let pb = ProgressBar::new(paths.len().try_into().unwrap());
 
-        let converter_options = AsciiConverterOptions::from(options.clone());
+        let converter_options = AsciiConverterOptions::from(options.to_owned());
 
         #[cfg(feature = "rayon")]
         let iter = paths.into_par_iter();

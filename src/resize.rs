@@ -59,7 +59,7 @@ impl CustomRatioResize for DynamicImage {
         filter: imageops::FilterType,
     ) -> DynamicImage {
         if width.is_none() && height.is_none() {
-            return self.clone();
+            return self.to_owned();
         }
 
         let nwidth = width.unwrap_or_else(|| {
