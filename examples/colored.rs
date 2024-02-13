@@ -1,10 +1,20 @@
-use tapciify::{AsciiConverter, AsciiConverterOptions};
+use tapciify::{
+    resizing::{resize, ResizingOptions},
+    AsciiConverter, AsciiConverterOptions,
+};
 
 fn main() {
-    let img = image::open("./assets/examples/original.webp").unwrap();
+    let orig_img = image::open("./assets/examples/original.webp").unwrap();
+
+    let img = resize(
+        &orig_img,
+        &ResizingOptions {
+            width: Some(64),
+            ..Default::default()
+        },
+    );
 
     let options = AsciiConverterOptions {
-        width: 64,
         colored: true,
         ..Default::default()
     };

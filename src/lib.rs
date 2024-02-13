@@ -3,6 +3,7 @@
 //! Useful functions, when using as lib
 //! - [`AsciiConverter::convert`]
 //! - [`AsciiConverter::convert_raw`]
+//! - [`image_resizing::resize`]
 //!
 //! ## Installation
 //!
@@ -49,6 +50,7 @@
 //! ```
 
 pub mod ascii;
+pub mod resizing;
 #[cfg(feature = "player")]
 pub mod player;
 

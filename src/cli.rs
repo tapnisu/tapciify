@@ -1,5 +1,5 @@
-use crate::ascii::{DEFAULT_ASCII_STRING, DEFAULT_FONT_RATIO};
-use clap::{ArgGroup, Parser};
+use crate::{ascii::DEFAULT_ASCII_STRING, resizing::DEFAULT_FONT_RATIO};
+use clap::Parser;
 
 #[cfg(target_family = "windows")]
 use glob::glob;
@@ -15,11 +15,6 @@ use rayon::prelude::*;
 /// Parse command arguments for tapciify CLI
 #[derive(Parser, Debug, Clone)]
 #[clap(author, version, about, long_about = None)]
-#[clap(group(
-    ArgGroup::new("size")
-    .required(true)
-    .args(&["width", "height"]),
-))]
 pub struct Cli {
     /// Input files to convert to ASCII art
     #[clap(short, long, num_args = 1.., required=true)]
@@ -96,7 +91,8 @@ impl fmt::Display for GlobToPathsError {
 /// ```rust
 /// use tapciify::cli::glob_to_paths;
 ///
-/// let result = glob_to_paths(vec!["assets\\examples\\*.webp".to_owned()])?;
+/// let paths = vec!["assets\\examples\\*.webp".to_owned()];
+/// let result = glob_to_paths(&paths)?;
 ///
 /// assert_eq!(
 ///     result,
@@ -110,14 +106,14 @@ impl fmt::Display for GlobToPathsError {
 /// # Ok::<(), tapciify::cli::GlobToPathsError>(())
 /// `````
 #[cfg(target_family = "windows")]
-pub fn glob_to_paths(patterns: Vec<String>) -> Result<Vec<String>, GlobToPathsError> {
+pub fn glob_to_paths(patterns: &[String]) -> Result<Vec<String>, GlobToPathsError> {
     #[cfg(feature = "rayon")]
     let iter = patterns.into_par_iter();
     #[cfg(not(feature = "rayon"))]
     let iter = patterns.into_iter();
 
     iter.map(|glob_p| -> Result<Vec<String>, GlobToPathsError> {
-        glob(&glob_p)?
+        glob(glob_p)?
             .map(|path| Ok(path?.display().to_string()))
             .collect()
     })
