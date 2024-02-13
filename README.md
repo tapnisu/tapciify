@@ -10,19 +10,19 @@
 
 2. [Rust](https://www.rust-lang.org/tools/install)
 
-## Install
+## Installation
 
 ```bash
 cargo install tapciify
 ```
 
-## View image
+## Converting image
 
 1. Run: `tapciify -i imagePath -w imageWidth` for image.
 
 2. Run: `tapciify -i imagePath -w imageWidth -r` for reversed colors.
 
-## View video
+## Converting video
 
 In this example I set framerate to 24 (but you can use any another)
 
