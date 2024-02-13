@@ -49,6 +49,7 @@
 //! ```
 
 pub mod ascii;
+pub mod image_resizing;
 #[cfg(feature = "player")]
 pub mod player;
 

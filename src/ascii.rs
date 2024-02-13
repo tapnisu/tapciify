@@ -15,7 +15,6 @@ use std::{
 use rayon::prelude::*;
 
 pub const DEFAULT_ASCII_STRING: &str = " .,:;+*?%S#@";
-pub const DEFAULT_FONT_RATIO: f64 = 11.0 / 24.0;
 
 /// Calculate lightness (from 0.0 to 1.0)
 ///
@@ -76,16 +75,6 @@ pub fn ascii_character(lightness: f32, ascii_string: &str) -> Result<char, Ascii
         .chars()
         .nth(((ascii_string.chars().count() - 1) as f32 * lightness) as usize)
         .ok_or(AsciiStringError)
-}
-
-/// Calculate new width from aspect ratio and new height
-pub fn calc_new_width(new_height: u32, width: u32, height: u32, font_ratio: f64) -> u32 {
-    (new_height as f64 / (height as f64) * width as f64 / font_ratio) as u32
-}
-
-/// Calculate new height from aspect ratio and new width
-pub fn calc_new_height(new_width: u32, width: u32, height: u32, font_ratio: f64) -> u32 {
-    (new_width as f64 * (height as f64) / width as f64 * font_ratio) as u32
 }
 
 /// Ascii character of RawAsciiImage
@@ -227,11 +216,8 @@ pub struct AsciiConverter {}
 /// Options for converter of images to ASCII art
 #[derive(Debug, Clone)]
 pub struct AsciiConverterOptions {
-    pub width: u32,
-    pub height: u32,
     pub ascii_string: String,
     pub colored: bool,
-    pub font_ratio: f64,
 }
 
 impl AsciiConverter {
@@ -279,30 +265,7 @@ impl AsciiConverter {
         img: &DynamicImage,
         options: &AsciiConverterOptions,
     ) -> Result<RawAsciiArt, AsciiConverterError> {
-        if options.width == 0 && options.height == 0 {
-            return Err(AsciiConverterError::SizeError(SizeError));
-        }
-
-        let width = if options.width == 0 {
-            calc_new_width(
-                options.height,
-                img.width(),
-                img.height(),
-                options.font_ratio,
-            )
-        } else {
-            options.width
-        };
-
-        let height = if options.height == 0 {
-            calc_new_height(options.width, img.width(), img.height(), options.font_ratio)
-        } else {
-            options.height
-        };
-
-        let img_buffer = img
-            .resize_exact(width, height, image::imageops::FilterType::Triangle)
-            .to_rgba8();
+        let img_buffer = img.to_rgba8();
 
         #[cfg(feature = "rayon")]
         let chunks = img_buffer.as_raw().par_chunks(4);
@@ -313,7 +276,12 @@ impl AsciiConverter {
             .map(|raw| AsciiCharacter::new(raw[0], raw[1], raw[2], raw[3], &options.ascii_string))
             .collect::<Result<Vec<AsciiCharacter>, AsciiStringError>>()?;
 
-        Ok(RawAsciiArt::new(characters, width, height, options.colored))
+        Ok(RawAsciiArt::new(
+            characters,
+            img.width(),
+            img.height(),
+            options.colored,
+        ))
     }
 
     /// Convert image to ASCII art
@@ -364,11 +332,8 @@ impl AsciiConverter {
 impl Default for AsciiConverterOptions {
     fn default() -> AsciiConverterOptions {
         AsciiConverterOptions {
-            width: 0,
-            height: 0,
             ascii_string: DEFAULT_ASCII_STRING.to_owned(),
             colored: false,
-            font_ratio: DEFAULT_FONT_RATIO,
         }
     }
 }

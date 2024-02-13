@@ -1,6 +1,9 @@
-use crate::ascii::{
-    AsciiArt, AsciiConverter, AsciiConverterError, AsciiConverterOptions, AsciiStringError,
-    SizeError, DEFAULT_ASCII_STRING, DEFAULT_FONT_RATIO,
+use crate::{
+    ascii::{
+        AsciiArt, AsciiConverter, AsciiConverterError, AsciiConverterOptions, AsciiStringError,
+        SizeError, DEFAULT_ASCII_STRING,
+    },
+    image_resizing::{resize_img, ImageResizingOptions, DEFAULT_FONT_RATIO},
 };
 use crossterm::{cursor::MoveUp, execute};
 use image::ImageError;
@@ -32,8 +35,8 @@ pub struct AsciiPlayer {}
 /// Options of player to convert and play frames
 #[derive(Debug, Clone)]
 pub struct AsciiPlayerOptions {
-    pub width: u32,
-    pub height: u32,
+    pub width: Option<u32>,
+    pub height: Option<u32>,
     pub ascii_string: String,
     pub colored: bool,
     pub frame_time: u64,
@@ -42,14 +45,37 @@ pub struct AsciiPlayerOptions {
     pub looped: bool,
 }
 
+impl Default for AsciiPlayerOptions {
+    fn default() -> AsciiPlayerOptions {
+        AsciiPlayerOptions {
+            width: Some(0),
+            height: Some(0),
+            ascii_string: DEFAULT_ASCII_STRING.to_owned(),
+            colored: false,
+            frame_time: 0,
+            pre_render: false,
+            font_ratio: DEFAULT_FONT_RATIO,
+            looped: false,
+        }
+    }
+}
+
 impl From<AsciiPlayerOptions> for AsciiConverterOptions {
     fn from(o: AsciiPlayerOptions) -> AsciiConverterOptions {
         AsciiConverterOptions {
-            width: o.width,
-            height: o.height,
             ascii_string: o.ascii_string,
             colored: o.colored,
+        }
+    }
+}
+
+impl From<AsciiPlayerOptions> for ImageResizingOptions {
+    fn from(o: AsciiPlayerOptions) -> ImageResizingOptions {
+        ImageResizingOptions {
+            width: o.width,
+            height: o.height,
             font_ratio: o.font_ratio,
+            ..Default::default()
         }
     }
 }
@@ -109,18 +135,26 @@ impl AsciiPlayer {
 
     /// Play paths as ASCII arts
     pub fn play_frames(
-        images_paths: Vec<String>,
-        options: AsciiPlayerOptions,
+        images_paths: &[String],
+        options: &AsciiPlayerOptions,
     ) -> Result<(), AsciiPlayerError> {
         let mut first_frame = true;
 
-        let converter_options = AsciiConverterOptions::from(options.to_owned());
+        let converter_options = AsciiConverterOptions::from(options.clone());
 
         loop {
             for image_path in images_paths.iter() {
                 let start = Instant::now();
 
-                let img = image::open(image_path)?;
+                let img = resize_img(
+                    &image::open(image_path)?,
+                    ImageResizingOptions {
+                        width: options.width,
+                        height: options.height,
+                        font_ratio: options.font_ratio,
+                        ..Default::default()
+                    },
+                );
                 let ascii_image = AsciiConverter::convert(&img, &converter_options)?;
 
                 if !first_frame {
@@ -145,12 +179,12 @@ impl AsciiPlayer {
 
     /// Convert paths to of ASCII arts
     fn pre_render(
-        images_paths: Vec<String>,
-        options: AsciiPlayerOptions,
+        images_paths: &[String],
+        options: &AsciiPlayerOptions,
     ) -> Result<Vec<AsciiArt>, AsciiPlayerError> {
         let pb = ProgressBar::new(images_paths.len().try_into().unwrap());
 
-        let converter_options = AsciiConverterOptions::from(options);
+        let converter_options = AsciiConverterOptions::from(options.clone());
 
         #[cfg(feature = "rayon")]
         let iter = images_paths.into_par_iter();
@@ -159,7 +193,15 @@ impl AsciiPlayer {
 
         let frames = iter
             .map(|path| {
-                let img = image::open(path)?;
+                let img = resize_img(
+                    &image::open(path)?,
+                    ImageResizingOptions {
+                        width: options.width,
+                        height: options.height,
+                        font_ratio: options.font_ratio,
+                        ..Default::default()
+                    },
+                );
                 let ascii_image = AsciiConverter::convert(&img, &converter_options)?;
 
                 pb.inc(1);
@@ -173,12 +215,12 @@ impl AsciiPlayer {
 
     /// Convert paths to of ASCII arts and play them
     pub fn play_pre_rendered_frames(
-        images_paths: Vec<String>,
-        options: AsciiPlayerOptions,
+        images_paths: &[String],
+        options: &AsciiPlayerOptions,
     ) -> Result<(), AsciiPlayerError> {
         let mut first_frame = true;
 
-        let frames = AsciiPlayer::pre_render(images_paths, options.to_owned())?;
+        let frames = AsciiPlayer::pre_render(images_paths, options)?;
 
         loop {
             frames.iter().for_each(|ascii_image| {
@@ -223,28 +265,13 @@ impl AsciiPlayer {
     /// assert!(AsciiPlayer::play(vec![path.to_owned()], options).is_ok())
     /// ```
     pub fn play(
-        images_paths: Vec<String>,
-        options: AsciiPlayerOptions,
+        images_paths: &[String],
+        options: &AsciiPlayerOptions,
     ) -> Result<(), AsciiPlayerError> {
         if options.pre_render {
             return AsciiPlayer::play_pre_rendered_frames(images_paths, options);
         }
 
         AsciiPlayer::play_frames(images_paths, options)
-    }
-}
-
-impl Default for AsciiPlayerOptions {
-    fn default() -> AsciiPlayerOptions {
-        AsciiPlayerOptions {
-            width: 0,
-            height: 0,
-            ascii_string: DEFAULT_ASCII_STRING.to_owned(),
-            colored: false,
-            frame_time: 0,
-            pre_render: false,
-            font_ratio: DEFAULT_FONT_RATIO,
-            looped: false,
-        }
     }
 }
