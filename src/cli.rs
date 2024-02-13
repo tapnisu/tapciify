@@ -72,6 +72,7 @@ impl From<GlobError> for GlobToPathsError {
     }
 }
 
+#[cfg(target_family = "windows")]
 impl Error for GlobToPathsError {}
 
 #[cfg(target_family = "windows")]
