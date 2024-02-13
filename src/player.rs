@@ -3,7 +3,7 @@ use crate::{
         AsciiArt, AsciiConverter, AsciiConverterError, AsciiConverterOptions, AsciiStringError,
         DEFAULT_ASCII_STRING,
     },
-    resizing::{resize, ResizingOptions, DEFAULT_FONT_RATIO},
+    ratio_resize, ResizingOptions, DEFAULT_FONT_RATIO,
 };
 use crossterm::{cursor::MoveUp, execute};
 use image::ImageError;
@@ -18,7 +18,7 @@ use rayon::prelude::*;
 /// # Examples
 ///
 /// ```rust
-/// use tapciify::calculate_frame_time;
+/// use tapciify::player::calculate_frame_time;
 ///
 /// let result = calculate_frame_time(Some(20.0));
 ///
@@ -136,7 +136,7 @@ impl AsciiPlayer {
             for image_path in images_paths.iter() {
                 let start = Instant::now();
 
-                let img = resize(
+                let img = ratio_resize(
                     &image::open(image_path)?,
                     &ResizingOptions {
                         width: options.width,
@@ -183,7 +183,7 @@ impl AsciiPlayer {
 
         let frames = iter
             .map(|path| {
-                let img = resize(
+                let img = ratio_resize(
                     &image::open(path)?,
                     &ResizingOptions {
                         width: options.width,

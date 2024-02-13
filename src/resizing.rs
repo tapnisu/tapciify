@@ -37,11 +37,11 @@ impl Default for ResizingOptions {
 /// # Examples
 ///
 /// ```rust
-/// use tapciify::resizing::{resize, ResizingOptions};
+/// use tapciify::{ratio_resize, ResizingOptions};
 ///
 /// let img = image::open("./assets/examples/original.webp").unwrap();
 ///
-/// let result = resize(
+/// let result = ratio_resize(
 ///     &img,
 ///     &ResizingOptions {
 ///         width: Some(64),
@@ -49,7 +49,7 @@ impl Default for ResizingOptions {
 ///     },
 /// );
 /// ```
-pub fn resize(img: &DynamicImage, options: &ResizingOptions) -> DynamicImage {
+pub fn ratio_resize(img: &DynamicImage, options: &ResizingOptions) -> DynamicImage {
     if options.width.is_none() && options.height.is_none() {
         return img.clone();
     }

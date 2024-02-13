@@ -1,13 +1,10 @@
 use std::error::Error;
-use tapciify::{
-    resizing::{resize, ResizingOptions},
-    AsciiConverter, AsciiConverterOptions,
-};
+use tapciify::{ratio_resize, AsciiConverter, AsciiConverterOptions, ResizingOptions};
 
 fn main() -> Result<(), Box<dyn Error>> {
     let orig_img = image::open("./assets/examples/original.webp")?;
 
-    let img = resize(
+    let img = ratio_resize(
         &orig_img,
         &ResizingOptions {
             // Put your other options here

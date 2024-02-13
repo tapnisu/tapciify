@@ -1,4 +1,4 @@
-use crate::{ascii::DEFAULT_ASCII_STRING, resizing::DEFAULT_FONT_RATIO};
+use crate::{DEFAULT_ASCII_STRING, DEFAULT_FONT_RATIO};
 use clap::Parser;
 
 #[cfg(target_family = "windows")]
