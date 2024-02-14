@@ -1,9 +1,8 @@
 //! > **Tool to convert your images into ASCII art**
 //!
 //! Useful functions, when using as lib
-//! - [`AsciiConverter::convert`]
-//! - [`AsciiConverter::convert_raw`]
-//! - [`CustomRatioResize`]
+//! - [`AsciiArtConverter::ascii_art`]
+//! - [`CustomRatioResize::resize_custom_ratio`]
 //!
 //! ## Installation
 //!
@@ -39,14 +38,14 @@
 //!
 //! ## Demo
 //!
-//! ```rust
+//! ```
 #![doc = include_str!("../examples/demo.rs")]
 //! ```
 //!
 //! ## Colored
 //!
-//! ```rust
-#![doc = include_str!("../examples/demo.rs")]
+//! ```
+#![doc = include_str!("../examples/colored.rs")]
 //! ```
 
 pub mod ascii;
@@ -59,7 +58,10 @@ pub mod player;
 pub mod cli;
 
 #[doc(inline)]
-pub use ascii::*;
+pub use ascii::{
+    AsciiArt, AsciiArtConverter, AsciiArtConverterError, AsciiArtConverterOptions, AsciiArtPixel,
+    AsciiStringError, SizeError, DEFAULT_ASCII_STRING,
+};
 #[doc(inline)]
 pub use resize::{CustomRatioResize, DEFAULT_FONT_RATIO};
 

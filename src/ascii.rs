@@ -4,20 +4,14 @@
 //!
 //! ## Demo
 //!
-//! ```rust
+//! ```
 #![doc = include_str!("../examples/demo.rs")]
 //! ```
 //!
 //! ## Colored
 //!
-//! ```rust
-#![doc = include_str!("../examples/demo.rs")]
 //! ```
-//!
-//! ## Using player
-//!
-//! ```rust
-#![doc = include_str!("../examples/player.rs")]
+#![doc = include_str!("../examples/demo.rs")]
 //! ```
 
 use colored::Colorize;
@@ -38,8 +32,8 @@ pub const DEFAULT_ASCII_STRING: &str = " .,:;+*?%S#@";
 ///
 /// # Examples
 ///
-/// ```rust
-/// use tapciify::get_lightness;
+/// ```
+/// use tapciify::ascii::get_lightness;
 ///
 /// let result = get_lightness(255, 255, 255, 255);
 /// assert_eq!(result, 1.0);
@@ -60,6 +54,7 @@ pub fn get_lightness(r: u8, g: u8, b: u8, a: u8) -> f32 {
     ((max as f32 + min as f32) * a as f32) / 130050.0 // 130050 - we need to divide by 512, and divide by 255 from alpha
 }
 
+/// Error caused by lightness being out of ASCII string in [`ascii_character`]
 #[derive(Debug, Clone)]
 pub struct AsciiStringError;
 
@@ -71,12 +66,12 @@ impl fmt::Display for AsciiStringError {
 
 impl Error for AsciiStringError {}
 
-/// Convert lightness of pixel to ASCII character
+/// Convert lightness of pixel to [`char`]
 ///
 /// # Examples
 ///
-/// ```rust
-/// use tapciify::ascii_character;
+/// ```
+/// use tapciify::ascii::ascii_character;
 ///
 /// let ascii_string = " *#";
 ///
@@ -97,9 +92,9 @@ pub fn ascii_character(lightness: f32, ascii_string: &str) -> Result<char, Ascii
         .ok_or(AsciiStringError)
 }
 
-/// Ascii character of RawAsciiImage
+/// ASCII pixel of [`AsciiArt`]
 #[derive(Debug, Clone)]
-pub struct AsciiCharacter {
+pub struct AsciiArtPixel {
     pub character: char,
     pub r: u8,
     pub g: u8,
@@ -107,23 +102,23 @@ pub struct AsciiCharacter {
     pub a: u8,
 }
 
-impl AsciiCharacter {
-    /// Convert RGBA and ASCII string into [`AsciiCharacter`]
+impl AsciiArtPixel {
+    /// Convert RGBA and ASCII string into [`AsciiArtPixel`]
     ///
     /// # Examples
     ///
-    /// ```rust
-    /// use tapciify::AsciiCharacter;
+    /// ```
+    /// use tapciify::AsciiArtPixel;
     ///
     /// let ascii_string = " *#";
     ///
-    /// let result = AsciiCharacter::new(255, 255, 255, 255, ascii_string)?;
+    /// let result = AsciiArtPixel::new(255, 255, 255, 255, ascii_string)?;
     /// assert_eq!(result.character, '#');
     ///
-    /// let result = AsciiCharacter::new(255, 255, 255, 0, ascii_string)?;
+    /// let result = AsciiArtPixel::new(255, 255, 255, 0, ascii_string)?;
     /// assert_eq!(result.character, ' ');
     ///
-    /// let result = AsciiCharacter::new(0, 0, 0, 255, ascii_string)?;
+    /// let result = AsciiArtPixel::new(0, 0, 0, 255, ascii_string)?;
     /// assert_eq!(result.character, ' ');
     /// # Ok::<(), tapciify::AsciiStringError>(())
     /// `````
@@ -133,12 +128,12 @@ impl AsciiCharacter {
         b: u8,
         a: u8,
         ascii_string: &str,
-    ) -> Result<AsciiCharacter, AsciiStringError> {
+    ) -> Result<AsciiArtPixel, AsciiStringError> {
         let lightness = get_lightness(r, g, b, a);
 
         let character = ascii_character(lightness, ascii_string)?;
 
-        Ok(AsciiCharacter {
+        Ok(AsciiArtPixel {
             character,
             r,
             g,
@@ -148,44 +143,54 @@ impl AsciiCharacter {
     }
 }
 
-/// Raw Ascii art conversion result
+/// Raw ASCII art conversion result
 #[derive(Debug, Clone)]
-pub struct RawAsciiArt {
-    pub characters: Vec<AsciiCharacter>,
+pub struct AsciiArt {
+    pub characters: Vec<AsciiArtPixel>,
     pub width: u32,
     pub height: u32,
     pub colored: bool,
 }
 
-impl RawAsciiArt {
-    pub fn new(
-        characters: Vec<AsciiCharacter>,
-        width: u32,
-        height: u32,
-        colored: bool,
-    ) -> RawAsciiArt {
-        RawAsciiArt {
-            characters,
-            width,
-            height,
-            colored,
-        }
+impl fmt::Display for AsciiArt {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        #[cfg(feature = "rayon")]
+        let iter = self.characters.par_iter();
+        #[cfg(not(feature = "rayon"))]
+        let iter = self.characters.iter();
+
+        let characters = iter
+            .map(|ascii_character| {
+                if self.colored {
+                    ascii_character
+                        .character
+                        .to_string()
+                        .truecolor(ascii_character.r, ascii_character.g, ascii_character.b)
+                        .to_string()
+                } else {
+                    ascii_character.character.to_string()
+                }
+            })
+            .collect::<Vec<String>>();
+
+        #[cfg(feature = "rayon")]
+        let chunks = characters.par_chunks(self.width.try_into().unwrap());
+        #[cfg(not(feature = "rayon"))]
+        let chunks = characters.chunks(self.width.try_into().unwrap());
+
+        let text = chunks
+            .map(|line| line.join(""))
+            .collect::<Vec<String>>()
+            .join("\n");
+
+        write!(f, "{}", text)
     }
 }
 
-/// Ascii art conversion result
-#[derive(Debug, Clone)]
-pub struct AsciiArt {
-    pub text: String,
-    pub width: u32,
-    pub height: u32,
-    pub colored: bool,
-}
-
 impl AsciiArt {
-    pub fn new(text: String, width: u32, height: u32, colored: bool) -> AsciiArt {
+    pub fn new(characters: Vec<AsciiArtPixel>, width: u32, height: u32, colored: bool) -> AsciiArt {
         AsciiArt {
-            text,
+            characters,
             width,
             height,
             colored,
@@ -202,90 +207,64 @@ impl fmt::Display for SizeError {
     }
 }
 
+/// Error caused by [`AsciiArtConverter`]
 #[derive(Debug, Clone)]
-pub enum AsciiConverterError {
+pub enum AsciiArtConverterError {
     AsciiStringError(AsciiStringError),
-    SizeError(SizeError),
 }
 
-impl From<AsciiStringError> for AsciiConverterError {
-    fn from(e: AsciiStringError) -> AsciiConverterError {
-        AsciiConverterError::AsciiStringError(e)
+impl From<AsciiStringError> for AsciiArtConverterError {
+    fn from(e: AsciiStringError) -> AsciiArtConverterError {
+        AsciiArtConverterError::AsciiStringError(e)
     }
 }
 
-impl From<SizeError> for AsciiConverterError {
-    fn from(e: SizeError) -> AsciiConverterError {
-        AsciiConverterError::SizeError(e)
-    }
-}
+impl Error for AsciiArtConverterError {}
 
-impl Error for AsciiConverterError {}
-
-impl fmt::Display for AsciiConverterError {
+impl fmt::Display for AsciiArtConverterError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            AsciiConverterError::AsciiStringError(err) => err.fmt(f),
-            AsciiConverterError::SizeError(err) => err.fmt(f),
+            AsciiArtConverterError::AsciiStringError(err) => err.fmt(f),
         }
     }
 }
 
-/// Converter of images to ASCII art
-#[derive(Debug, Clone)]
-pub struct AsciiConverter {}
-
 /// Options for converter of images to ASCII art
 #[derive(Debug, Clone)]
-pub struct AsciiConverterOptions {
+pub struct AsciiArtConverterOptions {
     pub ascii_string: String,
     pub colored: bool,
 }
 
-impl AsciiConverter {
-    /// Convert image to raw ASCII art
+/// Converter of images to ASCII art
+pub trait AsciiArtConverter {
+    /// Convert image to an ASCII art
     ///
     /// # Examples
     ///
-    /// Regular:
+    /// Demo:
     ///
-    /// ```rust
-    /// use tapciify::{AsciiConverter, AsciiConverterOptions};
-    ///
-    /// let path = "./assets/examples/original.webp";
-    /// let img = image::open(path)?;
-    ///
-    /// let options = AsciiConverterOptions {
-    ///     ..Default::default()
-    /// };
-    ///
-    /// assert!(AsciiConverter::convert_raw(&img, &options).is_ok());
-    ///
-    /// # Ok::<(), image::ImageError>(())
+    /// ```
+    #[doc = include_str!("../examples/demo.rs")]
     /// ````
     ///
     /// Colored:
     ///
-    /// ```rust
-    /// use tapciify::{AsciiConverter, AsciiConverterOptions};
-    ///
-    /// let path = "./assets/examples/original.webp";
-    /// let img = image::open(path)?;
-    ///
-    /// let options = AsciiConverterOptions {
-    ///     colored: true,
-    ///     ..Default::default()
-    /// };
-    ///
-    /// assert!(AsciiConverter::convert_raw(&img, &options).is_ok());
-    ///
-    /// # Ok::<(), image::ImageError>(())
+    /// ```
+    #[doc = include_str!("../examples/colored.rs")]
     /// ````
-    pub fn convert_raw(
-        img: &DynamicImage,
-        options: &AsciiConverterOptions,
-    ) -> Result<RawAsciiArt, AsciiConverterError> {
-        let img_buffer = img.to_rgba8();
+    fn ascii_art(
+        &self,
+        options: &AsciiArtConverterOptions,
+    ) -> Result<AsciiArt, AsciiArtConverterError>;
+}
+
+impl AsciiArtConverter for DynamicImage {
+    fn ascii_art(
+        &self,
+        options: &AsciiArtConverterOptions,
+    ) -> Result<AsciiArt, AsciiArtConverterError> {
+        let img_buffer = self.to_rgba8();
 
         #[cfg(feature = "rayon")]
         let chunks = img_buffer.as_raw().par_chunks(4);
@@ -293,65 +272,23 @@ impl AsciiConverter {
         let chunks = img_buffer.as_raw().chunks(4);
 
         let characters = chunks
-            .map(|raw| AsciiCharacter::new(raw[0], raw[1], raw[2], raw[3], &options.ascii_string))
-            .collect::<Result<Vec<AsciiCharacter>, AsciiStringError>>()?;
-
-        Ok(RawAsciiArt::new(
-            characters,
-            img.width(),
-            img.height(),
-            options.colored,
-        ))
-    }
-
-    /// Convert image to ASCII art
-    pub fn convert(
-        img: &DynamicImage,
-        options: &AsciiConverterOptions,
-    ) -> Result<AsciiArt, AsciiConverterError> {
-        let raw_ascii_art = AsciiConverter::convert_raw(img, options)?;
-
-        #[cfg(feature = "rayon")]
-        let iter = raw_ascii_art.characters.into_par_iter();
-        #[cfg(not(feature = "rayon"))]
-        let iter = raw_ascii_art.characters.into_iter();
-
-        let characters = iter
-            .map(|ascii_character| {
-                if options.colored {
-                    ascii_character
-                        .character
-                        .to_string()
-                        .truecolor(ascii_character.r, ascii_character.g, ascii_character.b)
-                        .to_string()
-                } else {
-                    ascii_character.character.to_string()
-                }
+            .map(|rgba| {
+                AsciiArtPixel::new(rgba[0], rgba[1], rgba[2], rgba[3], &options.ascii_string)
             })
-            .collect::<Vec<String>>();
-
-        #[cfg(feature = "rayon")]
-        let chunks = characters.par_chunks(raw_ascii_art.width.try_into().unwrap());
-        #[cfg(not(feature = "rayon"))]
-        let chunks = characters.chunks(raw_ascii_art.width.try_into().unwrap());
-
-        let text = chunks
-            .map(|line| line.join(""))
-            .collect::<Vec<String>>()
-            .join("\n");
+            .collect::<Result<Vec<AsciiArtPixel>, AsciiStringError>>()?;
 
         Ok(AsciiArt::new(
-            text,
-            raw_ascii_art.width,
-            raw_ascii_art.height,
-            raw_ascii_art.colored,
+            characters,
+            self.width(),
+            self.height(),
+            options.colored,
         ))
     }
 }
 
-impl Default for AsciiConverterOptions {
-    fn default() -> AsciiConverterOptions {
-        AsciiConverterOptions {
+impl Default for AsciiArtConverterOptions {
+    fn default() -> AsciiArtConverterOptions {
+        AsciiArtConverterOptions {
             ascii_string: DEFAULT_ASCII_STRING.to_owned(),
             colored: false,
         }

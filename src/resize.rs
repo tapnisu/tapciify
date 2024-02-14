@@ -22,7 +22,7 @@ pub trait CustomRatioResize {
     ///
     /// # Examples
     ///
-    /// ```rust
+    /// ```
     /// use image::imageops::FilterType;
     /// use tapciify::{CustomRatioResize, DEFAULT_FONT_RATIO};
     ///

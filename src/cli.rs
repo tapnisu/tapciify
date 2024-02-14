@@ -53,6 +53,7 @@ pub struct Cli {
     pub font_ratio: f64,
 }
 
+/// Error caused by [`glob_to_paths`]
 #[cfg(target_family = "windows")]
 #[derive(Debug)]
 pub enum GlobToPathsError {
@@ -91,7 +92,7 @@ impl fmt::Display for GlobToPathsError {
 ///
 /// # Examples
 ///
-/// ```rust
+/// ```
 /// use tapciify::cli::glob_to_paths;
 ///
 /// let paths = vec!["assets\\examples\\*.webp".to_owned()];
