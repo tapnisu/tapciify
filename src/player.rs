@@ -80,6 +80,7 @@ impl From<AsciiPlayerOptions> for AsciiArtConverterOptions {
     }
 }
 
+/// Error caused by [`AsciiPlayer`]
 #[derive(Debug)]
 pub enum AsciiPlayerError {
     Image(ImageError),
