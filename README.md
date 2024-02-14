@@ -42,7 +42,7 @@ In this example I set framerate to 24 (but you can use any another)
 
 ## Examples
 
-| Original                                         | ASCII                                               | ASCII colored                                              | Pixels                                                       |
-| ------------------------------------------------ | --------------------------------------------------- | ---------------------------------------------------------- | ------------------------------------------------------------ |
-| ![Original Image](assets/examples/original.webp) | ![ASCII image](assets/examples/ascii.webp)          | ![ASCII colored image](assets/examples/ascii-colored.webp) | ![Image using pixels (█)](assets/examples/ascii-pixels.webp) |
-| `Original image`                                 | `tapciify -i ./assets/examples/original.webp -w 64` | `tapciify -i ./assets/examples/original.webp -w 64 -c`     | `tapciify -i ./assets/examples/original.webp -w 64 --pixels` |
+| Original                                         | ASCII                                               | ASCII colored                                            | Pixels                                                                  |
+| ------------------------------------------------ | --------------------------------------------------- | -------------------------------------------------------- | ----------------------------------------------------------------------- |
+| ![Original Image](assets/examples/original.webp) | ![ASCII art](assets/examples/ascii.webp)            | ![ASCII colored art](assets/examples/ascii-colored.webp) | ![ASCII art using pixels (█ symbol)](assets/examples/ascii-pixels.webp) |
+| `Original image`                                 | `tapciify -i ./assets/examples/original.webp -w 64` | `tapciify -i ./assets/examples/original.webp -w 64 -c`   | `tapciify -i ./assets/examples/original.webp -w 64 --pixels`            |

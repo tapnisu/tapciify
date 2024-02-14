@@ -142,16 +142,16 @@ impl AsciiPlayer {
                     options.font_ratio,
                     options.filter,
                 );
-                let ascii_image = img.ascii_art(&converter_options)?;
+                let ascii_art = img.ascii_art(&converter_options)?;
 
                 if !first_frame {
-                    execute!(stdout(), MoveUp(ascii_image.height.try_into().unwrap()))
+                    execute!(stdout(), MoveUp(ascii_art.height.try_into().unwrap()))
                         .unwrap_or_default();
                 } else {
                     first_frame = false;
                 }
 
-                println!("{}", ascii_image.text);
+                println!("{}", ascii_art);
 
                 while options.frame_time > start.elapsed().as_millis().try_into().unwrap() {}
             }
@@ -180,17 +180,18 @@ impl AsciiPlayer {
 
         let frames = iter
             .map(|path| {
-                let img = image::open(path)?.resize_custom_ratio(
-                    options.width,
-                    options.height,
-                    options.font_ratio,
-                    options.filter,
-                );
-                let ascii_image = img.ascii_art(&converter_options)?;
+                let ascii_art = image::open(path)?
+                    .resize_custom_ratio(
+                        options.width,
+                        options.height,
+                        options.font_ratio,
+                        options.filter,
+                    )
+                    .ascii_art(&converter_options)?;
 
                 pb.inc(1);
 
-                Ok(ascii_image)
+                Ok(ascii_art)
             })
             .collect::<Result<Vec<AsciiArt>, AsciiPlayerError>>()?;
 
@@ -199,25 +200,25 @@ impl AsciiPlayer {
 
     /// Convert paths to of ASCII arts and play them
     pub fn play_pre_rendered_frames(
-        images_paths: &[String],
+        paths: &[String],
         options: &AsciiPlayerOptions,
     ) -> Result<(), AsciiPlayerError> {
         let mut first_frame = true;
 
-        let frames = AsciiPlayer::pre_render(images_paths, options)?;
+        let frames = AsciiPlayer::pre_render(paths, options)?;
 
         loop {
-            frames.iter().for_each(|ascii_image| {
+            frames.iter().for_each(|ascii_art| {
                 let start = Instant::now();
 
                 if !first_frame {
-                    execute!(stdout(), MoveUp(ascii_image.height.try_into().unwrap()))
+                    execute!(stdout(), MoveUp(ascii_art.height.try_into().unwrap()))
                         .unwrap_or_default();
                 } else {
                     first_frame = false;
                 }
 
-                println!("{}", ascii_image.text);
+                println!("{}", ascii_art);
 
                 while options.frame_time > start.elapsed().as_millis().try_into().unwrap() {}
             });
@@ -248,14 +249,11 @@ impl AsciiPlayer {
     ///
     /// assert!(AsciiPlayer::play(&paths, &options).is_ok())
     /// ```
-    pub fn play(
-        images_paths: &[String],
-        options: &AsciiPlayerOptions,
-    ) -> Result<(), AsciiPlayerError> {
+    pub fn play(paths: &[String], options: &AsciiPlayerOptions) -> Result<(), AsciiPlayerError> {
         if options.pre_render {
-            return AsciiPlayer::play_pre_rendered_frames(images_paths, options);
+            return AsciiPlayer::play_pre_rendered_frames(paths, options);
         }
 
-        AsciiPlayer::play_frames(images_paths, options)
+        AsciiPlayer::play_frames(paths, options)
     }
 }

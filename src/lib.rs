@@ -2,7 +2,7 @@
 //!
 //! Useful functions, when using as lib
 //! - [`AsciiArtConverter::ascii_art`]
-//! - [`CustomRatioResize`]
+//! - [`CustomRatioResize::resize_custom_ratio`]
 //!
 //! ## Installation
 //!
@@ -38,13 +38,13 @@
 //!
 //! ## Demo
 //!
-//! ```ignore
+//! ```
 #![doc = include_str!("../examples/demo.rs")]
 //! ```
 //!
 //! ## Colored
 //!
-//! ```ignore
+//! ```
 #![doc = include_str!("../examples/colored.rs")]
 //! ```
 
@@ -58,7 +58,10 @@ pub mod player;
 pub mod cli;
 
 #[doc(inline)]
-pub use ascii::*;
+pub use ascii::{
+    AsciiArt, AsciiArtConverter, AsciiArtConverterError, AsciiArtConverterOptions, AsciiArtPixel,
+    AsciiStringError, SizeError, DEFAULT_ASCII_STRING,
+};
 #[doc(inline)]
 pub use resize::{CustomRatioResize, DEFAULT_FONT_RATIO};
 
