@@ -91,7 +91,7 @@ impl fmt::Display for GlobToPathsError {
 ///
 /// # Examples
 ///
-/// ```rust
+/// ```
 /// use tapciify::cli::glob_to_paths;
 ///
 /// let paths = vec!["assets\\examples\\*.webp".to_owned()];

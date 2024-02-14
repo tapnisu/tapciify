@@ -3,14 +3,14 @@
 //!
 //! # Examples
 //!
-//! ```rust
+//! ```
 #![doc = include_str!("../examples/player.rs")]
 //! ```
 
 use crate::{
     ascii::{
-        AsciiArt, AsciiConverter, AsciiConverterError, AsciiConverterOptions, AsciiStringError,
-        DEFAULT_ASCII_STRING,
+        AsciiArt, AsciiArtConverter, AsciiArtConverterError, AsciiArtConverterOptions,
+        AsciiStringError, DEFAULT_ASCII_STRING,
     },
     CustomRatioResize, DEFAULT_FONT_RATIO,
 };
@@ -26,7 +26,7 @@ use rayon::prelude::*;
 ///
 /// # Examples
 ///
-/// ```rust
+/// ```
 /// use tapciify::player::calculate_frame_time;
 ///
 /// let result = calculate_frame_time(Some(20.0));
@@ -71,9 +71,9 @@ impl Default for AsciiPlayerOptions {
     }
 }
 
-impl From<AsciiPlayerOptions> for AsciiConverterOptions {
-    fn from(o: AsciiPlayerOptions) -> AsciiConverterOptions {
-        AsciiConverterOptions {
+impl From<AsciiPlayerOptions> for AsciiArtConverterOptions {
+    fn from(o: AsciiPlayerOptions) -> AsciiArtConverterOptions {
+        AsciiArtConverterOptions {
             ascii_string: o.ascii_string,
             colored: o.colored,
         }
@@ -83,7 +83,7 @@ impl From<AsciiPlayerOptions> for AsciiConverterOptions {
 #[derive(Debug)]
 pub enum AsciiPlayerError {
     Image(ImageError),
-    AsciiConverter(AsciiConverterError),
+    AsciiConverter(AsciiArtConverterError),
     AsciiString(AsciiStringError),
 }
 
@@ -93,8 +93,8 @@ impl From<ImageError> for AsciiPlayerError {
     }
 }
 
-impl From<AsciiConverterError> for AsciiPlayerError {
-    fn from(e: AsciiConverterError) -> AsciiPlayerError {
+impl From<AsciiArtConverterError> for AsciiPlayerError {
+    fn from(e: AsciiArtConverterError) -> AsciiPlayerError {
         AsciiPlayerError::AsciiConverter(e)
     }
 }
@@ -130,7 +130,7 @@ impl AsciiPlayer {
     ) -> Result<(), AsciiPlayerError> {
         let mut first_frame = true;
 
-        let converter_options = AsciiConverterOptions::from(options.to_owned());
+        let converter_options = AsciiArtConverterOptions::from(options.to_owned());
 
         loop {
             for path in paths.iter() {
@@ -142,7 +142,7 @@ impl AsciiPlayer {
                     options.font_ratio,
                     options.filter,
                 );
-                let ascii_image = AsciiConverter::convert(&img, &converter_options)?;
+                let ascii_image = img.ascii_art(&converter_options)?;
 
                 if !first_frame {
                     execute!(stdout(), MoveUp(ascii_image.height.try_into().unwrap()))
@@ -171,7 +171,7 @@ impl AsciiPlayer {
     ) -> Result<Vec<AsciiArt>, AsciiPlayerError> {
         let pb = ProgressBar::new(paths.len().try_into().unwrap());
 
-        let converter_options = AsciiConverterOptions::from(options.to_owned());
+        let converter_options = AsciiArtConverterOptions::from(options.to_owned());
 
         #[cfg(feature = "rayon")]
         let iter = paths.into_par_iter();
@@ -186,7 +186,7 @@ impl AsciiPlayer {
                     options.font_ratio,
                     options.filter,
                 );
-                let ascii_image = AsciiConverter::convert(&img, &converter_options)?;
+                let ascii_image = img.ascii_art(&converter_options)?;
 
                 pb.inc(1);
 
@@ -236,7 +236,7 @@ impl AsciiPlayer {
     ///
     /// # Examples
     ///
-    /// ```rust
+    /// ```
     /// use tapciify::{AsciiPlayer, AsciiPlayerOptions};
     ///
     /// let paths = vec!["./assets/examples/original.webp".to_owned()];

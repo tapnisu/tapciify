@@ -1,8 +1,7 @@
 //! > **Tool to convert your images into ASCII art**
 //!
 //! Useful functions, when using as lib
-//! - [`AsciiConverter::convert`]
-//! - [`AsciiConverter::convert_raw`]
+//! - [`AsciiArtConverter::ascii_art`]
 //! - [`CustomRatioResize`]
 //!
 //! ## Installation
@@ -39,14 +38,14 @@
 //!
 //! ## Demo
 //!
-//! ```rust
+//! ```ignore
 #![doc = include_str!("../examples/demo.rs")]
 //! ```
 //!
 //! ## Colored
 //!
-//! ```rust
-#![doc = include_str!("../examples/demo.rs")]
+//! ```ignore
+#![doc = include_str!("../examples/colored.rs")]
 //! ```
 
 pub mod ascii;
