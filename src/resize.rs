@@ -1,5 +1,8 @@
+//! Utils for resizing your images, but including your font ratio
+
 use image::{imageops, DynamicImage};
 
+/// Consolas font ratio
 pub const DEFAULT_FONT_RATIO: f64 = 11.0 / 24.0;
 
 /// Calculate new width from aspect ratio and new height
@@ -12,6 +15,7 @@ pub fn calc_new_height(new_width: u32, width: u32, height: u32, font_ratio: f64)
     (new_width as f64 * font_ratio * height as f64 / width as f64) as u32
 }
 
+/// Trait for resizing images and counting in font ratio
 pub trait CustomRatioResize {
     /// Resize [`DynamicImage`] to your sizes
     /// When both `width` and `height` are [`None`], will return the original [`DynamicImage`]

@@ -1,3 +1,5 @@
+//! Utils used in tapciify CLI
+
 use crate::{DEFAULT_ASCII_STRING, DEFAULT_FONT_RATIO};
 use clap::Parser;
 

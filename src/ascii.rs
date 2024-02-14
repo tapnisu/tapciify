@@ -1,3 +1,5 @@
+//! Utils for converting your images to ASCII
+//!
 //! # Examples
 //!
 //! ## Demo
@@ -29,6 +31,7 @@ use std::{
 #[cfg(feature = "rayon")]
 use rayon::prelude::*;
 
+/// Default ASCII string, feel free to use your one
 pub const DEFAULT_ASCII_STRING: &str = " .,:;+*?%S#@";
 
 /// Calculate lightness (from 0.0 to 1.0)

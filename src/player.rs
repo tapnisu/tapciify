@@ -1,3 +1,6 @@
+//! Utils for playing multiple frames.
+//! Probably you only need to use that if you are creating a CLI
+//!
 //! # Examples
 //!
 //! ```rust
