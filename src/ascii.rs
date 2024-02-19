@@ -15,10 +15,10 @@
 //! ```
 
 use colored::Colorize;
+use err_derive::Error;
 use image::DynamicImage;
 use std::{
     cmp::{max, min},
-    error::Error,
     fmt,
 };
 
@@ -55,16 +55,9 @@ pub fn get_lightness(r: u8, g: u8, b: u8, a: u8) -> f32 {
 }
 
 /// Error caused by lightness being out of ASCII string in [`ascii_character`]
-#[derive(Debug, Clone)]
+#[derive(Clone, Debug, Error)]
+#[error(display = "lightness is out of ASCII string")]
 pub struct AsciiStringError;
-
-impl fmt::Display for AsciiStringError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "lightness is out of ASCII string")
-    }
-}
-
-impl Error for AsciiStringError {}
 
 /// Convert lightness of pixel to [`char`]
 ///
@@ -198,35 +191,17 @@ impl AsciiArt {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Clone, Debug, Error)]
+#[error(display = "width and height can't both be 0")]
 pub struct SizeError;
 
-impl fmt::Display for SizeError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "width and height can't both be 0")
-    }
-}
-
 /// Error caused by [`AsciiArtConverter`]
-#[derive(Debug, Clone)]
+#[derive(Clone, Debug, Error)]
 pub enum AsciiArtConverterError {
-    AsciiStringError(AsciiStringError),
-}
-
-impl From<AsciiStringError> for AsciiArtConverterError {
-    fn from(e: AsciiStringError) -> AsciiArtConverterError {
-        AsciiArtConverterError::AsciiStringError(e)
-    }
-}
-
-impl Error for AsciiArtConverterError {}
-
-impl fmt::Display for AsciiArtConverterError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            AsciiArtConverterError::AsciiStringError(err) => err.fmt(f),
-        }
-    }
+    #[error(display = "{}", _0)]
+    AsciiStringError(#[source] AsciiStringError),
+    #[error(display = "{}", _0)]
+    SizeError(#[source] SizeError),
 }
 
 /// Options for converter of images to ASCII art
@@ -265,6 +240,10 @@ impl AsciiArtConverter for DynamicImage {
         options: &AsciiArtConverterOptions,
     ) -> Result<AsciiArt, AsciiArtConverterError> {
         let img_buffer = self.to_rgba8();
+
+        if self.width() == 0 || self.height() == 0 {
+            return Err(AsciiArtConverterError::SizeError(SizeError));
+        }
 
         #[cfg(feature = "rayon")]
         let chunks = img_buffer.as_raw().par_chunks(4);

@@ -10,14 +10,15 @@
 use crate::{
     ascii::{
         AsciiArt, AsciiArtConverter, AsciiArtConverterError, AsciiArtConverterOptions,
-        AsciiStringError, DEFAULT_ASCII_STRING,
+        DEFAULT_ASCII_STRING,
     },
     CustomRatioResize, DEFAULT_FONT_RATIO,
 };
 use crossterm::{cursor::MoveUp, execute};
+use err_derive::Error;
 use image::{imageops::FilterType, ImageError};
 use indicatif::ProgressBar;
-use std::{error::Error, fmt, io::stdout, time::Instant};
+use std::{io::stdout, time::Instant};
 
 #[cfg(feature = "rayon")]
 use rayon::prelude::*;
@@ -81,42 +82,13 @@ impl From<AsciiPlayerOptions> for AsciiArtConverterOptions {
 }
 
 /// Error caused by [`AsciiPlayer`]
-#[derive(Debug)]
+#[derive(Debug, Error)]
 pub enum AsciiPlayerError {
-    Image(ImageError),
-    AsciiConverter(AsciiArtConverterError),
-    AsciiString(AsciiStringError),
+    #[error(display = "{}", _0)]
+    Image(#[source] ImageError),
+    #[error(display = "{}", _0)]
+    AsciiConverter(#[source] AsciiArtConverterError),
 }
-
-impl From<ImageError> for AsciiPlayerError {
-    fn from(e: ImageError) -> AsciiPlayerError {
-        AsciiPlayerError::Image(e)
-    }
-}
-
-impl From<AsciiArtConverterError> for AsciiPlayerError {
-    fn from(e: AsciiArtConverterError) -> AsciiPlayerError {
-        AsciiPlayerError::AsciiConverter(e)
-    }
-}
-
-impl From<AsciiStringError> for AsciiPlayerError {
-    fn from(e: AsciiStringError) -> AsciiPlayerError {
-        AsciiPlayerError::AsciiString(e)
-    }
-}
-
-impl fmt::Display for AsciiPlayerError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            AsciiPlayerError::Image(err) => err.fmt(f),
-            AsciiPlayerError::AsciiConverter(err) => err.fmt(f),
-            AsciiPlayerError::AsciiString(err) => err.fmt(f),
-        }
-    }
-}
-
-impl Error for AsciiPlayerError {}
 
 impl AsciiPlayer {
     /// Reverse ASCII string

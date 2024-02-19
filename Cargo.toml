@@ -1,6 +1,6 @@
 [package]
 name = "tapciify"
-version = "3.0.0"
+version = "3.1.0"
 edition = "2021"
 readme = "README.md"
 authors = ["Aleksei Rybin <0xalekseirybin@gmail.com>"]
@@ -19,6 +19,7 @@ license = "MIT"
 [dependencies]
 colored = "2"
 image = "0.24"
+err-derive = "0.3"
 
 clap = { version = "4", features = ["derive"], optional = true }
 crossterm = { version = "0.27", optional = true }
