@@ -4,9 +4,9 @@ use crate::{DEFAULT_ASCII_STRING, DEFAULT_FONT_RATIO};
 use clap::Parser;
 
 #[cfg(target_family = "windows")]
-use glob::{glob, GlobError, PatternError};
+use err_derive::Error;
 #[cfg(target_family = "windows")]
-use std::{error::Error, fmt};
+use glob::{glob, GlobError, PatternError};
 
 #[cfg(target_family = "windows")]
 #[cfg(feature = "rayon")]
@@ -55,37 +55,12 @@ pub struct Cli {
 
 /// Error caused by [`glob_to_paths`]
 #[cfg(target_family = "windows")]
-#[derive(Debug)]
+#[derive(Debug, Error)]
 pub enum GlobToPathsError {
-    PatternError(PatternError),
-    GlobError(GlobError),
-}
-
-#[cfg(target_family = "windows")]
-impl From<PatternError> for GlobToPathsError {
-    fn from(e: PatternError) -> GlobToPathsError {
-        GlobToPathsError::PatternError(e)
-    }
-}
-
-#[cfg(target_family = "windows")]
-impl From<GlobError> for GlobToPathsError {
-    fn from(e: GlobError) -> GlobToPathsError {
-        GlobToPathsError::GlobError(e)
-    }
-}
-
-#[cfg(target_family = "windows")]
-impl Error for GlobToPathsError {}
-
-#[cfg(target_family = "windows")]
-impl fmt::Display for GlobToPathsError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            GlobToPathsError::PatternError(err) => err.fmt(f),
-            GlobToPathsError::GlobError(err) => err.fmt(f),
-        }
-    }
+    #[error(display = "{}", _0)]
+    PatternError(#[source] PatternError),
+    #[error(display = "{}", _0)]
+    GlobError(#[source] GlobError),
 }
 
 /// Add glob support for paths parsing on Windows
