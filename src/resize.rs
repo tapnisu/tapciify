@@ -48,18 +48,19 @@ impl CustomRatioResize for DynamicImage {
         font_ratio: f64,
         filter: imageops::FilterType,
     ) -> DynamicImage {
-        if width.is_none() && height.is_none() {
-            return self.to_owned();
-        }
+        let (new_width, new_height) = match (width, height) {
+            (None, None) => return self.to_owned(),
+            (None, Some(height)) => (
+                calc_new_width(height, self.width(), self.height(), font_ratio),
+                height,
+            ),
+            (Some(width), None) => (
+                width,
+                calc_new_height(width, self.width(), self.height(), font_ratio),
+            ),
+            (Some(width), Some(height)) => (width, height),
+        };
 
-        let nwidth = width.unwrap_or_else(|| {
-            calc_new_width(height.unwrap(), self.width(), self.height(), font_ratio)
-        });
-
-        let nheight = height.unwrap_or_else(|| {
-            calc_new_height(width.unwrap(), self.width(), self.height(), font_ratio)
-        });
-
-        self.resize_exact(nwidth, nheight, filter)
+        self.resize_exact(new_width, new_height, filter)
     }
 }
