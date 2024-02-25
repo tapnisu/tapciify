@@ -98,7 +98,7 @@ pub fn glob_to_paths(patterns: &[String]) -> Result<Vec<String>, GlobToPathsErro
     })
     .flat_map(|result| match result {
         Ok(vec) => vec.into_iter().map(Ok).collect(),
-        Err(er) => vec![Err(er)],
+        Err(e) => vec![Err(e)],
     })
     .collect()
 }
