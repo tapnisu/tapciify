@@ -8,6 +8,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         &paths,
         &AsciiPlayerOptions {
             width: Some(64),
+            // Put your other options here
             ..Default::default()
         },
     )?;

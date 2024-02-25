@@ -12,17 +12,13 @@ fn main() -> Result<(), clap::Error> {
     #[cfg(not(target_family = "windows"))]
     let images_paths = cli.input;
 
-    let (ascii_string, colored) = if cli.pixels {
-        ("█".to_owned(), true)
-    } else {
-        (
-            if cli.reverse {
-                AsciiPlayer::reverse_ascii_string(cli.ascii_string)
-            } else {
-                cli.ascii_string
-            },
+    let (ascii_string, colored) = match (cli.reverse, cli.pixels) {
+        (true, false) => (
+            AsciiPlayer::reverse_ascii_string(cli.ascii_string),
             cli.colored,
-        )
+        ),
+        (false, false) => (cli.ascii_string, cli.colored),
+        (_, true) => ("█".to_owned(), true),
     };
 
     let frame_time = calculate_frame_time(cli.framerate);
