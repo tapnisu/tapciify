@@ -71,6 +71,7 @@ pub enum GlobToPathsError {
 ///
 /// ```
 /// use tapciify::cli::glob_to_paths;
+/// use std::path::PathBuf;
 ///
 /// let paths = vec!["assets\\examples\\*.webp".to_owned()];
 /// let result = glob_to_paths(&paths)?;
@@ -83,6 +84,9 @@ pub enum GlobToPathsError {
 ///         "assets\\examples\\ascii.webp",
 ///         "assets\\examples\\original.webp"
 ///     ]
+///     .iter()
+///     .map(PathBuf::from)
+///     .collect::<Vec<PathBuf>>()
 /// );
 /// # Ok::<(), tapciify::cli::GlobToPathsError>(())
 /// `````

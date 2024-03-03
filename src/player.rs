@@ -213,7 +213,7 @@ impl AsciiPlayer {
     /// ```
     /// use tapciify::{AsciiPlayer, AsciiPlayerOptions};
     ///
-    /// let paths = vec!["./assets/examples/original.webp".to_owned()];
+    /// let paths = vec!["./assets/examples/original.webp".into()];
     ///
     /// let options = AsciiPlayerOptions {
     ///     width: Some(128),
