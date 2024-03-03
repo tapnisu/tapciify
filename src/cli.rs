@@ -4,11 +4,11 @@ use crate::{DEFAULT_ASCII_STRING, DEFAULT_FONT_RATIO};
 use clap::Parser;
 
 #[cfg(target_family = "windows")]
-use err_derive::Error;
-#[cfg(target_family = "windows")]
 use glob::{glob, GlobError, PatternError};
 #[cfg(target_family = "windows")]
 use std::path::PathBuf;
+#[cfg(target_family = "windows")]
+use thiserror::Error;
 
 #[cfg(target_family = "windows")]
 #[cfg(feature = "rayon")]
@@ -59,10 +59,10 @@ pub struct Cli {
 #[cfg(target_family = "windows")]
 #[derive(Debug, Error)]
 pub enum GlobToPathsError {
-    #[error(display = "{}", _0)]
-    PatternError(#[source] PatternError),
-    #[error(display = "{}", _0)]
-    GlobError(#[source] GlobError),
+    #[error("{0}")]
+    PatternError(#[from] PatternError),
+    #[error("{0}")]
+    GlobError(#[from] GlobError),
 }
 
 /// Add glob support for paths parsing on Windows

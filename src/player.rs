@@ -15,10 +15,10 @@ use crate::{
     CustomRatioResize, DEFAULT_FONT_RATIO,
 };
 use crossterm::{cursor::MoveUp, execute};
-use err_derive::Error;
 use image::{imageops::FilterType, ImageError};
 use indicatif::ProgressBar;
 use std::{io::stdout, path::PathBuf, time::Instant};
+use thiserror::Error;
 
 #[cfg(feature = "rayon")]
 use rayon::prelude::*;
@@ -84,10 +84,10 @@ impl From<AsciiPlayerOptions> for AsciiArtConverterOptions {
 /// Error caused by [`AsciiPlayer`]
 #[derive(Debug, Error)]
 pub enum AsciiPlayerError {
-    #[error(display = "{}", _0)]
-    Image(#[source] ImageError),
-    #[error(display = "{}", _0)]
-    AsciiConverter(#[source] AsciiArtConverterError),
+    #[error("{0}")]
+    Image(#[from] ImageError),
+    #[error("{0}")]
+    AsciiConverter(#[from] AsciiArtConverterError),
 }
 
 impl AsciiPlayer {

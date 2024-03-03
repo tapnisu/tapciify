@@ -15,12 +15,12 @@
 //! ```
 
 use colored::Colorize;
-use err_derive::Error;
 use image::DynamicImage;
 use std::{
     cmp::{max, min},
     fmt,
 };
+use thiserror::Error;
 
 #[cfg(feature = "rayon")]
 use rayon::prelude::*;
@@ -56,7 +56,7 @@ pub fn get_lightness(r: u8, g: u8, b: u8, a: u8) -> f32 {
 
 /// Error caused by lightness being out of ASCII string in [`ascii_character`]
 #[derive(Clone, Debug, Error)]
-#[error(display = "lightness is out of ASCII string")]
+#[error("lightness is out of ASCII string")]
 pub struct AsciiStringError;
 
 /// Convert lightness of pixel to [`char`]
@@ -192,16 +192,16 @@ impl AsciiArt {
 }
 
 #[derive(Clone, Debug, Error)]
-#[error(display = "width and height can't both be 0")]
+#[error("width and height can't both be 0")]
 pub struct SizeError;
 
 /// Error caused by [`AsciiArtConverter`]
 #[derive(Clone, Debug, Error)]
 pub enum AsciiArtConverterError {
-    #[error(display = "{}", _0)]
-    AsciiStringError(#[source] AsciiStringError),
-    #[error(display = "{}", _0)]
-    SizeError(#[source] SizeError),
+    #[error("{0}")]
+    AsciiStringError(#[from] AsciiStringError),
+    #[error("{0}")]
+    SizeError(#[from] SizeError),
 }
 
 /// Options for converter of images to ASCII art
