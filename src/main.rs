@@ -2,6 +2,9 @@ use clap::{error::ErrorKind, CommandFactory, Parser};
 use tapciify::cli::Cli;
 use tapciify::player::{calculate_frame_time, AsciiPlayer, AsciiPlayerOptions};
 
+#[cfg(not(target_family = "windows"))]
+use std::path::PathBuf;
+
 fn main() -> Result<(), clap::Error> {
     let cli = Cli::parse();
     let mut cmd = Cli::command();
@@ -10,7 +13,7 @@ fn main() -> Result<(), clap::Error> {
     let images_paths = tapciify::cli::glob_to_paths(&cli.input)
         .unwrap_or_else(|err| cmd.error(ErrorKind::InvalidValue, err).exit());
     #[cfg(not(target_family = "windows"))]
-    let images_paths = cli.input;
+    let images_paths: Vec<PathBuf> = cli.input.into_iter().map(PathBuf::from).collect();
 
     let (ascii_string, colored) = match (cli.reverse, cli.pixels) {
         (true, false) => (

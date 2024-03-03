@@ -18,7 +18,7 @@ use crossterm::{cursor::MoveUp, execute};
 use err_derive::Error;
 use image::{imageops::FilterType, ImageError};
 use indicatif::ProgressBar;
-use std::{io::stdout, time::Instant};
+use std::{io::stdout, path::PathBuf, time::Instant};
 
 #[cfg(feature = "rayon")]
 use rayon::prelude::*;
@@ -98,7 +98,7 @@ impl AsciiPlayer {
 
     /// Play paths as ASCII arts
     pub fn play_frames(
-        paths: &[String],
+        paths: &[PathBuf],
         options: &AsciiPlayerOptions,
     ) -> Result<(), AsciiPlayerError> {
         let mut first_frame = true;
@@ -139,7 +139,7 @@ impl AsciiPlayer {
 
     /// Convert paths to of ASCII arts
     fn pre_render(
-        paths: &[String],
+        paths: &[PathBuf],
         options: &AsciiPlayerOptions,
     ) -> Result<Vec<AsciiArt>, AsciiPlayerError> {
         let pb = ProgressBar::new(paths.len().try_into().unwrap());
@@ -173,7 +173,7 @@ impl AsciiPlayer {
 
     /// Convert paths to of ASCII arts and play them
     pub fn play_pre_rendered_frames(
-        paths: &[String],
+        paths: &[PathBuf],
         options: &AsciiPlayerOptions,
     ) -> Result<(), AsciiPlayerError> {
         let mut first_frame = true;
@@ -213,7 +213,7 @@ impl AsciiPlayer {
     /// ```
     /// use tapciify::{AsciiPlayer, AsciiPlayerOptions};
     ///
-    /// let paths = vec!["./assets/examples/original.webp".to_owned()];
+    /// let paths = vec!["./assets/examples/original.webp".into()];
     ///
     /// let options = AsciiPlayerOptions {
     ///     width: Some(128),
@@ -222,7 +222,7 @@ impl AsciiPlayer {
     ///
     /// assert!(AsciiPlayer::play(&paths, &options).is_ok())
     /// ```
-    pub fn play(paths: &[String], options: &AsciiPlayerOptions) -> Result<(), AsciiPlayerError> {
+    pub fn play(paths: &[PathBuf], options: &AsciiPlayerOptions) -> Result<(), AsciiPlayerError> {
         if options.pre_render {
             return AsciiPlayer::play_pre_rendered_frames(paths, options);
         }
