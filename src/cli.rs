@@ -97,8 +97,10 @@ pub fn glob_to_paths(patterns: &[String]) -> Result<Vec<PathBuf>, GlobToPathsErr
     #[cfg(not(feature = "rayon"))]
     let iter = patterns.into_iter();
 
-    iter.map(|glob_p| -> Result<Vec<PathBuf>, GlobToPathsError> {
-        glob(glob_p)?.map(|path| Ok(path?)).collect()
+    iter.map(|glob_p| {
+        glob(glob_p)?
+            .map(|path| Ok(path?))
+            .collect::<Result<Vec<PathBuf>, GlobToPathsError>>()
     })
     .flat_map(|result| match result {
         Ok(vec) => vec.into_iter().map(Ok).collect(),
