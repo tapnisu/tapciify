@@ -7,6 +7,8 @@ use clap::Parser;
 use err_derive::Error;
 #[cfg(target_family = "windows")]
 use glob::{glob, GlobError, PatternError};
+#[cfg(target_family = "windows")]
+use std::path::PathBuf;
 
 #[cfg(target_family = "windows")]
 #[cfg(feature = "rayon")]
@@ -85,16 +87,14 @@ pub enum GlobToPathsError {
 /// # Ok::<(), tapciify::cli::GlobToPathsError>(())
 /// `````
 #[cfg(target_family = "windows")]
-pub fn glob_to_paths(patterns: &[String]) -> Result<Vec<String>, GlobToPathsError> {
+pub fn glob_to_paths(patterns: &[String]) -> Result<Vec<PathBuf>, GlobToPathsError> {
     #[cfg(feature = "rayon")]
     let iter = patterns.into_par_iter();
     #[cfg(not(feature = "rayon"))]
     let iter = patterns.into_iter();
 
-    iter.map(|glob_p| -> Result<Vec<String>, GlobToPathsError> {
-        glob(glob_p)?
-            .map(|path| Ok(path?.display().to_string()))
-            .collect()
+    iter.map(|glob_p| -> Result<Vec<PathBuf>, GlobToPathsError> {
+        glob(glob_p)?.map(|path| Ok(path?)).collect()
     })
     .flat_map(|result| match result {
         Ok(vec) => vec.into_iter().map(Ok).collect(),
