@@ -60,6 +60,33 @@ impl AsciiArtConverter for DynamicImage {
     }
 }
 
+impl AsciiArtConverter for image::RgbImage {
+    fn ascii_art(
+        &self,
+        options: &AsciiArtConverterOptions,
+    ) -> Result<AsciiArt, AsciiArtConverterError> {
+        if self.width() == 0 || self.height() == 0 {
+            return Err(AsciiArtConverterError::SizeError(SizeError));
+        }
+
+        #[cfg(feature = "rayon")]
+        let chunks = self.as_raw().par_chunks(3);
+        #[cfg(not(feature = "rayon"))]
+        let chunks = self.as_raw().chunks(3);
+
+        let characters = chunks
+            .map(|data| AsciiArtPixel::new(data[0], data[1], data[2], 255, &options.ascii_string))
+            .collect::<Result<Vec<AsciiArtPixel>, AsciiStringError>>()?;
+
+        Ok(AsciiArt::new(
+            characters,
+            self.width(),
+            self.height(),
+            options.colored,
+        ))
+    }
+}
+
 impl AsciiArtConverter for image::RgbaImage {
     fn ascii_art(
         &self,
@@ -75,8 +102,81 @@ impl AsciiArtConverter for image::RgbaImage {
         let chunks = self.as_raw().chunks(4);
 
         let characters = chunks
-            .map(|rgba| {
-                AsciiArtPixel::new(rgba[0], rgba[1], rgba[2], rgba[3], &options.ascii_string)
+            .map(|data| {
+                AsciiArtPixel::new(data[0], data[1], data[2], data[3], &options.ascii_string)
+            })
+            .collect::<Result<Vec<AsciiArtPixel>, AsciiStringError>>()?;
+
+        Ok(AsciiArt::new(
+            characters,
+            self.width(),
+            self.height(),
+            options.colored,
+        ))
+    }
+}
+
+impl AsciiArtConverter for image::GrayImage {
+    fn ascii_art(
+        &self,
+        options: &AsciiArtConverterOptions,
+    ) -> Result<AsciiArt, AsciiArtConverterError> {
+        if self.width() == 0 || self.height() == 0 {
+            return Err(AsciiArtConverterError::SizeError(SizeError));
+        }
+
+        #[cfg(feature = "rayon")]
+        let chunks = self.as_raw().par_iter();
+        #[cfg(not(feature = "rayon"))]
+        let chunks = self.as_raw().iter();
+
+        let characters = chunks
+            .map(|data| -> Result<AsciiArtPixel, AsciiStringError> {
+                Ok(AsciiArtPixel {
+                    character: ascii_character(*data as f32 / 255.0, &options.ascii_string)?,
+                    r: *data,
+                    g: *data,
+                    b: *data,
+                    a: 255,
+                })
+            })
+            .collect::<Result<Vec<AsciiArtPixel>, AsciiStringError>>()?;
+
+        Ok(AsciiArt::new(
+            characters,
+            self.width(),
+            self.height(),
+            options.colored,
+        ))
+    }
+}
+
+impl AsciiArtConverter for image::GrayAlphaImage {
+    fn ascii_art(
+        &self,
+        options: &AsciiArtConverterOptions,
+    ) -> Result<AsciiArt, AsciiArtConverterError> {
+        if self.width() == 0 || self.height() == 0 {
+            return Err(AsciiArtConverterError::SizeError(SizeError));
+        }
+
+        #[cfg(feature = "rayon")]
+        let chunks = self.as_raw().par_chunks(2);
+        #[cfg(not(feature = "rayon"))]
+        let chunks = self.as_raw().chunks(2);
+
+        let characters = chunks
+            .map(|data| {
+                Ok(AsciiArtPixel {
+                    character: ascii_character(
+                        (data[0] as f32 * data[1] as f32) / (255.0 * 255.0),
+                        &options.ascii_string,
+                    )?,
+                    r: data[0],
+                    g: data[0],
+                    b: data[0],
+                    a: data[1],
+                })
             })
             .collect::<Result<Vec<AsciiArtPixel>, AsciiStringError>>()?;
 
