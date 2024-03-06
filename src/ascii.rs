@@ -16,7 +16,10 @@
 
 use colored::Colorize;
 use image::DynamicImage;
-use std::fmt;
+use std::{
+    cmp::{max, min},
+    fmt,
+};
 use thiserror::Error;
 
 #[cfg(feature = "rayon")]
@@ -45,8 +48,10 @@ pub const DEFAULT_ASCII_STRING: &str = " .,:;+*?%S#@";
 /// assert_eq!(result, 0.2);
 /// ````
 pub fn get_lightness(r: u8, g: u8, b: u8, a: u8) -> f32 {
-    (0.2126 * r as f32 + 0.7152 * g as f32 + 0.0722 * b as f32) * (a as f32 / (255f32 * 255f32))
-    // per ITU-R BT.709
+    let max = max(max(r, g), b);
+    let min = min(min(r, g), b);
+
+    ((max as f32 + min as f32) * a as f32) / 130050.0 // 130050 - we need to divide by 512, and divide by 255 from alpha
 }
 
 /// Error caused by lightness being out of ASCII string in [`ascii_character`]
@@ -133,14 +138,14 @@ impl AsciiArtPixel {
 
 /// Raw ASCII art conversion result
 #[derive(Debug, Clone)]
-pub struct AsciiArt<T = AsciiArtPixel> {
-    pub characters: Vec<T>,
+pub struct AsciiArt {
+    pub characters: Vec<AsciiArtPixel>,
     pub width: u32,
     pub height: u32,
     pub colored: bool,
 }
 
-impl fmt::Display for AsciiArt<AsciiArtPixel> {
+impl fmt::Display for AsciiArt {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         #[cfg(feature = "rayon")]
         let iter = self.characters.par_iter();
@@ -175,8 +180,8 @@ impl fmt::Display for AsciiArt<AsciiArtPixel> {
     }
 }
 
-impl<T> AsciiArt<T> {
-    pub fn new(characters: Vec<T>, width: u32, height: u32, colored: bool) -> AsciiArt<T> {
+impl AsciiArt {
+    pub fn new(characters: Vec<AsciiArtPixel>, width: u32, height: u32, colored: bool) -> AsciiArt {
         AsciiArt {
             characters,
             width,
@@ -207,7 +212,7 @@ pub struct AsciiArtConverterOptions {
 }
 
 /// Converter of images to ASCII art
-pub trait AsciiArtConverter<T> {
+pub trait AsciiArtConverter {
     /// Convert image to an ASCII art
     ///
     /// # Examples
@@ -226,14 +231,14 @@ pub trait AsciiArtConverter<T> {
     fn ascii_art(
         &self,
         options: &AsciiArtConverterOptions,
-    ) -> Result<AsciiArt<T>, AsciiArtConverterError>;
+    ) -> Result<AsciiArt, AsciiArtConverterError>;
 }
 
-impl AsciiArtConverter<AsciiArtPixel> for DynamicImage {
+impl AsciiArtConverter for DynamicImage {
     fn ascii_art(
         &self,
         options: &AsciiArtConverterOptions,
-    ) -> Result<AsciiArt<AsciiArtPixel>, AsciiArtConverterError> {
+    ) -> Result<AsciiArt, AsciiArtConverterError> {
         let img_buffer = self.to_rgba8();
 
         if self.width() == 0 || self.height() == 0 {
