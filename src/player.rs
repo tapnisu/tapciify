@@ -42,54 +42,6 @@ pub fn calculate_frame_time(framerate: Option<f64>) -> u64 {
 #[derive(Debug, Clone)]
 pub struct AsciiPlayer {}
 
-/// Options of player to convert and play frames
-#[derive(Debug, Clone)]
-pub struct AsciiPlayerOptions {
-    pub width: Option<u32>,
-    pub height: Option<u32>,
-    pub ascii_string: String,
-    pub colored: bool,
-    pub frame_time: u64,
-    pub pre_render: bool,
-    pub font_ratio: f64,
-    pub looped: bool,
-    pub filter: FilterType,
-}
-
-impl Default for AsciiPlayerOptions {
-    fn default() -> AsciiPlayerOptions {
-        AsciiPlayerOptions {
-            width: None,
-            height: None,
-            ascii_string: DEFAULT_ASCII_STRING.to_owned(),
-            colored: false,
-            frame_time: 0,
-            pre_render: false,
-            font_ratio: DEFAULT_FONT_RATIO,
-            looped: false,
-            filter: FilterType::Triangle,
-        }
-    }
-}
-
-impl From<AsciiPlayerOptions> for AsciiArtConverterOptions {
-    fn from(o: AsciiPlayerOptions) -> AsciiArtConverterOptions {
-        AsciiArtConverterOptions {
-            ascii_string: o.ascii_string,
-            colored: o.colored,
-        }
-    }
-}
-
-/// Error caused by [`AsciiPlayer`]
-#[derive(Debug, Error)]
-pub enum AsciiPlayerError {
-    #[error("{0}")]
-    Image(#[from] ImageError),
-    #[error("{0}")]
-    AsciiConverter(#[from] AsciiArtConverterError),
-}
-
 impl AsciiPlayer {
     /// Reverse ASCII string
     pub fn reverse_ascii_string(ascii_string: String) -> String {
@@ -229,4 +181,52 @@ impl AsciiPlayer {
 
         AsciiPlayer::play_frames(paths, options)
     }
+}
+
+/// Options of player to convert and play frames
+#[derive(Debug, Clone)]
+pub struct AsciiPlayerOptions {
+    pub width: Option<u32>,
+    pub height: Option<u32>,
+    pub ascii_string: String,
+    pub colored: bool,
+    pub frame_time: u64,
+    pub pre_render: bool,
+    pub font_ratio: f64,
+    pub looped: bool,
+    pub filter: FilterType,
+}
+
+impl Default for AsciiPlayerOptions {
+    fn default() -> AsciiPlayerOptions {
+        AsciiPlayerOptions {
+            width: None,
+            height: None,
+            ascii_string: DEFAULT_ASCII_STRING.to_owned(),
+            colored: false,
+            frame_time: 0,
+            pre_render: false,
+            font_ratio: DEFAULT_FONT_RATIO,
+            looped: false,
+            filter: FilterType::Triangle,
+        }
+    }
+}
+
+impl From<AsciiPlayerOptions> for AsciiArtConverterOptions {
+    fn from(o: AsciiPlayerOptions) -> AsciiArtConverterOptions {
+        AsciiArtConverterOptions {
+            ascii_string: o.ascii_string,
+            colored: o.colored,
+        }
+    }
+}
+
+/// Error caused by [`AsciiPlayer`]
+#[derive(Debug, Error)]
+pub enum AsciiPlayerError {
+    #[error("{0}")]
+    Image(#[from] ImageError),
+    #[error("{0}")]
+    AsciiConverter(#[from] AsciiArtConverterError),
 }

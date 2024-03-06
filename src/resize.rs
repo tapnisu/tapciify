@@ -5,16 +5,6 @@ use image::{imageops, DynamicImage};
 /// Consolas font ratio
 pub const DEFAULT_FONT_RATIO: f64 = 11.0 / 24.0;
 
-/// Calculate new width from aspect ratio and new height
-pub fn calc_new_width(new_height: u32, width: u32, height: u32, font_ratio: f64) -> u32 {
-    ((new_height * width) as f64 / (height as f64 * font_ratio)) as u32
-}
-
-/// Calculate new height from aspect ratio and new width
-pub fn calc_new_height(new_width: u32, width: u32, height: u32, font_ratio: f64) -> u32 {
-    (new_width as f64 * font_ratio * height as f64 / width as f64) as u32
-}
-
 /// Trait for resizing images and counting in font ratio
 pub trait CustomRatioResize {
     /// Resize [`DynamicImage`] to your sizes
@@ -63,4 +53,14 @@ impl CustomRatioResize for DynamicImage {
 
         self.resize_exact(new_width, new_height, filter)
     }
+}
+
+/// Calculate new width from aspect ratio and new height
+pub fn calc_new_width(new_height: u32, width: u32, height: u32, font_ratio: f64) -> u32 {
+    ((new_height * width) as f64 / (height as f64 * font_ratio)) as u32
+}
+
+/// Calculate new height from aspect ratio and new width
+pub fn calc_new_height(new_width: u32, width: u32, height: u32, font_ratio: f64) -> u32 {
+    (new_width as f64 * font_ratio * height as f64 / width as f64) as u32
 }

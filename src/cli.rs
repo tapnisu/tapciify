@@ -55,16 +55,6 @@ pub struct Cli {
     pub font_ratio: f64,
 }
 
-/// Error caused by [`glob_to_paths`]
-#[cfg(target_family = "windows")]
-#[derive(Debug, Error)]
-pub enum GlobToPathsError {
-    #[error("{0}")]
-    PatternError(#[from] PatternError),
-    #[error("{0}")]
-    GlobError(#[from] GlobError),
-}
-
 /// Add glob support for paths parsing on Windows
 ///
 /// # Examples
@@ -107,4 +97,14 @@ pub fn glob_to_paths(patterns: &[String]) -> Result<Vec<PathBuf>, GlobToPathsErr
         Err(e) => vec![Err(e)],
     })
     .collect()
+}
+
+/// Error caused by [`glob_to_paths`]
+#[cfg(target_family = "windows")]
+#[derive(Debug, Error)]
+pub enum GlobToPathsError {
+    #[error("{0}")]
+    PatternError(#[from] PatternError),
+    #[error("{0}")]
+    GlobError(#[from] GlobError),
 }
