@@ -56,16 +56,23 @@ impl AsciiArtConverter for DynamicImage {
         &self,
         options: &AsciiArtConverterOptions,
     ) -> Result<AsciiArt, AsciiArtConverterError> {
-        let img_buffer = self.to_rgba8();
+        self.to_rgba8().ascii_art(options)
+    }
+}
 
+impl AsciiArtConverter for image::RgbaImage {
+    fn ascii_art(
+        &self,
+        options: &AsciiArtConverterOptions,
+    ) -> Result<AsciiArt, AsciiArtConverterError> {
         if self.width() == 0 || self.height() == 0 {
             return Err(AsciiArtConverterError::SizeError(SizeError));
         }
 
         #[cfg(feature = "rayon")]
-        let chunks = img_buffer.as_raw().par_chunks(4);
+        let chunks = self.as_raw().par_chunks(4);
         #[cfg(not(feature = "rayon"))]
-        let chunks = img_buffer.as_raw().chunks(4);
+        let chunks = self.as_raw().chunks(4);
 
         let characters = chunks
             .map(|rgba| {
