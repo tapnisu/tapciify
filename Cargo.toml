@@ -4,9 +4,13 @@ version = "3.1.0"
 edition = "2021"
 readme = "README.md"
 authors = ["Aleksei Rybin <0xalekseirybin@gmail.com>"]
-repository = "https://github.com/tapciify/tapciify/"
 description = "CLI tool that can let you view images in terminal as ASCII art"
 keywords = ["image", "ascii", "terminal", "cli"]
+license = "MIT"
+
+documentation = "https://docs.rs/tapciify"
+repository = "https://github.com/tapciify/tapciify"
+homepage = "https://github.com/tapciify/tapciify"
 categories = [
     "command-line-utilities",
     "multimedia",
@@ -14,16 +18,32 @@ categories = [
     "multimedia::video",
     "visualization",
 ]
-license = "MIT"
 
 [dependencies]
+image = { version = "0.24", features = [
+    "gif",
+    "jpeg",
+    "ico",
+    "png",
+    "pnm",
+    "tga",
+    "tiff",
+    "webp",
+    "bmp",
+    "hdr",
+    "dxt",
+    "dds",
+    "farbfeld",
+    "openexr",
+    "qoi",
+], default_features = false }
 colored = "2"
-image = "0.24"
 thiserror = "1.0"
 
 clap = { version = "4", features = ["derive"], optional = true }
 crossterm = { version = "0.27", optional = true }
 glob = { version = "0.3", optional = true }
+imageproc = { version = "0.23", optional = true, default_features = false }
 indicatif = { version = "0.17", optional = true }
 rayon = { version = "1", optional = true }
 
@@ -31,11 +51,17 @@ rayon = { version = "1", optional = true }
 default = ["full"]
 full = ["rayon", "player"]
 
-parallelism = ["dep:rayon"]
-multithreading = ["dep:rayon"]
-rayon = ["dep:rayon"]
+player = [
+    "dep:clap",
+    "dep:crossterm",
+    "dep:indicatif",
+    "dep:glob",
+    "dep:imageproc",
+]
 
-player = ["dep:clap", "dep:crossterm", "dep:indicatif", "dep:glob"]
+rayon = ["dep:rayon", "imageproc/rayon", "image/jpeg_rayon"]
+multithreading = ["rayon"]
+parallelism = ["rayon"]
 
 [[bin]]
 name = "tapciify"
