@@ -241,17 +241,7 @@ impl fmt::Display for AsciiArt {
         let iter = self.characters.iter();
 
         let characters = iter
-            .map(|ascii_character| {
-                if self.colored {
-                    ascii_character
-                        .character
-                        .to_string()
-                        .truecolor(ascii_character.r, ascii_character.g, ascii_character.b)
-                        .to_string()
-                } else {
-                    ascii_character.character.to_string()
-                }
-            })
+            .map(|ascii_character| ascii_character.to_string(self.colored))
             .collect::<Vec<String>>();
 
         #[cfg(feature = "rayon")]
@@ -318,6 +308,19 @@ impl AsciiArtPixel {
             b,
             a,
         })
+    }
+
+    /// Allows you to convert to colored [`String`] or normal [`String`]. Just read the [`AsciiArtPixel::character`] value
+    pub fn to_string(&self, colored: bool) -> String {
+        if colored {
+            return self
+                .character
+                .to_string()
+                .truecolor(self.r, self.g, self.b)
+                .to_string();
+        }
+
+        self.character.to_string()
     }
 }
 
