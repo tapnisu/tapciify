@@ -67,8 +67,8 @@ impl AsciiPlayer {
                 let start = Instant::now();
 
                 let img = image::open(path)?;
-                let prepared_img = if options.threshold {
-                    DynamicImage::from(adaptive_threshold(&img.to_luma8(), 20))
+                let prepared_img = if let Some(threshold) = options.threshold {
+                    DynamicImage::from(adaptive_threshold(&img.to_luma8(), threshold))
                 } else {
                     img
                 }
@@ -118,8 +118,8 @@ impl AsciiPlayer {
         let frames = iter
             .map(|path| {
                 let img = image::open(path)?;
-                let prepared_img = if options.threshold {
-                    DynamicImage::from(adaptive_threshold(&img.to_luma8(), 20))
+                let prepared_img = if let Some(threshold) = options.threshold {
+                    DynamicImage::from(adaptive_threshold(&img.to_luma8(), threshold))
                 } else {
                     img
                 }
@@ -213,7 +213,7 @@ pub struct AsciiPlayerOptions {
     pub font_ratio: f64,
     pub looped: bool,
     pub filter: FilterType,
-    pub threshold: bool,
+    pub threshold: Option<u32>,
 }
 
 impl Default for AsciiPlayerOptions {
@@ -228,7 +228,7 @@ impl Default for AsciiPlayerOptions {
             font_ratio: DEFAULT_FONT_RATIO,
             looped: false,
             filter: FilterType::Triangle,
-            threshold: false,
+            threshold: None,
         }
     }
 }
