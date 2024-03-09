@@ -53,6 +53,9 @@ pub struct Cli {
     /// Font ratio: width / height
     #[clap(long="ratio", default_value_t = DEFAULT_FONT_RATIO)]
     pub font_ratio: f64,
+    /// Use threshold for images
+    #[clap(short, long, value_parser)]
+    pub threshold: Option<u32>,
 }
 
 /// Add glob support for paths parsing on Windows
@@ -72,7 +75,8 @@ pub struct Cli {
 ///         "assets\\examples\\ascii-colored.webp",
 ///         "assets\\examples\\ascii-pixels.webp",
 ///         "assets\\examples\\ascii.webp",
-///         "assets\\examples\\original.webp"
+///         "assets\\examples\\original.webp",
+///         "assets\\examples\\rin-shima.webp"
 ///     ]
 ///     .iter()
 ///     .map(PathBuf::from)

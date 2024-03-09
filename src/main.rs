@@ -1,4 +1,5 @@
 use clap::{error::ErrorKind, CommandFactory, Parser};
+use tapciify::ascii::ReverseString;
 use tapciify::cli::Cli;
 use tapciify::player::{calculate_frame_time, AsciiPlayer, AsciiPlayerOptions};
 
@@ -16,10 +17,7 @@ fn main() -> Result<(), clap::Error> {
     let images_paths: Vec<PathBuf> = cli.input.into_iter().map(PathBuf::from).collect();
 
     let (ascii_string, colored) = match (cli.reverse, cli.pixels) {
-        (true, false) => (
-            AsciiPlayer::reverse_ascii_string(cli.ascii_string),
-            cli.colored,
-        ),
+        (true, false) => (cli.ascii_string.reverse(), cli.colored),
         (false, false) => (cli.ascii_string, cli.colored),
         (_, true) => ("█".to_owned(), true),
     };
@@ -37,6 +35,7 @@ fn main() -> Result<(), clap::Error> {
             pre_render: cli.pre_render,
             font_ratio: cli.font_ratio,
             looped: cli.looped,
+            threshold: cli.threshold,
             ..Default::default()
         },
     );

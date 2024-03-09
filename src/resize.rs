@@ -2,7 +2,7 @@
 
 use image::{imageops, DynamicImage};
 
-/// Consolas font ratio
+/// Consolas font family aspect ratio
 pub const DEFAULT_FONT_RATIO: f64 = 11.0 / 24.0;
 
 /// Trait for resizing images and counting in font ratio
