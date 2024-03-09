@@ -15,7 +15,7 @@
 //! ```
 
 use colored::Colorize;
-use image::DynamicImage;
+use image::{DynamicImage, Pixel};
 use std::{
     cmp::{max, min},
     fmt,
@@ -70,12 +70,26 @@ impl AsciiArtConverter for image::RgbImage {
         }
 
         #[cfg(feature = "rayon")]
-        let chunks = self.as_raw().par_chunks(3);
+        let bridge = self
+            .pixels()
+            .map(|rgba| rgba.to_owned())
+            .collect::<Vec<image::Rgb<u8>>>()
+            .into_par_iter();
         #[cfg(not(feature = "rayon"))]
-        let chunks = self.as_raw().chunks(3);
+        let bridge = self.pixels();
 
-        let characters = chunks
-            .map(|data| AsciiArtPixel::new(data[0], data[1], data[2], 255, &options.ascii_string))
+        let characters = bridge
+            .map(|data| -> Result<AsciiArtPixel, AsciiStringError> {
+                let luma = data.to_luma();
+
+                Ok(AsciiArtPixel {
+                    character: ascii_character(luma[0] as f32 / 255.0, &options.ascii_string)?,
+                    r: data[0],
+                    g: data[1],
+                    b: data[2],
+                    a: 255,
+                })
+            })
             .collect::<Result<Vec<AsciiArtPixel>, AsciiStringError>>()?;
 
         Ok(AsciiArt::new(
@@ -97,13 +111,28 @@ impl AsciiArtConverter for image::RgbaImage {
         }
 
         #[cfg(feature = "rayon")]
-        let chunks = self.as_raw().par_chunks(4);
+        let bridge = self
+            .pixels()
+            .map(|rgba| rgba.to_owned())
+            .collect::<Vec<image::Rgba<u8>>>()
+            .into_par_iter();
         #[cfg(not(feature = "rayon"))]
-        let chunks = self.as_raw().chunks(4);
+        let bridge = self.pixels();
 
-        let characters = chunks
-            .map(|data| {
-                AsciiArtPixel::new(data[0], data[1], data[2], data[3], &options.ascii_string)
+        let characters = bridge
+            .map(|data| -> Result<AsciiArtPixel, AsciiStringError> {
+                let luma = data.to_luma_alpha();
+
+                Ok(AsciiArtPixel {
+                    character: ascii_character(
+                        luma[0] as f32 * luma[1] as f32 / (255.0 * 255.0),
+                        &options.ascii_string,
+                    )?,
+                    r: data[0],
+                    g: data[1],
+                    b: data[2],
+                    a: data[3],
+                })
             })
             .collect::<Result<Vec<AsciiArtPixel>, AsciiStringError>>()?;
 
@@ -126,17 +155,21 @@ impl AsciiArtConverter for image::GrayImage {
         }
 
         #[cfg(feature = "rayon")]
-        let chunks = self.as_raw().par_iter();
+        let bridge = self
+            .pixels()
+            .map(|luma| luma.to_owned())
+            .collect::<Vec<image::Luma<u8>>>()
+            .into_par_iter();
         #[cfg(not(feature = "rayon"))]
-        let chunks = self.as_raw().iter();
+        let bridge = self.pixels();
 
-        let characters = chunks
+        let characters = bridge
             .map(|data| -> Result<AsciiArtPixel, AsciiStringError> {
                 Ok(AsciiArtPixel {
-                    character: ascii_character(*data as f32 / 255.0, &options.ascii_string)?,
-                    r: *data,
-                    g: *data,
-                    b: *data,
+                    character: ascii_character(data[0] as f32 / 255.0, &options.ascii_string)?,
+                    r: data[0],
+                    g: data[0],
+                    b: data[0],
                     a: 255,
                 })
             })
@@ -161,15 +194,19 @@ impl AsciiArtConverter for image::GrayAlphaImage {
         }
 
         #[cfg(feature = "rayon")]
-        let chunks = self.as_raw().par_chunks(2);
+        let bridge = self
+            .pixels()
+            .map(|luma| luma.to_owned())
+            .collect::<Vec<image::LumaA<u8>>>()
+            .into_par_iter();
         #[cfg(not(feature = "rayon"))]
-        let chunks = self.as_raw().chunks(2);
+        let bridge = self.pixels();
 
-        let characters = chunks
-            .map(|data| {
+        let characters = bridge
+            .map(|data| -> Result<AsciiArtPixel, AsciiStringError> {
                 Ok(AsciiArtPixel {
                     character: ascii_character(
-                        (data[0] as f32 * data[1] as f32) / (255.0 * 255.0),
+                        data[0] as f32 * data[1] as f32 / (255.0 * 255.0),
                         &options.ascii_string,
                     )?,
                     r: data[0],
@@ -303,6 +340,7 @@ impl AsciiArtPixel {
     /// assert_eq!(result.character, ' ');
     /// # Ok::<(), tapciify::AsciiStringError>(())
     /// `````
+    #[deprecated(since = "3.1.0")]
     pub fn new(
         r: u8,
         g: u8,
@@ -310,6 +348,7 @@ impl AsciiArtPixel {
         a: u8,
         ascii_string: &str,
     ) -> Result<AsciiArtPixel, AsciiStringError> {
+        #[allow(deprecated)]
         let lightness = get_lightness(r, g, b, a);
 
         let character = ascii_character(lightness, ascii_string)?;
@@ -374,6 +413,7 @@ pub struct AsciiStringError;
 /// let result = get_lightness(255, 255, 255, 51);
 /// assert_eq!(result, 0.2);
 /// ````
+#[deprecated(since = "3.1.0", note = "Use `image::Pixel::to_luma` instead")]
 pub fn get_lightness(r: u8, g: u8, b: u8, a: u8) -> f32 {
     let max = max(max(r, g), b);
     let min = min(min(r, g), b);
