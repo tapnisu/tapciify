@@ -17,10 +17,12 @@ use crate::{
 use crossterm::{cursor::MoveUp, execute};
 use image::{imageops::FilterType, DynamicImage, ImageError};
 use imageproc::contrast::adaptive_threshold;
-use indicatif::{ParallelProgressIterator, ProgressStyle};
+use indicatif::ProgressStyle;
 use std::{io::stdout, path::PathBuf, time::Instant};
 use thiserror::Error;
 
+#[cfg(feature = "rayon")]
+use indicatif::ParallelProgressIterator;
 #[cfg(feature = "rayon")]
 use rayon::prelude::*;
 
