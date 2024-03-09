@@ -4,7 +4,7 @@ use crate::{DEFAULT_ASCII_STRING, DEFAULT_FONT_RATIO};
 use clap::Parser;
 
 #[cfg(target_family = "windows")]
-use glob::{glob, GlobError, PatternError};
+use glob::glob;
 #[cfg(target_family = "windows")]
 use std::path::PathBuf;
 #[cfg(target_family = "windows")]
@@ -108,7 +108,7 @@ pub fn glob_to_paths(patterns: &[String]) -> Result<Vec<PathBuf>, GlobToPathsErr
 #[derive(Debug, Error)]
 pub enum GlobToPathsError {
     #[error("{0}")]
-    PatternError(#[from] PatternError),
+    PatternError(#[from] glob::PatternError),
     #[error("{0}")]
-    GlobError(#[from] GlobError),
+    GlobError(#[from] glob::GlobError),
 }

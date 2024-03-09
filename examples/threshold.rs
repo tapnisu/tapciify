@@ -1,4 +1,4 @@
-use image::{imageops::FilterType, DynamicImage};
+use image::imageops::FilterType;
 use imageproc::contrast::adaptive_threshold;
 use std::error::Error;
 use tapciify::{
@@ -7,7 +7,7 @@ use tapciify::{
 
 fn main() -> Result<(), Box<dyn Error>> {
     let img = image::open("./assets/examples/rin-shima.webp")?;
-    let threshold_img: DynamicImage = adaptive_threshold(&img.to_luma8(), 20).into();
+    let threshold_img: image::DynamicImage = adaptive_threshold(&img.to_luma8(), 20).into();
 
     let result = threshold_img
         .resize_custom_ratio(Some(64), None, DEFAULT_FONT_RATIO, FilterType::Triangle)

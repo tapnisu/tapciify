@@ -1,6 +1,6 @@
 //! Utils for resizing your images, but including your font ratio
 
-use image::{imageops, DynamicImage};
+use image::imageops;
 
 /// Consolas font family aspect ratio
 pub const DEFAULT_FONT_RATIO: f64 = 11.0 / 24.0;
@@ -27,17 +27,17 @@ pub trait CustomRatioResize {
         height: Option<u32>,
         font_ratio: f64,
         filter: imageops::FilterType,
-    ) -> DynamicImage;
+    ) -> image::DynamicImage;
 }
 
-impl CustomRatioResize for DynamicImage {
+impl CustomRatioResize for image::DynamicImage {
     fn resize_custom_ratio(
         &self,
         width: Option<u32>,
         height: Option<u32>,
         font_ratio: f64,
         filter: imageops::FilterType,
-    ) -> DynamicImage {
+    ) -> image::DynamicImage {
         let (new_width, new_height) = match (width, height) {
             (None, None) => return self.to_owned(),
             (None, Some(height)) => (

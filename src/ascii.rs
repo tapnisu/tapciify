@@ -15,7 +15,7 @@
 //! ```
 
 use colored::Colorize;
-use image::{DynamicImage, Pixel};
+use image::Pixel;
 use std::{
     cmp::{max, min},
     fmt,
@@ -51,7 +51,7 @@ pub trait AsciiArtConverter {
     ) -> Result<AsciiArt, AsciiArtConverterError>;
 }
 
-impl AsciiArtConverter for DynamicImage {
+impl AsciiArtConverter for image::DynamicImage {
     fn ascii_art(
         &self,
         options: &AsciiArtConverterOptions,

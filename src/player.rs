@@ -15,7 +15,7 @@ use crate::{
     CustomRatioResize, DEFAULT_FONT_RATIO,
 };
 use crossterm::{cursor::MoveUp, execute};
-use image::{imageops::FilterType, DynamicImage, ImageError};
+use image::imageops::FilterType;
 use imageproc::contrast::adaptive_threshold;
 use indicatif::ProgressStyle;
 use std::{io::stdout, path::PathBuf, time::Instant};
@@ -73,7 +73,7 @@ impl AsciiPlayer {
 
                 let img = image::open(path)?;
                 let prepared_img = if let Some(threshold) = options.threshold {
-                    DynamicImage::from(adaptive_threshold(&img.to_luma8(), threshold))
+                    image::DynamicImage::from(adaptive_threshold(&img.to_luma8(), threshold))
                 } else {
                     img
                 }
@@ -129,7 +129,7 @@ impl AsciiPlayer {
             .map(|path| {
                 let img = image::open(path)?;
                 let prepared_img = if let Some(threshold) = options.threshold {
-                    DynamicImage::from(adaptive_threshold(&img.to_luma8(), threshold))
+                    image::DynamicImage::from(adaptive_threshold(&img.to_luma8(), threshold))
                 } else {
                     img
                 }
@@ -254,7 +254,7 @@ impl From<AsciiPlayerOptions> for AsciiArtConverterOptions {
 #[derive(Debug, Error)]
 pub enum AsciiPlayerError {
     #[error("{0}")]
-    Image(#[from] ImageError),
+    Image(#[from] image::ImageError),
     #[error("{0}")]
     AsciiConverter(#[from] AsciiArtConverterError),
 }
