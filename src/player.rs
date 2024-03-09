@@ -17,7 +17,7 @@ use crate::{
 use crossterm::{cursor::MoveUp, execute};
 use image::{imageops::FilterType, DynamicImage, ImageError};
 use imageproc::contrast::adaptive_threshold;
-use indicatif::ParallelProgressIterator;
+use indicatif::{ParallelProgressIterator, ProgressStyle};
 use std::{io::stdout, path::PathBuf, time::Instant};
 use thiserror::Error;
 
@@ -114,7 +114,12 @@ impl AsciiPlayer {
         let iter = paths.iter();
 
         let frames = iter
-            .progress()
+            .progress_with_style(
+                ProgressStyle::with_template(
+                    "{elapsed_precise} | {wide_bar} {percent}% | ETA: {eta} | FPS: {per_sec} | {pos}/{len} ",
+                )
+                .unwrap(),
+            )
             .map(|path| {
                 let img = image::open(path)?;
                 let prepared_img = if let Some(threshold) = options.threshold {
