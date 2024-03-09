@@ -53,6 +53,9 @@ pub struct Cli {
     /// Font ratio: width / height
     #[clap(long="ratio", default_value_t = DEFAULT_FONT_RATIO)]
     pub font_ratio: f64,
+    /// Use threshold for images
+    #[clap(short, long, action)]
+    pub threshold: bool,
 }
 
 /// Add glob support for paths parsing on Windows

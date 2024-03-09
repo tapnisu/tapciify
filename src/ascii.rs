@@ -441,3 +441,14 @@ pub fn get_lightness(r: u8, g: u8, b: u8, a: u8) -> f32 {
 
     ((max as f32 + min as f32) * a as f32) / 130050.0 // 130050 - we need to divide by 512, and divide by 255 from alpha
 }
+
+pub trait ReverseString {
+    /// Reverse [`Self`]
+    fn reverse(&self) -> Self;
+}
+
+impl ReverseString for String {
+    fn reverse(&self) -> String {
+        self.chars().rev().collect()
+    }
+}

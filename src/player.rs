@@ -10,12 +10,13 @@
 use crate::{
     ascii::{
         AsciiArt, AsciiArtConverter, AsciiArtConverterError, AsciiArtConverterOptions,
-        DEFAULT_ASCII_STRING,
+        ReverseString, DEFAULT_ASCII_STRING,
     },
     CustomRatioResize, DEFAULT_FONT_RATIO,
 };
 use crossterm::{cursor::MoveUp, execute};
-use image::{imageops::FilterType, ImageError};
+use image::{imageops::FilterType, DynamicImage, ImageError};
+use imageproc::contrast::adaptive_threshold;
 use indicatif::ProgressBar;
 use std::{io::stdout, path::PathBuf, time::Instant};
 use thiserror::Error;
@@ -43,9 +44,13 @@ pub fn calculate_frame_time(framerate: Option<f64>) -> u64 {
 pub struct AsciiPlayer {}
 
 impl AsciiPlayer {
+    #[deprecated(
+        since = "3.1.0",
+        note = "Use `tapciify::ascii::ReverseString::reverse` instead"
+    )]
     /// Reverse ASCII string
     pub fn reverse_ascii_string(ascii_string: String) -> String {
-        ascii_string.chars().rev().collect()
+        ascii_string.reverse()
     }
 
     /// Play paths as ASCII arts
@@ -61,13 +66,20 @@ impl AsciiPlayer {
             for path in paths.iter() {
                 let start = Instant::now();
 
-                let img = image::open(path)?.resize_custom_ratio(
+                let img = image::open(path)?;
+                let prepared_img = if options.threshold {
+                    DynamicImage::from(adaptive_threshold(&img.to_luma8(), 20))
+                } else {
+                    img
+                }
+                .resize_custom_ratio(
                     options.width,
                     options.height,
                     options.font_ratio,
                     options.filter,
                 );
-                let ascii_art = img.ascii_art(&converter_options)?;
+
+                let ascii_art = prepared_img.ascii_art(&converter_options)?;
 
                 if !first_frame {
                     execute!(stdout(), MoveUp(ascii_art.height.try_into().unwrap()))
@@ -105,14 +117,20 @@ impl AsciiPlayer {
 
         let frames = iter
             .map(|path| {
-                let ascii_art = image::open(path)?
-                    .resize_custom_ratio(
-                        options.width,
-                        options.height,
-                        options.font_ratio,
-                        options.filter,
-                    )
-                    .ascii_art(&converter_options)?;
+                let img = image::open(path)?;
+                let prepared_img = if options.threshold {
+                    DynamicImage::from(adaptive_threshold(&img.to_luma8(), 20))
+                } else {
+                    img
+                }
+                .resize_custom_ratio(
+                    options.width,
+                    options.height,
+                    options.font_ratio,
+                    options.filter,
+                );
+
+                let ascii_art = prepared_img.ascii_art(&converter_options)?;
 
                 pb.inc(1);
 
@@ -195,6 +213,7 @@ pub struct AsciiPlayerOptions {
     pub font_ratio: f64,
     pub looped: bool,
     pub filter: FilterType,
+    pub threshold: bool,
 }
 
 impl Default for AsciiPlayerOptions {
@@ -209,6 +228,7 @@ impl Default for AsciiPlayerOptions {
             font_ratio: DEFAULT_FONT_RATIO,
             looped: false,
             filter: FilterType::Triangle,
+            threshold: false,
         }
     }
 }
