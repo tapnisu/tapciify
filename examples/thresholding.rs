@@ -6,12 +6,10 @@ use tapciify::{
 };
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let img = image::open("./flandre.webp")?;
-    // let img = image::open("./fumo.webp")?;
+    let img = image::open("./assets/examples/original.webp")?;
+    let thresholded_img: DynamicImage = adaptive_threshold(&img.to_luma8(), 30).into();
 
-    let img: DynamicImage = adaptive_threshold(&img.to_luma8(), 30).into();
-
-    let result = img
+    let result = thresholded_img
         .resize_custom_ratio(Some(64), None, DEFAULT_FONT_RATIO, FilterType::Triangle)
         .ascii_art(&AsciiArtConverterOptions {
             // Put your other options here
