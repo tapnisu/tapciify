@@ -118,13 +118,14 @@ impl AsciiPlayer {
         #[cfg(not(feature = "rayon"))]
         let iter = paths.iter();
 
+        // Moving this into the function argument breaks rustfmt
+        let progress_bar_style = ProgressStyle::with_template(
+            "{elapsed_precise} | {wide_bar} {percent}% | ETA: {eta} | FPS: {per_sec} | {pos}/{len}",
+        )
+        .unwrap_or_else(|_| ProgressStyle::default_bar());
+
         let frames = iter
-            .progress_with_style(
-                ProgressStyle::with_template(
-                    "{elapsed_precise} | {wide_bar} {percent}% | ETA: {eta} | FPS: {per_sec} | {pos}/{len} ",
-                )
-                .unwrap(),
-            )
+            .progress_with_style(progress_bar_style)
             .map(|path| {
                 let img = image::open(path)?;
                 let prepared_img = if let Some(threshold) = options.threshold {
