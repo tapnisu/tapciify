@@ -321,7 +321,8 @@ impl AsciiArtPixel {
     }
 }
 
-trait ToAsciiArtPixel {
+pub trait ToAsciiArtPixel {
+    /// Convert [`image`] crate color types to [`AsciiArtPixel`]
     fn to_ascii_art_pixel(&self, ascii_string: &str) -> Result<AsciiArtPixel, AsciiStringError>;
 }
 
