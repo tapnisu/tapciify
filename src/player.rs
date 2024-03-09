@@ -22,9 +22,12 @@ use std::{io::stdout, path::PathBuf, time::Instant};
 use thiserror::Error;
 
 #[cfg(feature = "rayon")]
-use indicatif::ParallelProgressIterator;
-#[cfg(feature = "rayon")]
 use rayon::prelude::*;
+
+#[cfg(feature = "rayon")]
+use indicatif::ParallelProgressIterator;
+#[cfg(not(feature = "rayon"))]
+use indicatif::ProgressIterator;
 
 /// Calculate frame time in millis (1 / framerate)
 ///
