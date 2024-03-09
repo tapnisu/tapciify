@@ -59,8 +59,9 @@ pub mod cli;
 
 #[doc(inline)]
 pub use ascii::{
-    AsciiArt, AsciiArtConverter, AsciiArtConverterError, AsciiArtConverterOptions, AsciiArtPixel,
-    AsciiStringError, SizeError, DEFAULT_ASCII_STRING,
+    ascii_character, AsciiArt, AsciiArtConverter, AsciiArtConverterError, AsciiArtConverterOptions,
+    AsciiArtPixel, AsciiStringError, ReverseString, SizeError, ToAsciiArtPixel,
+    DEFAULT_ASCII_STRING,
 };
 #[doc(inline)]
 pub use resize::{CustomRatioResize, DEFAULT_FONT_RATIO};
