@@ -79,17 +79,7 @@ impl AsciiArtConverter for image::RgbImage {
         let iter = self.pixels();
 
         let characters = iter
-            .map(|pixel| -> Result<AsciiArtPixel, AsciiStringError> {
-                let luma_pixel = pixel.to_luma();
-
-                Ok(AsciiArtPixel {
-                    character: ascii_character(luma_pixel[0] as f32 / 255.0, &options.ascii_string)?,
-                    r: pixel[0],
-                    g: pixel[1],
-                    b: pixel[2],
-                    a: 255,
-                })
-            })
+            .map(|pixel| pixel.to_ascii_art_pixel(&options.ascii_string))
             .collect::<Result<Vec<AsciiArtPixel>, AsciiStringError>>()?;
 
         Ok(AsciiArt::new(
@@ -120,20 +110,7 @@ impl AsciiArtConverter for image::RgbaImage {
         let iter = self.pixels();
 
         let characters = iter
-            .map(|pixel| -> Result<AsciiArtPixel, AsciiStringError> {
-                let luma_pixel = pixel.to_luma_alpha();
-
-                Ok(AsciiArtPixel {
-                    character: ascii_character(
-                        luma_pixel[0] as f32 * luma_pixel[1] as f32 / (255.0 * 255.0),
-                        &options.ascii_string,
-                    )?,
-                    r: pixel[0],
-                    g: pixel[1],
-                    b: pixel[2],
-                    a: pixel[3],
-                })
-            })
+            .map(|pixel| pixel.to_ascii_art_pixel(&options.ascii_string))
             .collect::<Result<Vec<AsciiArtPixel>, AsciiStringError>>()?;
 
         Ok(AsciiArt::new(
@@ -164,15 +141,7 @@ impl AsciiArtConverter for image::GrayImage {
         let iter = self.pixels();
 
         let characters = iter
-            .map(|pixel| -> Result<AsciiArtPixel, AsciiStringError> {
-                Ok(AsciiArtPixel {
-                    character: ascii_character(pixel[0] as f32 / 255.0, &options.ascii_string)?,
-                    r: pixel[0],
-                    g: pixel[0],
-                    b: pixel[0],
-                    a: 255,
-                })
-            })
+            .map(|pixel| pixel.to_ascii_art_pixel(&options.ascii_string))
             .collect::<Result<Vec<AsciiArtPixel>, AsciiStringError>>()?;
 
         Ok(AsciiArt::new(
@@ -203,18 +172,7 @@ impl AsciiArtConverter for image::GrayAlphaImage {
         let iter = self.pixels();
 
         let characters = iter
-            .map(|pixel| -> Result<AsciiArtPixel, AsciiStringError> {
-                Ok(AsciiArtPixel {
-                    character: ascii_character(
-                        pixel[0] as f32 * pixel[1] as f32 / (255.0 * 255.0),
-                        &options.ascii_string,
-                    )?,
-                    r: pixel[0],
-                    g: pixel[0],
-                    b: pixel[0],
-                    a: pixel[1],
-                })
-            })
+            .map(|pixel| pixel.to_ascii_art_pixel(&options.ascii_string))
             .collect::<Result<Vec<AsciiArtPixel>, AsciiStringError>>()?;
 
         Ok(AsciiArt::new(
@@ -359,6 +317,68 @@ impl AsciiArtPixel {
             g,
             b,
             a,
+        })
+    }
+}
+
+trait ToAsciiArtPixel {
+    fn to_ascii_art_pixel(&self, ascii_string: &str) -> Result<AsciiArtPixel, AsciiStringError>;
+}
+
+impl ToAsciiArtPixel for image::Rgb<u8> {
+    fn to_ascii_art_pixel(&self, ascii_string: &str) -> Result<AsciiArtPixel, AsciiStringError> {
+        let luma_pixel = self.to_luma();
+
+        Ok(AsciiArtPixel {
+            character: ascii_character(luma_pixel[0] as f32 / 255.0, ascii_string)?,
+            r: self[0],
+            g: self[1],
+            b: self[2],
+            a: 255,
+        })
+    }
+}
+
+impl ToAsciiArtPixel for image::Rgba<u8> {
+    fn to_ascii_art_pixel(&self, ascii_string: &str) -> Result<AsciiArtPixel, AsciiStringError> {
+        let luma_pixel = self.to_luma_alpha();
+
+        Ok(AsciiArtPixel {
+            character: ascii_character(
+                luma_pixel[0] as f32 * luma_pixel[1] as f32 / (255.0 * 255.0),
+                ascii_string,
+            )?,
+            r: self[0],
+            g: self[1],
+            b: self[2],
+            a: self[3],
+        })
+    }
+}
+
+impl ToAsciiArtPixel for image::Luma<u8> {
+    fn to_ascii_art_pixel(&self, ascii_string: &str) -> Result<AsciiArtPixel, AsciiStringError> {
+        Ok(AsciiArtPixel {
+            character: ascii_character(self[0] as f32 / 255.0, ascii_string)?,
+            r: self[0],
+            g: self[0],
+            b: self[0],
+            a: 255,
+        })
+    }
+}
+
+impl ToAsciiArtPixel for image::LumaA<u8> {
+    fn to_ascii_art_pixel(&self, ascii_string: &str) -> Result<AsciiArtPixel, AsciiStringError> {
+        Ok(AsciiArtPixel {
+            character: ascii_character(
+                self[0] as f32 * self[1] as f32 / (255.0 * 255.0),
+                ascii_string,
+            )?,
+            r: self[0],
+            g: self[0],
+            b: self[0],
+            a: self[1],
         })
     }
 }
