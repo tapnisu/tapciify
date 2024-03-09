@@ -70,23 +70,23 @@ impl AsciiArtConverter for image::RgbImage {
         }
 
         #[cfg(feature = "rayon")]
-        let bridge = self
+        let iter = self
             .pixels()
             .map(|rgba| rgba.to_owned())
             .collect::<Vec<image::Rgb<u8>>>()
             .into_par_iter();
         #[cfg(not(feature = "rayon"))]
-        let bridge = self.pixels();
+        let iter = self.pixels();
 
-        let characters = bridge
-            .map(|data| -> Result<AsciiArtPixel, AsciiStringError> {
-                let luma = data.to_luma();
+        let characters = iter
+            .map(|pixel| -> Result<AsciiArtPixel, AsciiStringError> {
+                let luma_pixel = pixel.to_luma();
 
                 Ok(AsciiArtPixel {
-                    character: ascii_character(luma[0] as f32 / 255.0, &options.ascii_string)?,
-                    r: data[0],
-                    g: data[1],
-                    b: data[2],
+                    character: ascii_character(luma_pixel[0] as f32 / 255.0, &options.ascii_string)?,
+                    r: pixel[0],
+                    g: pixel[1],
+                    b: pixel[2],
                     a: 255,
                 })
             })
@@ -111,27 +111,27 @@ impl AsciiArtConverter for image::RgbaImage {
         }
 
         #[cfg(feature = "rayon")]
-        let bridge = self
+        let iter = self
             .pixels()
             .map(|rgba| rgba.to_owned())
             .collect::<Vec<image::Rgba<u8>>>()
             .into_par_iter();
         #[cfg(not(feature = "rayon"))]
-        let bridge = self.pixels();
+        let iter = self.pixels();
 
-        let characters = bridge
-            .map(|data| -> Result<AsciiArtPixel, AsciiStringError> {
-                let luma = data.to_luma_alpha();
+        let characters = iter
+            .map(|pixel| -> Result<AsciiArtPixel, AsciiStringError> {
+                let luma_pixel = pixel.to_luma_alpha();
 
                 Ok(AsciiArtPixel {
                     character: ascii_character(
-                        luma[0] as f32 * luma[1] as f32 / (255.0 * 255.0),
+                        luma_pixel[0] as f32 * luma_pixel[1] as f32 / (255.0 * 255.0),
                         &options.ascii_string,
                     )?,
-                    r: data[0],
-                    g: data[1],
-                    b: data[2],
-                    a: data[3],
+                    r: pixel[0],
+                    g: pixel[1],
+                    b: pixel[2],
+                    a: pixel[3],
                 })
             })
             .collect::<Result<Vec<AsciiArtPixel>, AsciiStringError>>()?;
@@ -155,21 +155,21 @@ impl AsciiArtConverter for image::GrayImage {
         }
 
         #[cfg(feature = "rayon")]
-        let bridge = self
+        let iter = self
             .pixels()
             .map(|luma| luma.to_owned())
             .collect::<Vec<image::Luma<u8>>>()
             .into_par_iter();
         #[cfg(not(feature = "rayon"))]
-        let bridge = self.pixels();
+        let iter = self.pixels();
 
-        let characters = bridge
-            .map(|data| -> Result<AsciiArtPixel, AsciiStringError> {
+        let characters = iter
+            .map(|pixel| -> Result<AsciiArtPixel, AsciiStringError> {
                 Ok(AsciiArtPixel {
-                    character: ascii_character(data[0] as f32 / 255.0, &options.ascii_string)?,
-                    r: data[0],
-                    g: data[0],
-                    b: data[0],
+                    character: ascii_character(pixel[0] as f32 / 255.0, &options.ascii_string)?,
+                    r: pixel[0],
+                    g: pixel[0],
+                    b: pixel[0],
                     a: 255,
                 })
             })
@@ -194,25 +194,25 @@ impl AsciiArtConverter for image::GrayAlphaImage {
         }
 
         #[cfg(feature = "rayon")]
-        let bridge = self
+        let iter = self
             .pixels()
             .map(|luma| luma.to_owned())
             .collect::<Vec<image::LumaA<u8>>>()
             .into_par_iter();
         #[cfg(not(feature = "rayon"))]
-        let bridge = self.pixels();
+        let iter = self.pixels();
 
-        let characters = bridge
-            .map(|data| -> Result<AsciiArtPixel, AsciiStringError> {
+        let characters = iter
+            .map(|pixel| -> Result<AsciiArtPixel, AsciiStringError> {
                 Ok(AsciiArtPixel {
                     character: ascii_character(
-                        data[0] as f32 * data[1] as f32 / (255.0 * 255.0),
+                        pixel[0] as f32 * pixel[1] as f32 / (255.0 * 255.0),
                         &options.ascii_string,
                     )?,
-                    r: data[0],
-                    g: data[0],
-                    b: data[0],
-                    a: data[1],
+                    r: pixel[0],
+                    g: pixel[0],
+                    b: pixel[0],
+                    a: pixel[1],
                 })
             })
             .collect::<Result<Vec<AsciiArtPixel>, AsciiStringError>>()?;
