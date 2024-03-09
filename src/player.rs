@@ -113,7 +113,7 @@ impl AsciiPlayer {
         #[cfg(feature = "rayon")]
         let iter = paths.into_par_iter();
         #[cfg(not(feature = "rayon"))]
-        let iter = paths.into_iter();
+        let iter = paths.iter();
 
         let frames = iter
             .map(|path| {

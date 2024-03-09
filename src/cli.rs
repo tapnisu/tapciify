@@ -89,7 +89,7 @@ pub fn glob_to_paths(patterns: &[String]) -> Result<Vec<PathBuf>, GlobToPathsErr
     #[cfg(feature = "rayon")]
     let iter = patterns.into_par_iter();
     #[cfg(not(feature = "rayon"))]
-    let iter = patterns.into_iter();
+    let iter = patterns.iter();
 
     iter.map(|glob_p| {
         glob(glob_p)?
