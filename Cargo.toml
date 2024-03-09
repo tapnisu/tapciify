@@ -62,7 +62,7 @@ player = [
     "dep:imageproc",
 ]
 
-rayon = ["dep:rayon", "imageproc/rayon", "image/jpeg_rayon"]
+rayon = ["dep:rayon", "imageproc/rayon", "image/jpeg_rayon", "indicatif/rayon"]
 multithreading = ["rayon"]
 parallelism = ["rayon"]
 

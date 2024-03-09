@@ -17,7 +17,7 @@ use crate::{
 use crossterm::{cursor::MoveUp, execute};
 use image::{imageops::FilterType, DynamicImage, ImageError};
 use imageproc::contrast::adaptive_threshold;
-use indicatif::ProgressBar;
+use indicatif::ParallelProgressIterator;
 use std::{io::stdout, path::PathBuf, time::Instant};
 use thiserror::Error;
 
@@ -106,8 +106,6 @@ impl AsciiPlayer {
         paths: &[PathBuf],
         options: &AsciiPlayerOptions,
     ) -> Result<Vec<AsciiArt>, AsciiPlayerError> {
-        let pb = ProgressBar::new(paths.len().try_into().unwrap());
-
         let converter_options = options.to_owned().into();
 
         #[cfg(feature = "rayon")]
@@ -116,6 +114,7 @@ impl AsciiPlayer {
         let iter = paths.iter();
 
         let frames = iter
+            .progress()
             .map(|path| {
                 let img = image::open(path)?;
                 let prepared_img = if let Some(threshold) = options.threshold {
@@ -131,8 +130,6 @@ impl AsciiPlayer {
                 );
 
                 let ascii_art = prepared_img.ascii_art(&converter_options)?;
-
-                pb.inc(1);
 
                 Ok(ascii_art)
             })
