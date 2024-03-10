@@ -22,10 +22,10 @@ pub struct Cli {
     #[clap(short, long, num_args = 1.., required=true)]
     pub input: Vec<String>,
     /// Width of output
-    #[clap(short, long, value_parser)]
+    #[clap(short, long)]
     pub width: Option<u32>,
     /// Height of output
-    #[clap(short = 'H', long, value_parser)]
+    #[clap(short = 'H', long)]
     pub height: Option<u32>,
 
     /// Framerate for showing images
@@ -54,7 +54,7 @@ pub struct Cli {
     #[clap(long="ratio", default_value_t = DEFAULT_FONT_RATIO)]
     pub font_ratio: f64,
     /// Use threshold for images
-    #[clap(short, long, value_parser)]
+    #[clap(short, long)]
     pub threshold: Option<u32>,
 }
 
