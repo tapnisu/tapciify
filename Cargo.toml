@@ -23,7 +23,7 @@ categories = [
 ]
 
 [dependencies]
-image = { version = "0.24", features = [
+image = { version = "0.25", features = [
     "gif",
     "jpeg",
     "ico",
