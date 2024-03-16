@@ -23,24 +23,20 @@ fn main() -> Result<(), clap::Error> {
     };
 
     let frame_time = calculate_frame_time(cli.framerate);
+    let options = AsciiPlayerOptions {
+        width: cli.width,
+        height: cli.height,
+        ascii_string,
+        colored,
+        frame_time,
+        pre_render: cli.pre_render,
+        font_ratio: cli.font_ratio,
+        looped: cli.looped,
+        threshold: cli.threshold,
+        ..Default::default()
+    };
 
-    let result = AsciiPlayer::play(
-        &images_paths,
-        &AsciiPlayerOptions {
-            width: cli.width,
-            height: cli.height,
-            ascii_string,
-            colored,
-            frame_time,
-            pre_render: cli.pre_render,
-            font_ratio: cli.font_ratio,
-            looped: cli.looped,
-            threshold: cli.threshold,
-            ..Default::default()
-        },
-    );
-
-    if let Err(err) = result {
+    if let Err(err) = AsciiPlayer::play(&images_paths, &options) {
         cmd.error(ErrorKind::InvalidValue, err).exit()
     }
 
