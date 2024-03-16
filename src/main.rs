@@ -6,7 +6,7 @@ use tapciify::player::{calculate_frame_time, AsciiPlayer, AsciiPlayerOptions};
 #[cfg(not(target_family = "windows"))]
 use std::path::PathBuf;
 
-fn main() -> Result<(), clap::Error> {
+fn main() {
     let cli = Cli::parse();
     let mut cmd = Cli::command();
 
@@ -37,8 +37,6 @@ fn main() -> Result<(), clap::Error> {
     };
 
     if let Err(err) = AsciiPlayer::play(&images_paths, &options) {
-        cmd.error(ErrorKind::InvalidValue, err).exit()
+        cmd.error(ErrorKind::Io, err).exit()
     }
-
-    Ok(())
 }
