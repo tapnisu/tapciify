@@ -21,6 +21,7 @@ categories = [
     "multimedia::video",
     "visualization",
 ]
+exclude = ["assets/*", ".github/*", "examples/*"]
 
 [dependencies]
 image = { version = "0.24", features = [
