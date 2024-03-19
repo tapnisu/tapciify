@@ -7,8 +7,8 @@ pub const DEFAULT_FONT_RATIO: f64 = 11.0 / 24.0;
 
 /// Trait for resizing images and counting in font ratio
 pub trait CustomRatioResize {
-    /// Resize [`DynamicImage`] to your sizes
-    /// When both `width` and `height` are [`None`], will return the original [`DynamicImage`]
+    /// Resize [`image::DynamicImage`] to your sizes
+    /// When both `width` and `height` are [`None`], will return the original [`image::DynamicImage`]
     ///
     /// # Examples
     ///
