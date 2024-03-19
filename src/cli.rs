@@ -66,6 +66,7 @@ pub struct Cli {
 /// use tapciify::cli::glob_to_paths;
 /// use std::path::PathBuf;
 ///
+/// # fn main() -> Result<(), tapciify::cli::GlobToPathsError> {
 /// let paths = vec!["assets\\examples\\*.webp".to_owned()];
 /// let result = glob_to_paths(&paths)?;
 ///
@@ -82,7 +83,8 @@ pub struct Cli {
 ///     .map(PathBuf::from)
 ///     .collect::<Vec<PathBuf>>()
 /// );
-/// # Ok::<(), tapciify::cli::GlobToPathsError>(())
+/// # Ok(())
+/// # }
 /// `````
 #[cfg(target_family = "windows")]
 pub fn glob_to_paths(patterns: &[String]) -> Result<Vec<PathBuf>, GlobToPathsError> {

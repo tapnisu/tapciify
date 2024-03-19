@@ -354,6 +354,7 @@ impl AsciiArtPixel {
     /// ```
     /// use tapciify::AsciiArtPixel;
     ///
+    /// # fn main() -> Result<(), tapciify::AsciiStringError> {
     /// let ascii_string = " *#";
     ///
     /// let result = AsciiArtPixel::new(255, 255, 255, 255, ascii_string)?;
@@ -364,7 +365,9 @@ impl AsciiArtPixel {
     ///
     /// let result = AsciiArtPixel::new(0, 0, 0, 255, ascii_string)?;
     /// assert_eq!(result.character, ' ');
-    /// # Ok::<(), tapciify::AsciiStringError>(())
+    ///
+    /// # Ok(())
+    /// # }
     /// `````
     #[deprecated(since = "3.1.0")]
     pub fn new(
@@ -472,6 +475,7 @@ impl ToAsciiArtPixel for image::LumaA<u8> {
 /// ```
 /// use tapciify::ascii::ascii_character;
 ///
+/// # fn main() -> Result<(), tapciify::AsciiStringError> {
 /// let ascii_string = " *#";
 ///
 /// let result = ascii_character(1.0, ascii_string)?;
@@ -482,7 +486,9 @@ impl ToAsciiArtPixel for image::LumaA<u8> {
 ///
 /// let result = ascii_character(0.0, ascii_string)?;
 /// assert_eq!(result, ' ');
-/// # Ok::<(), tapciify::AsciiStringError>(())
+///
+/// # Ok(())
+/// # }
 /// `````
 pub fn ascii_character(lightness: f32, ascii_string: &str) -> Result<char, AsciiStringError> {
     ascii_string
