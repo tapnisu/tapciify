@@ -24,22 +24,8 @@ categories = [
 exclude = ["assets/*", ".github/*", "examples/*"]
 
 [dependencies]
-image = { version = "0.24", features = [
-    "gif",
-    "jpeg",
-    "ico",
-    "png",
-    "pnm",
-    "tga",
-    "tiff",
-    "webp",
-    "bmp",
-    "hdr",
-    "dxt",
-    "dds",
-    "farbfeld",
-    "openexr",
-    "qoi",
+image = { version = "0.25", features = [
+    "default-formats",
 ], default_features = false }
 colored = "2"
 thiserror = "1.0"
@@ -47,7 +33,7 @@ thiserror = "1.0"
 clap = { version = "4", features = ["derive"], optional = true }
 crossterm = { version = "0.27", optional = true }
 glob = { version = "0.3", optional = true }
-imageproc = { version = "0.23", optional = true, default_features = false }
+imageproc = { version = "0.24", optional = true, default_features = false }
 indicatif = { version = "0.17", optional = true }
 rayon = { version = "1", optional = true }
 
@@ -63,7 +49,7 @@ player = [
     "dep:imageproc",
 ]
 
-rayon = ["dep:rayon", "imageproc/rayon", "image/jpeg_rayon", "indicatif/rayon"]
+rayon = ["dep:rayon", "imageproc/rayon", "image/rayon", "indicatif/rayon"]
 multithreading = ["rayon"]
 parallelism = ["rayon"]
 
