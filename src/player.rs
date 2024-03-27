@@ -89,34 +89,28 @@ impl AsciiPlayer {
                 let start = Instant::now();
                 let img = image::open(path)?;
 
+                let prepared_img = if let Some(threshold) = options.threshold {
+                    image::DynamicImage::from(adaptive_threshold(&img.to_luma8(), threshold))
+                } else {
+                    img
+                };
+
                 let ascii_art = match options.braille {
-                    true => {
-                        let resized_img = img.resize(
+                    true => prepared_img
+                        .resize(
                             options.width.map_or(u32::MAX, |width| width * 2),
                             options.height.map_or(u32::MAX, |height| height * 4),
                             options.filter,
-                        );
-
-                        resized_img.braille_art(options.threshold.unwrap_or(5))?
-                    }
-                    false => {
-                        let prepared_img = if let Some(threshold) = options.threshold {
-                            image::DynamicImage::from(adaptive_threshold(
-                                &img.to_luma8(),
-                                threshold,
-                            ))
-                        } else {
-                            img
-                        }
+                        )
+                        .braille_art()?,
+                    false => prepared_img
                         .resize_custom_ratio(
                             options.width,
                             options.height,
                             options.font_ratio,
                             options.filter,
-                        );
-
-                        prepared_img.ascii_art(&converter_options)?
-                    }
+                        )
+                        .ascii_art(&converter_options)?,
                 };
 
                 if !first_frame {
@@ -161,34 +155,28 @@ impl AsciiPlayer {
             .progress_with_style(progress_bar_style)
             .map(|path| {
                 let img = image::open(path)?;
+                let prepared_img = if let Some(threshold) = options.threshold {
+                    image::DynamicImage::from(adaptive_threshold(&img.to_luma8(), threshold))
+                } else {
+                    img
+                };
+
                 let ascii_art = match options.braille {
-                    true => {
-                        let resized_img = img.resize(
+                    true => prepared_img
+                        .resize(
                             options.width.map_or(u32::MAX, |width| width * 2),
                             options.height.map_or(u32::MAX, |height| height * 4),
                             options.filter,
-                        );
-
-                        resized_img.braille_art(options.threshold.unwrap_or(5))?
-                    }
-                    false => {
-                        let prepared_img = if let Some(threshold) = options.threshold {
-                            image::DynamicImage::from(adaptive_threshold(
-                                &img.to_luma8(),
-                                threshold,
-                            ))
-                        } else {
-                            img
-                        }
+                        )
+                        .braille_art()?,
+                    false => prepared_img
                         .resize_custom_ratio(
                             options.width,
                             options.height,
                             options.font_ratio,
                             options.filter,
-                        );
-
-                        prepared_img.ascii_art(&converter_options)?
-                    }
+                        )
+                        .ascii_art(&converter_options)?,
                 };
 
                 Ok(ascii_art)
