@@ -2,6 +2,9 @@ use image::GenericImageView;
 
 use crate::{AsciiArt, AsciiArtConverterError, AsciiArtPixel, SizeError};
 
+#[cfg(feature = "rayon")]
+use rayon::prelude::*;
+
 /// Convert array of booleans into braille character
 ///
 /// Grid of booleans placement
@@ -26,50 +29,62 @@ pub fn boolean_array_to_braille(array: &[bool; 8]) -> char {
 }
 
 pub trait BrailleArtConverter {
-    fn braille_art(&self) -> Result<AsciiArt, AsciiArtConverterError>;
+    fn braille_art(&self, block_radius: u32) -> Result<AsciiArt, AsciiArtConverterError>;
 }
 
 impl BrailleArtConverter for image::DynamicImage {
-    fn braille_art(&self) -> Result<AsciiArt, AsciiArtConverterError> {
-        self.to_luma8().braille_art()
+    fn braille_art(&self, block_radius: u32) -> Result<AsciiArt, AsciiArtConverterError> {
+        self.to_luma8().braille_art(block_radius)
     }
 }
 
 impl BrailleArtConverter for image::GrayImage {
-    fn braille_art(&self) -> Result<AsciiArt, AsciiArtConverterError> {
+    fn braille_art(&self, block_radius: u32) -> Result<AsciiArt, AsciiArtConverterError> {
         if self.width() < 8 || self.height() < 8 {
             return Err(AsciiArtConverterError::SizeError(SizeError));
         }
 
-        let img: image::DynamicImage = imageproc::contrast::adaptive_threshold(self, 5).into();
-        let mut characters = vec![];
+        let img: image::DynamicImage =
+            imageproc::contrast::adaptive_threshold(self, block_radius).into();
 
-        for y in 0..(img.height() / 4) {
-            for x in 0..(img.width() / 2) {
-                let x = x * 2;
-                let y = y * 4;
+        let y_range = 0..(img.height() / 4);
+        #[cfg(feature = "rayon")]
+        let iter = y_range.into_par_iter();
+        #[cfg(not(feature = "rayon"))]
+        let iter = y_range.into_iter();
 
-                let braille_array = &[
-                    img.get_pixel(x, y),
-                    img.get_pixel(x, y + 1),
-                    img.get_pixel(x, y + 2),
-                    img.get_pixel(x + 1, y),
-                    img.get_pixel(x, y + 1),
-                    img.get_pixel(x, y + 2),
-                    img.get_pixel(x, y + 3),
-                    img.get_pixel(x + 1, y + 3),
-                ]
-                .map(|p| p[0] > 123);
+        let characters = iter
+            .flat_map(|y| {
+                let mut row = vec![];
 
-                characters.push(AsciiArtPixel {
-                    character: boolean_array_to_braille(braille_array),
-                    r: 255,
-                    g: 255,
-                    b: 255,
-                    a: 255,
-                });
-            }
-        }
+                for x in 0..(img.width() / 2) {
+                    let x = x * 2;
+                    let y = y * 4;
+
+                    let braille_array = &[
+                        img.get_pixel(x, y),
+                        img.get_pixel(x, y + 1),
+                        img.get_pixel(x, y + 2),
+                        img.get_pixel(x + 1, y),
+                        img.get_pixel(x, y + 1),
+                        img.get_pixel(x, y + 2),
+                        img.get_pixel(x, y + 3),
+                        img.get_pixel(x + 1, y + 3),
+                    ]
+                    .map(|p| p[0] > 123);
+
+                    row.push(AsciiArtPixel {
+                        character: boolean_array_to_braille(braille_array),
+                        r: 255,
+                        g: 255,
+                        b: 255,
+                        a: 255,
+                    })
+                }
+
+                row
+            })
+            .collect();
 
         Ok(AsciiArt::new(
             characters,
