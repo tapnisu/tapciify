@@ -47,7 +47,7 @@ impl BrailleArtConverter for image::GrayImage {
         let img: image::DynamicImage =
             imageproc::contrast::adaptive_threshold(self, block_radius).into();
 
-        let y_range = 0..(img.height() / 4);
+        let y_range: Vec<u32> = (0..img.height()).step_by(4).collect();
         #[cfg(feature = "rayon")]
         let iter = y_range.into_par_iter();
         #[cfg(not(feature = "rayon"))]
@@ -57,10 +57,7 @@ impl BrailleArtConverter for image::GrayImage {
             .flat_map(|y| {
                 let mut row = vec![];
 
-                for x in 0..(img.width() / 2) {
-                    let x = x * 2;
-                    let y = y * 4;
-
+                for x in (0..img.width()).step_by(2) {
                     let braille_array = &[
                         img.get_pixel(x, y),
                         img.get_pixel(x, y + 1),
