@@ -27,22 +27,27 @@ pub fn boolean_array_to_braille(array: &[bool; 8]) -> char {
 }
 
 pub trait BrailleArtConverter {
-    fn braille_art(&self) -> Result<AsciiArt, AsciiArtConverterError>;
+    fn braille_art(&self, colored: bool) -> Result<AsciiArt, AsciiArtConverterError>;
 }
 
 impl BrailleArtConverter for image::DynamicImage {
-    fn braille_art(&self) -> Result<AsciiArt, AsciiArtConverterError> {
-        self.to_luma8().braille_art()
+    fn braille_art(&self, colored: bool) -> Result<AsciiArt, AsciiArtConverterError> {
+        self.to_luma8().braille_art(colored)
     }
 }
 
 impl BrailleArtConverter for image::GrayImage {
-    fn braille_art(&self) -> Result<AsciiArt, AsciiArtConverterError> {
+    fn braille_art(&self, colored: bool) -> Result<AsciiArt, AsciiArtConverterError> {
         if self.width() < 8 || self.height() < 8 {
             return Err(AsciiArtConverterError::SizeError(SizeError));
         }
 
-        let y_range: Vec<u32> = (0..self.height()).step_by(4).collect();
+        let x_range = (0..(self.width())).step_by(2);
+        let y_range: Vec<u32> = (0..(self.height() - 4)).step_by(4).collect();
+
+        let width = x_range.clone().len() as u32;
+        let height = y_range.clone().len() as u32;
+
         #[cfg(feature = "rayon")]
         let iter = y_range.into_par_iter();
         #[cfg(not(feature = "rayon"))]
@@ -52,9 +57,12 @@ impl BrailleArtConverter for image::GrayImage {
             .flat_map(|y| {
                 let mut row = vec![];
 
-                for x in (0..self.width()).step_by(2) {
+                for x in x_range.clone() {
+                    // Top left pixel
+                    let tlpx = self.get_pixel(x, y);
+
                     let braille_array = &[
-                        self.get_pixel(x, y),
+                        tlpx,
                         self.get_pixel(x, y + 1),
                         self.get_pixel(x, y + 2),
                         self.get_pixel(x + 1, y),
@@ -67,9 +75,9 @@ impl BrailleArtConverter for image::GrayImage {
 
                     row.push(AsciiArtPixel {
                         character: boolean_array_to_braille(braille_array),
-                        r: 255,
-                        g: 255,
-                        b: 255,
+                        r: tlpx.0[0],
+                        g: tlpx.0[0],
+                        b: tlpx.0[0],
                         a: 255,
                     })
                 }
@@ -78,11 +86,6 @@ impl BrailleArtConverter for image::GrayImage {
             })
             .collect();
 
-        Ok(AsciiArt::new(
-            characters,
-            self.width() / 2,
-            self.height() / 4,
-            false,
-        ))
+        Ok(AsciiArt::new(characters, width, height, colored))
     }
 }

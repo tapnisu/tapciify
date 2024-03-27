@@ -309,6 +309,18 @@ impl AsciiArt {
             colored,
         }
     }
+
+    /// Clones with change in colored
+    pub fn to_colored(mut self, colored: bool) -> AsciiArt {
+        self.colored = colored;
+
+        self
+    }
+
+    /// Mutates colored
+    pub fn mut_colored(&mut self, colored: bool) {
+        self.colored = colored;
+    }
 }
 
 impl fmt::Display for AsciiArt {

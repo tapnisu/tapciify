@@ -102,7 +102,7 @@ impl AsciiPlayer {
                             options.height.map_or(u32::MAX, |height| height * 4),
                             options.filter,
                         )
-                        .braille_art()?,
+                        .braille_art(options.colored)?,
                     false => prepared_img
                         .resize_custom_ratio(
                             options.width,
@@ -168,7 +168,7 @@ impl AsciiPlayer {
                             options.height.map_or(u32::MAX, |height| height * 4),
                             options.filter,
                         )
-                        .braille_art()?,
+                        .braille_art(options.colored)?,
                     false => prepared_img
                         .resize_custom_ratio(
                             options.width,
