@@ -40,7 +40,7 @@
 //!
 //! ```
 //! use image::imageops::FilterType;
-//! use std::error::Error;
+//! # use std::error::Error;
 //! use tapciify::{
 //!     AsciiArtConverter, AsciiArtConverterOptions, CustomRatioResize, DEFAULT_FONT_RATIO,
 //! };
@@ -56,7 +56,6 @@
 //! })?;
 //!
 //! println!("{}", result);
-//!
 //! # Ok(())
 //! # }
 //! ````
@@ -65,7 +64,7 @@
 //!
 //! ```
 //! use image::imageops::FilterType;
-//! use std::error::Error;
+//! # use std::error::Error;
 //! use tapciify::{
 //!     AsciiArtConverter, AsciiArtConverterOptions, CustomRatioResize, DEFAULT_FONT_RATIO,
 //! };
@@ -82,7 +81,6 @@
 //!     })?;
 //!
 //! println!("{}", result);
-//!
 //! # Ok(())
 //! # }
 //! ````

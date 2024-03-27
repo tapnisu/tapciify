@@ -27,7 +27,29 @@ pub fn boolean_array_to_braille(array: &[bool; 8]) -> char {
     std::char::from_u32(codepoint).unwrap_or(' ')
 }
 
+/// Allows to render your images using Braille Pattern
 pub trait BrailleArtConverter {
+    /// Convert image into ASCII art using Braille Pattern characters
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use image::imageops::FilterType;
+    /// # use std::error::Error;
+    /// use tapciify::braille::BrailleArtConverter;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let img = image::open("./assets/examples/rin-shima.webp")?;
+    ///
+    /// let result = img
+    ///     .resize(64 * 2, u32::max_value(), FilterType::Triangle)
+    ///     .to_luma8()
+    ///     .braille_art(false)?;
+    ///
+    /// println!("{}", result);
+    /// # Ok(())
+    /// # }
+    /// ```
     fn braille_art(&self, colored: bool) -> Result<AsciiArt, AsciiArtConverterError>;
 }
 

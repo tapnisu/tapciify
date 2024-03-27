@@ -6,7 +6,7 @@
 //!
 //! ```
 //! use image::imageops::FilterType;
-//! use std::error::Error;
+//! # use std::error::Error;
 //! use tapciify::{
 //!     AsciiArtConverter, AsciiArtConverterOptions, CustomRatioResize, DEFAULT_FONT_RATIO,
 //! };
@@ -31,7 +31,7 @@
 //!
 //! ```
 //! use image::imageops::FilterType;
-//! use std::error::Error;
+//! # use std::error::Error;
 //! use tapciify::{
 //!     AsciiArtConverter, AsciiArtConverterOptions, CustomRatioResize, DEFAULT_FONT_RATIO,
 //! };
@@ -46,9 +46,7 @@
 //!         colored: true,
 //!         ..Default::default()
 //!     })?;
-//!
 //! println!("{}", result);
-//!
 //! # Ok(())
 //! # }
 //! ````
@@ -77,7 +75,7 @@ pub trait AsciiArtConverter {
     ///
     /// ```
     /// use image::imageops::FilterType;
-    /// use std::error::Error;
+    /// # use std::error::Error;
     /// use tapciify::{
     ///     AsciiArtConverter, AsciiArtConverterOptions, CustomRatioResize, DEFAULT_FONT_RATIO,
     /// };
@@ -93,7 +91,6 @@ pub trait AsciiArtConverter {
     /// })?;
     ///
     /// println!("{}", result);
-    ///
     /// # Ok(())
     /// # }
     /// ````
@@ -102,7 +99,7 @@ pub trait AsciiArtConverter {
     ///
     /// ```
     /// use image::imageops::FilterType;
-    /// use std::error::Error;
+    /// # use std::error::Error;
     /// use tapciify::{
     ///     AsciiArtConverter, AsciiArtConverterOptions, CustomRatioResize, DEFAULT_FONT_RATIO,
     /// };
@@ -119,7 +116,6 @@ pub trait AsciiArtConverter {
     ///     })?;
     ///
     /// println!("{}", result);
-    ///
     /// # Ok(())
     /// # }
     /// ````

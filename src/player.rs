@@ -4,7 +4,7 @@
 //! # Examples
 //!
 //! ```
-//! use std::error::Error;
+//! # use std::error::Error;
 //! use tapciify::{AsciiPlayer, AsciiPlayerOptions};
 //!
 //! # fn main() -> Result<(), Box<dyn Error>> {
@@ -18,7 +18,6 @@
 //!         ..Default::default()
 //!     },
 //! )?;
-//!
 //! # Ok(())
 //! # }
 //! ```
