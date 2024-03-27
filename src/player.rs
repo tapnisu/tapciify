@@ -92,8 +92,8 @@ impl AsciiPlayer {
                 let ascii_art = match options.braille {
                     true => {
                         let resized_img = img.resize(
-                            options.width.unwrap_or(u32::MAX),
-                            options.height.unwrap_or(u32::MAX),
+                            options.width.map_or(u32::MAX, |width| width * 2),
+                            options.height.map_or(u32::MAX, |height| height * 4),
                             options.filter,
                         );
 
@@ -164,8 +164,8 @@ impl AsciiPlayer {
                 let ascii_art = match options.braille {
                     true => {
                         let resized_img = img.resize(
-                            options.width.unwrap_or(u32::MAX),
-                            options.height.unwrap_or(u32::MAX),
+                            options.width.map_or(u32::MAX, |width| width * 2),
+                            options.height.map_or(u32::MAX, |height| height * 4),
                             options.filter,
                         );
 
