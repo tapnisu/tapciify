@@ -34,8 +34,7 @@ use crossterm::{cursor::MoveUp, execute};
 use image::imageops::FilterType;
 use imageproc::contrast::adaptive_threshold;
 use indicatif::ProgressStyle;
-use std::{io::stdout, path::PathBuf, time::Instant};
-use thiserror::Error;
+use std::{error, fmt, io::stdout, path::PathBuf, time::Instant};
 
 #[cfg(feature = "rayon")]
 use rayon::prelude::*;
@@ -289,10 +288,36 @@ impl From<AsciiPlayerOptions> for AsciiArtConverterOptions {
 }
 
 /// Error caused by [`AsciiPlayer`]
-#[derive(Debug, Error)]
+#[derive(Debug)]
 pub enum AsciiPlayerError {
-    #[error("{0}")]
-    Image(#[from] image::ImageError),
-    #[error("{0}")]
-    AsciiConverter(#[from] AsciiArtConverterError),
+    Image(image::ImageError),
+    // TODO: Rename into AsciiArtConverter
+    AsciiConverter(AsciiArtConverterError),
 }
+
+impl fmt::Display for AsciiPlayerError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            AsciiPlayerError::Image(err) => {
+                write!(f, "Image error: {}", err)
+            }
+            AsciiPlayerError::AsciiConverter(err) => {
+                write!(f, "ASCII art converter error: {}", err)
+            }
+        }
+    }
+}
+
+impl From<image::ImageError> for AsciiPlayerError {
+    fn from(err: image::ImageError) -> AsciiPlayerError {
+        AsciiPlayerError::Image(err)
+    }
+}
+
+impl From<AsciiArtConverterError> for AsciiPlayerError {
+    fn from(err: AsciiArtConverterError) -> AsciiPlayerError {
+        AsciiPlayerError::AsciiConverter(err)
+    }
+}
+
+impl error::Error for AsciiPlayerError {}

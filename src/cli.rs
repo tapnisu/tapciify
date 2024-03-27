@@ -6,9 +6,7 @@ use clap::Parser;
 #[cfg(target_family = "windows")]
 use glob::glob;
 #[cfg(target_family = "windows")]
-use std::path::PathBuf;
-#[cfg(target_family = "windows")]
-use thiserror::Error;
+use std::{error, fmt, path::PathBuf};
 
 #[cfg(target_family = "windows")]
 #[cfg(feature = "rayon")]
@@ -112,10 +110,31 @@ pub fn glob_to_paths(patterns: &[String]) -> Result<Vec<PathBuf>, GlobToPathsErr
 
 /// Error caused by [`glob_to_paths`]
 #[cfg(target_family = "windows")]
-#[derive(Debug, Error)]
+#[derive(Debug)]
 pub enum GlobToPathsError {
-    #[error("{0}")]
-    PatternError(#[from] glob::PatternError),
-    #[error("{0}")]
-    GlobError(#[from] glob::GlobError),
+    PatternError(glob::PatternError),
+    GlobError(glob::GlobError),
 }
+
+impl fmt::Display for GlobToPathsError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            GlobToPathsError::PatternError(err) => write!(f, "Pattern error: {}", err),
+            GlobToPathsError::GlobError(err) => write!(f, "Glob error: {}", err),
+        }
+    }
+}
+
+impl From<glob::PatternError> for GlobToPathsError {
+    fn from(err: glob::PatternError) -> GlobToPathsError {
+        GlobToPathsError::PatternError(err)
+    }
+}
+
+impl From<glob::GlobError> for GlobToPathsError {
+    fn from(err: glob::GlobError) -> GlobToPathsError {
+        GlobToPathsError::GlobError(err)
+    }
+}
+
+impl error::Error for GlobToPathsError {}

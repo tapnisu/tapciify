@@ -55,9 +55,8 @@ use colored::Colorize;
 use image::Pixel;
 use std::{
     cmp::{max, min},
-    fmt,
+    error, fmt,
 };
-use thiserror::Error;
 
 #[cfg(feature = "rayon")]
 use rayon::prelude::*;
@@ -250,17 +249,47 @@ pub struct AsciiArtConverterOptions {
 }
 
 /// Error caused by [`AsciiArtConverter`]
-#[derive(Clone, Debug, Error)]
+#[derive(Clone, Debug)]
 pub enum AsciiArtConverterError {
-    #[error("{0}")]
-    AsciiStringError(#[from] AsciiStringError),
-    #[error("{0}")]
-    SizeError(#[from] SizeError),
+    AsciiStringError(AsciiStringError),
+    SizeError(SizeError),
 }
 
-#[derive(Clone, Debug, Error)]
-#[error("width and height are too small")]
+impl fmt::Display for AsciiArtConverterError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            AsciiArtConverterError::AsciiStringError(err) => {
+                write!(f, "ASCII string error: {}", err)
+            }
+            AsciiArtConverterError::SizeError(err) => write!(f, "Size error: {}", err),
+        }
+    }
+}
+
+impl From<AsciiStringError> for AsciiArtConverterError {
+    fn from(err: AsciiStringError) -> AsciiArtConverterError {
+        AsciiArtConverterError::AsciiStringError(err)
+    }
+}
+
+impl From<SizeError> for AsciiArtConverterError {
+    fn from(err: SizeError) -> AsciiArtConverterError {
+        AsciiArtConverterError::SizeError(err)
+    }
+}
+
+impl error::Error for AsciiArtConverterError {}
+
+#[derive(Clone, Debug)]
 pub struct SizeError;
+
+impl fmt::Display for SizeError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "width and height are too small")
+    }
+}
+
+impl error::Error for SizeError {}
 
 impl Default for AsciiArtConverterOptions {
     fn default() -> AsciiArtConverterOptions {
@@ -490,9 +519,16 @@ pub fn ascii_character(lightness: f32, ascii_string: &str) -> Result<char, Ascii
 }
 
 /// Error caused by lightness being out of ASCII string in [`ascii_character`]
-#[derive(Clone, Debug, Error)]
-#[error("lightness is out of ASCII string")]
+#[derive(Clone, Debug)]
 pub struct AsciiStringError;
+
+impl fmt::Display for AsciiStringError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "lightness is out of ASCII string")
+    }
+}
+
+impl error::Error for AsciiStringError {}
 
 /// Calculate lightness (from 0.0 to 1.0)
 ///

@@ -1,6 +1,6 @@
 use crate::{AsciiArt, AsciiArtConverterError, AsciiArtPixel, SizeError};
-
 use image::Pixel;
+
 #[cfg(feature = "rayon")]
 use rayon::prelude::*;
 

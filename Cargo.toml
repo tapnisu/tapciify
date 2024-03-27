@@ -28,7 +28,6 @@ image = { version = "0.25", features = [
     "default-formats",
 ], default_features = false }
 colored = "2"
-thiserror = "1.0"
 
 clap = { version = "4", features = ["derive"], optional = true }
 crossterm = { version = "0.27", optional = true }
