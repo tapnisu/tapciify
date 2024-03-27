@@ -279,7 +279,7 @@ pub enum AsciiArtConverterError {
 }
 
 #[derive(Clone, Debug, Error)]
-#[error("width and height can't both be 0")]
+#[error("width and height are too small")]
 pub struct SizeError;
 
 impl Default for AsciiArtConverterOptions {
