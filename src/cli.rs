@@ -79,8 +79,10 @@ pub struct Cli {
 ///         "assets\\examples\\ascii-colored.webp",
 ///         "assets\\examples\\ascii-pixels.webp",
 ///         "assets\\examples\\ascii.webp",
+///         "assets\\examples\\braille-colored.webp",
+///         "assets\\examples\\braille.webp",
 ///         "assets\\examples\\original.webp",
-///         "assets\\examples\\rin-shima.webp"
+///         "assets\\examples\\rin-shima.webp",
 ///     ]
 ///     .iter()
 ///     .map(PathBuf::from)
