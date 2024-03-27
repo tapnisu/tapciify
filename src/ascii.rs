@@ -144,11 +144,7 @@ impl AsciiArtConverter for image::RgbImage {
         }
 
         #[cfg(feature = "rayon")]
-        let iter = self
-            .pixels()
-            .map(|rgba| rgba.to_owned())
-            .collect::<Vec<image::Rgb<u8>>>()
-            .into_par_iter();
+        let iter = self.par_pixels();
         #[cfg(not(feature = "rayon"))]
         let iter = self.pixels();
 
@@ -175,11 +171,7 @@ impl AsciiArtConverter for image::RgbaImage {
         }
 
         #[cfg(feature = "rayon")]
-        let iter = self
-            .pixels()
-            .map(|rgba| rgba.to_owned())
-            .collect::<Vec<image::Rgba<u8>>>()
-            .into_par_iter();
+        let iter = self.par_pixels();
         #[cfg(not(feature = "rayon"))]
         let iter = self.pixels();
 
@@ -206,11 +198,7 @@ impl AsciiArtConverter for image::GrayImage {
         }
 
         #[cfg(feature = "rayon")]
-        let iter = self
-            .pixels()
-            .map(|luma| luma.to_owned())
-            .collect::<Vec<image::Luma<u8>>>()
-            .into_par_iter();
+        let iter = self.par_pixels();
         #[cfg(not(feature = "rayon"))]
         let iter = self.pixels();
 
@@ -237,11 +225,7 @@ impl AsciiArtConverter for image::GrayAlphaImage {
         }
 
         #[cfg(feature = "rayon")]
-        let iter = self
-            .pixels()
-            .map(|luma| luma.to_owned())
-            .collect::<Vec<image::LumaA<u8>>>()
-            .into_par_iter();
+        let iter = self.par_pixels();
         #[cfg(not(feature = "rayon"))]
         let iter = self.pixels();
 
