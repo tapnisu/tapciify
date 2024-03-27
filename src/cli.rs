@@ -1,6 +1,6 @@
 //! Utils used in tapciify CLI
 
-use crate::{DEFAULT_ASCII_STRING, DEFAULT_FONT_RATIO};
+use crate::DEFAULT_ASCII_STRING;
 use clap::Parser;
 
 #[cfg(target_family = "windows")]
@@ -49,8 +49,8 @@ pub struct Cli {
     #[clap(short, long, action)]
     pub reverse: bool,
     /// Font ratio: width / height
-    #[clap(long="ratio", default_value_t = DEFAULT_FONT_RATIO)]
-    pub font_ratio: f64,
+    #[clap(long = "ratio")]
+    pub font_ratio: Option<f64>,
     /// Use threshold for images
     #[clap(short, long)]
     pub threshold: Option<u32>,

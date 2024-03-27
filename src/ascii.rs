@@ -280,6 +280,7 @@ impl From<SizeError> for AsciiArtConverterError {
 
 impl error::Error for AsciiArtConverterError {}
 
+/// Error caused by too small image sizes
 #[derive(Clone, Debug)]
 pub struct SizeError;
 
@@ -426,6 +427,7 @@ impl AsciiArtPixel {
     }
 }
 
+/// Trait for converting pixels into [`AsciiArtPixel`]
 pub trait ToAsciiArtPixel {
     /// Convert [`image`] crate color types to [`AsciiArtPixel`]
     fn to_ascii_art_pixel(&self, ascii_string: &str) -> Result<AsciiArtPixel, AsciiStringError>;
@@ -557,6 +559,7 @@ pub fn get_lightness(r: u8, g: u8, b: u8, a: u8) -> f32 {
     ((max as f32 + min as f32) * a as f32) / 130050.0 // 130050 - we need to divide by 512, and divide by 255 from alpha
 }
 
+/// Just a small util for reversing [`String`]
 pub trait ReverseString {
     /// Reverse [`Self`]
     fn reverse(&self) -> Self;

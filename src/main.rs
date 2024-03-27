@@ -1,7 +1,9 @@
 use clap::{error::ErrorKind, CommandFactory, Parser};
 use tapciify::ascii::ReverseString;
+use tapciify::braille::DEFAULT_BRAILLE_FONT_RATIO;
 use tapciify::cli::Cli;
 use tapciify::player::{calculate_frame_time, AsciiPlayer, AsciiPlayerOptions};
+use tapciify::DEFAULT_FONT_RATIO;
 
 #[cfg(not(target_family = "windows"))]
 use std::path::PathBuf;
@@ -15,6 +17,12 @@ fn main() {
         .unwrap_or_else(|err| cmd.error(ErrorKind::InvalidValue, err).exit());
     #[cfg(not(target_family = "windows"))]
     let images_paths: Vec<PathBuf> = cli.input.into_iter().map(PathBuf::from).collect();
+
+    let font_ratio = match (cli.font_ratio, cli.braille) {
+        (Some(ratio), _) => ratio,
+        (None, true) => DEFAULT_BRAILLE_FONT_RATIO,
+        (None, false) => DEFAULT_FONT_RATIO,
+    };
 
     let (ascii_string, colored) = match (cli.reverse, cli.pixels) {
         (true, false) => (cli.ascii_string.reverse(), cli.colored),
@@ -30,7 +38,7 @@ fn main() {
         colored,
         frame_time,
         pre_render: cli.pre_render,
-        font_ratio: cli.font_ratio,
+        font_ratio,
         looped: cli.looped,
         threshold: cli.threshold,
         braille: cli.braille,
