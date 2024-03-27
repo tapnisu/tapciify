@@ -1,6 +1,6 @@
 use image::imageops::FilterType;
 use std::error::Error;
-use tapciify::ascii::BrailleArtConverter;
+use tapciify::braille::BrailleArtConverter;
 
 fn main() -> Result<(), Box<dyn Error>> {
     let img = image::open("./assets/examples/rin-shima.webp")?;

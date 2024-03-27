@@ -90,6 +90,9 @@
 pub mod ascii;
 pub mod resize;
 
+#[cfg(feature = "braille")]
+pub mod braille;
+
 #[cfg(feature = "player")]
 pub mod player;
 
