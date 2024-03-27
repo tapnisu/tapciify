@@ -17,7 +17,7 @@ use rayon::prelude::*;
 /// # Example
 ///
 /// ```
-/// # use tapciify::braille::boolean_array_to_braille;
+/// use tapciify::braille::boolean_array_to_braille;
 ///
 /// # fn main() {
 /// let braille_char =
