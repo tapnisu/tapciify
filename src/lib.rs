@@ -40,7 +40,7 @@
 //!
 //! ```
 //! use image::imageops::FilterType;
-//! use std::error::Error;
+//! # use std::error::Error;
 //! use tapciify::{
 //!     AsciiArtConverter, AsciiArtConverterOptions, CustomRatioResize, DEFAULT_FONT_RATIO,
 //! };
@@ -56,7 +56,6 @@
 //! })?;
 //!
 //! println!("{}", result);
-//!
 //! # Ok(())
 //! # }
 //! ````
@@ -65,7 +64,7 @@
 //!
 //! ```
 //! use image::imageops::FilterType;
-//! use std::error::Error;
+//! # use std::error::Error;
 //! use tapciify::{
 //!     AsciiArtConverter, AsciiArtConverterOptions, CustomRatioResize, DEFAULT_FONT_RATIO,
 //! };
@@ -82,13 +81,15 @@
 //!     })?;
 //!
 //! println!("{}", result);
-//!
 //! # Ok(())
 //! # }
 //! ````
 
 pub mod ascii;
 pub mod resize;
+
+#[cfg(feature = "braille")]
+pub mod braille;
 
 #[cfg(feature = "player")]
 pub mod player;

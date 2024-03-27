@@ -4,7 +4,7 @@
 //! # Examples
 //!
 //! ```
-//! use std::error::Error;
+//! # use std::error::Error;
 //! use tapciify::{AsciiPlayer, AsciiPlayerOptions};
 //!
 //! # fn main() -> Result<(), Box<dyn Error>> {
@@ -18,7 +18,6 @@
 //!         ..Default::default()
 //!     },
 //! )?;
-//!
 //! # Ok(())
 //! # }
 //! ```
@@ -28,6 +27,7 @@ use crate::{
         AsciiArt, AsciiArtConverter, AsciiArtConverterError, AsciiArtConverterOptions,
         ReverseString, DEFAULT_ASCII_STRING,
     },
+    braille::BrailleArtConverter,
     CustomRatioResize, DEFAULT_FONT_RATIO,
 };
 use crossterm::{cursor::MoveUp, execute};
@@ -86,21 +86,31 @@ impl AsciiPlayer {
         loop {
             for path in paths.iter() {
                 let start = Instant::now();
-
                 let img = image::open(path)?;
+
                 let prepared_img = if let Some(threshold) = options.threshold {
                     image::DynamicImage::from(adaptive_threshold(&img.to_luma8(), threshold))
                 } else {
                     img
-                }
-                .resize_custom_ratio(
-                    options.width,
-                    options.height,
-                    options.font_ratio,
-                    options.filter,
-                );
+                };
 
-                let ascii_art = prepared_img.ascii_art(&converter_options)?;
+                let ascii_art = match options.braille {
+                    true => prepared_img
+                        .resize(
+                            options.width.map_or(u32::MAX, |width| width * 2),
+                            options.height.map_or(u32::MAX, |height| height * 4),
+                            options.filter,
+                        )
+                        .braille_art(options.colored)?,
+                    false => prepared_img
+                        .resize_custom_ratio(
+                            options.width,
+                            options.height,
+                            options.font_ratio,
+                            options.filter,
+                        )
+                        .ascii_art(&converter_options)?,
+                };
 
                 if !first_frame {
                     execute!(stdout(), MoveUp(ascii_art.height.try_into().unwrap()))
@@ -148,15 +158,25 @@ impl AsciiPlayer {
                     image::DynamicImage::from(adaptive_threshold(&img.to_luma8(), threshold))
                 } else {
                     img
-                }
-                .resize_custom_ratio(
-                    options.width,
-                    options.height,
-                    options.font_ratio,
-                    options.filter,
-                );
+                };
 
-                let ascii_art = prepared_img.ascii_art(&converter_options)?;
+                let ascii_art = match options.braille {
+                    true => prepared_img
+                        .resize(
+                            options.width.map_or(u32::MAX, |width| width * 2),
+                            options.height.map_or(u32::MAX, |height| height * 4),
+                            options.filter,
+                        )
+                        .braille_art(options.colored)?,
+                    false => prepared_img
+                        .resize_custom_ratio(
+                            options.width,
+                            options.height,
+                            options.font_ratio,
+                            options.filter,
+                        )
+                        .ascii_art(&converter_options)?,
+                };
 
                 Ok(ascii_art)
             })
@@ -238,6 +258,7 @@ pub struct AsciiPlayerOptions {
     pub looped: bool,
     pub filter: FilterType,
     pub threshold: Option<u32>,
+    pub braille: bool,
 }
 
 impl Default for AsciiPlayerOptions {
@@ -253,6 +274,7 @@ impl Default for AsciiPlayerOptions {
             looped: false,
             filter: FilterType::Triangle,
             threshold: None,
+            braille: false,
         }
     }
 }

@@ -41,14 +41,15 @@ rayon = { version = "1", optional = true }
 default = ["full"]
 full = ["rayon", "player"]
 
+braille = []
 player = [
+    "braille",
     "dep:clap",
     "dep:crossterm",
-    "dep:indicatif",
     "dep:glob",
     "dep:imageproc",
+    "dep:indicatif",
 ]
-
 rayon = ["dep:rayon", "imageproc/rayon", "image/rayon", "indicatif/rayon"]
 multithreading = ["rayon"]
 parallelism = ["rayon"]

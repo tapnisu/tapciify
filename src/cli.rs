@@ -56,6 +56,9 @@ pub struct Cli {
     /// Use threshold for images
     #[clap(short, long)]
     pub threshold: Option<u32>,
+    /// Use braille patter for rendering images
+    #[clap(short, long, action)]
+    pub braille: bool,
 }
 
 /// Add glob support for paths parsing on Windows

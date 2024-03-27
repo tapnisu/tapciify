@@ -33,6 +33,7 @@ fn main() {
         font_ratio: cli.font_ratio,
         looped: cli.looped,
         threshold: cli.threshold,
+        braille: cli.braille,
         ..Default::default()
     };
 
