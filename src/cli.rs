@@ -116,6 +116,7 @@ pub enum GlobToPathsError {
     GlobError(glob::GlobError),
 }
 
+#[cfg(target_family = "windows")]
 impl fmt::Display for GlobToPathsError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
@@ -125,16 +126,19 @@ impl fmt::Display for GlobToPathsError {
     }
 }
 
+#[cfg(target_family = "windows")]
 impl From<glob::PatternError> for GlobToPathsError {
     fn from(err: glob::PatternError) -> GlobToPathsError {
         GlobToPathsError::PatternError(err)
     }
 }
 
+#[cfg(target_family = "windows")]
 impl From<glob::GlobError> for GlobToPathsError {
     fn from(err: glob::GlobError) -> GlobToPathsError {
         GlobToPathsError::GlobError(err)
     }
 }
 
+#[cfg(target_family = "windows")]
 impl error::Error for GlobToPathsError {}
