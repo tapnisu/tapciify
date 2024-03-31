@@ -1,6 +1,6 @@
 [package]
 name = "tapciify"
-version = "3.2.0"
+version = "3.2.1"
 edition = "2021"
 readme = "README.md"
 authors = ["Aleksei Rybin <0xalekseirybin@gmail.com>"]
