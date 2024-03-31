@@ -73,6 +73,36 @@ impl AsciiPlayer {
         ascii_string.reverse()
     }
 
+    /// Renders frame using [`AsciiPlayerOptions`]
+    pub fn render_frame(
+        path: &PathBuf,
+        options: &AsciiPlayerOptions,
+        converter_options: &AsciiArtConverterOptions,
+    ) -> Result<AsciiArt, AsciiPlayerError> {
+        let img = image::open(path)?;
+        let prepared_img = options
+            .threshold
+            .map_or_else(
+                || img.clone(),
+                |threshold| {
+                    image::DynamicImage::from(adaptive_threshold(&img.to_luma8(), threshold))
+                },
+            )
+            .resize_custom_ratio(
+                options.width,
+                options.height,
+                options.font_ratio,
+                options.filter,
+            );
+
+        let ascii_art = match options.braille {
+            true => prepared_img.braille_art(options.colored)?,
+            false => prepared_img.ascii_art(converter_options)?,
+        };
+
+        Ok(ascii_art)
+    }
+
     /// Play paths as ASCII arts
     pub fn play_frames(
         paths: &[PathBuf],
@@ -85,31 +115,8 @@ impl AsciiPlayer {
         loop {
             for path in paths.iter() {
                 let start = Instant::now();
-                let img = image::open(path)?;
 
-                let prepared_img = if let Some(threshold) = options.threshold {
-                    image::DynamicImage::from(adaptive_threshold(&img.to_luma8(), threshold))
-                } else {
-                    img
-                };
-
-                let ascii_art = match options.braille {
-                    true => prepared_img
-                        .resize(
-                            options.width.map_or(u32::MAX, |width| width * 2),
-                            options.height.map_or(u32::MAX, |height| height * 4),
-                            options.filter,
-                        )
-                        .braille_art(options.colored)?,
-                    false => prepared_img
-                        .resize_custom_ratio(
-                            options.width,
-                            options.height,
-                            options.font_ratio,
-                            options.filter,
-                        )
-                        .ascii_art(&converter_options)?,
-                };
+                let ascii_art = AsciiPlayer::render_frame(path, options, &converter_options)?;
 
                 if !first_frame {
                     execute!(stdout(), MoveUp(ascii_art.height.try_into().unwrap()))
@@ -151,34 +158,7 @@ impl AsciiPlayer {
 
         let frames = iter
             .progress_with_style(progress_bar_style)
-            .map(|path| {
-                let img = image::open(path)?;
-                let prepared_img = if let Some(threshold) = options.threshold {
-                    image::DynamicImage::from(adaptive_threshold(&img.to_luma8(), threshold))
-                } else {
-                    img
-                };
-
-                let ascii_art = match options.braille {
-                    true => prepared_img
-                        .resize(
-                            options.width.map_or(u32::MAX, |width| width * 2),
-                            options.height.map_or(u32::MAX, |height| height * 4),
-                            options.filter,
-                        )
-                        .braille_art(options.colored)?,
-                    false => prepared_img
-                        .resize_custom_ratio(
-                            options.width,
-                            options.height,
-                            options.font_ratio,
-                            options.filter,
-                        )
-                        .ascii_art(&converter_options)?,
-                };
-
-                Ok(ascii_art)
-            })
+            .map(|path| AsciiPlayer::render_frame(path, options, &converter_options))
             .collect::<Result<Vec<AsciiArt>, AsciiPlayerError>>()?;
 
         Ok(frames)
