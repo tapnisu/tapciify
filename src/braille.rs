@@ -159,15 +159,18 @@ impl BrailleArtConverter for image::RgbaImage {
         let height = y_range.clone().len() as u32;
 
         #[cfg(feature = "rayon")]
-        let iter = y_range.into_par_iter();
+        let x_iter = x_range.into_par_iter();
         #[cfg(not(feature = "rayon"))]
-        let iter = y_range.into_iter();
+        let x_iter = x_range.into_iter();
 
-        let characters = iter
+        #[cfg(feature = "rayon")]
+        let y_iter = y_range.into_par_iter();
+        #[cfg(not(feature = "rayon"))]
+        let y_iter = y_range.into_iter();
+
+        let characters = y_iter
             .flat_map(|y| {
-                let mut row = vec![];
-
-                for x in x_range.clone() {
+                x_iter.clone().map(move |x| {
                     // Top left pixel
                     let tlpx = self.get_pixel(x, y);
 
@@ -186,16 +189,14 @@ impl BrailleArtConverter for image::RgbaImage {
                         la_px[0] as u16 * la_px[1] as u16 > ((255 / 2) * (255 / 2))
                     });
 
-                    row.push(AsciiArtPixel {
+                    AsciiArtPixel {
                         character: boolean_array_to_braille(braille_array),
                         r: tlpx.0[0],
                         g: tlpx.0[1],
                         b: tlpx.0[2],
                         a: tlpx.0[3],
-                    })
-                }
-
-                row
+                    }
+                })
             })
             .collect();
 
@@ -219,15 +220,18 @@ impl BrailleArtConverter for image::GrayImage {
         let height = y_range.clone().len() as u32;
 
         #[cfg(feature = "rayon")]
-        let iter = y_range.into_par_iter();
+        let x_iter = x_range.into_par_iter();
         #[cfg(not(feature = "rayon"))]
-        let iter = y_range.into_iter();
+        let x_iter = x_range.into_iter();
 
-        let characters = iter
+        #[cfg(feature = "rayon")]
+        let y_iter = y_range.into_par_iter();
+        #[cfg(not(feature = "rayon"))]
+        let y_iter = y_range.into_iter();
+
+        let characters = y_iter
             .flat_map(|y| {
-                let mut row = vec![];
-
-                for x in x_range.clone() {
+                x_iter.clone().map(move |x| {
                     // Top left pixel
                     let tlpx = self.get_pixel(x, y);
 
@@ -243,16 +247,14 @@ impl BrailleArtConverter for image::GrayImage {
                     ]
                     .map(|p| p[0] > 255 / 2);
 
-                    row.push(AsciiArtPixel {
+                    AsciiArtPixel {
                         character: boolean_array_to_braille(braille_array),
                         r: tlpx.0[0],
                         g: tlpx.0[0],
                         b: tlpx.0[0],
                         a: 255,
-                    })
-                }
-
-                row
+                    }
+                })
             })
             .collect();
 
@@ -276,15 +278,18 @@ impl BrailleArtConverter for image::GrayAlphaImage {
         let height = y_range.clone().len() as u32;
 
         #[cfg(feature = "rayon")]
-        let iter = y_range.into_par_iter();
+        let x_iter = x_range.into_par_iter();
         #[cfg(not(feature = "rayon"))]
-        let iter = y_range.into_iter();
+        let x_iter = x_range.into_iter();
 
-        let characters = iter
+        #[cfg(feature = "rayon")]
+        let y_iter = y_range.into_par_iter();
+        #[cfg(not(feature = "rayon"))]
+        let y_iter = y_range.into_iter();
+
+        let characters = y_iter
             .flat_map(|y| {
-                let mut row = vec![];
-
-                for x in x_range.clone() {
+                x_iter.clone().map(move |x| {
                     // Top left pixel
                     let tlpx = self.get_pixel(x, y);
 
@@ -300,16 +305,14 @@ impl BrailleArtConverter for image::GrayAlphaImage {
                     ]
                     .map(|p| p[0] as u16 * p[1] as u16 > ((255 / 2) * (255 / 2)));
 
-                    row.push(AsciiArtPixel {
+                    AsciiArtPixel {
                         character: boolean_array_to_braille(braille_array),
                         r: tlpx.0[0],
                         g: tlpx.0[0],
                         b: tlpx.0[0],
                         a: tlpx.0[1],
-                    })
-                }
-
-                row
+                    }
+                })
             })
             .collect();
 
