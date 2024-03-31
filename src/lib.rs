@@ -97,6 +97,7 @@ pub mod player;
 #[cfg(feature = "player")]
 pub mod cli;
 
+#[allow(deprecated)]
 #[doc(inline)]
 pub use ascii::{
     ascii_character, AsciiArt, AsciiArtConverter, AsciiArtConverterError, AsciiArtConverterOptions,

@@ -560,11 +560,13 @@ pub fn get_lightness(r: u8, g: u8, b: u8, a: u8) -> f32 {
 }
 
 /// Just a small util for reversing [`String`]
+#[deprecated(since = "3.2.1")]
 pub trait ReverseString {
     /// Reverse [`Self`]
     fn reverse(&self) -> Self;
 }
 
+#[allow(deprecated)]
 impl ReverseString for String {
     fn reverse(&self) -> String {
         self.chars().rev().collect()

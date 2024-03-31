@@ -25,7 +25,7 @@
 use crate::{
     ascii::{
         AsciiArt, AsciiArtConverter, AsciiArtConverterError, AsciiArtConverterOptions,
-        ReverseString, DEFAULT_ASCII_STRING,
+        DEFAULT_ASCII_STRING,
     },
     braille::BrailleArtConverter,
     CustomRatioResize, DEFAULT_FONT_RATIO,
@@ -70,7 +70,7 @@ impl AsciiPlayer {
     )]
     /// Reverse ASCII string
     pub fn reverse_ascii_string(ascii_string: String) -> String {
-        ascii_string.reverse()
+        ascii_string.chars().rev().collect()
     }
 
     /// Renders frame using [`AsciiPlayerOptions`]

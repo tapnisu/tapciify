@@ -1,5 +1,4 @@
 use clap::{error::ErrorKind, CommandFactory, Parser};
-use tapciify::ascii::ReverseString;
 use tapciify::braille::DEFAULT_BRAILLE_FONT_RATIO;
 use tapciify::cli::Cli;
 use tapciify::player::{calculate_frame_time, AsciiPlayer, AsciiPlayerOptions};
@@ -25,7 +24,7 @@ fn main() {
     };
 
     let (ascii_string, colored) = match (cli.reverse, cli.pixels) {
-        (true, false) => (cli.ascii_string.reverse(), cli.colored),
+        (true, false) => (cli.ascii_string.chars().rev().collect(), cli.colored),
         (false, false) => (cli.ascii_string, cli.colored),
         (_, true) => ("█".to_owned(), true),
     };
