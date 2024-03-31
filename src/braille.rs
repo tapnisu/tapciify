@@ -90,11 +90,11 @@ impl BrailleArtConverter for image::RgbImage {
         let width = self.width();
         let height = self.height();
 
-        if width < 8 || height < 8 {
+        if width < 4 || height < 8 {
             return Err(AsciiArtConverterError::SizeError(SizeError));
         }
 
-        let x_range: Vec<u32> = (0..width).step_by(2).collect();
+        let x_range: Vec<u32> = (0..(width - 2)).step_by(2).collect();
         let y_range: Vec<u32> = (0..(height - 4)).step_by(4).collect();
 
         let width = x_range.clone().len() as u32;
@@ -148,11 +148,11 @@ impl BrailleArtConverter for image::RgbaImage {
         let width = self.width();
         let height = self.height();
 
-        if width < 8 || height < 8 {
+        if width < 4 || height < 8 {
             return Err(AsciiArtConverterError::SizeError(SizeError));
         }
 
-        let x_range = (0..width).step_by(2);
+        let x_range: Vec<u32> = (0..(width - 2)).step_by(2).collect();
         let y_range: Vec<u32> = (0..(height - 4)).step_by(4).collect();
 
         let width = x_range.clone().len() as u32;
@@ -208,11 +208,11 @@ impl BrailleArtConverter for image::GrayImage {
         let width = self.width();
         let height = self.height();
 
-        if width < 8 || height < 8 {
+        if width < 4 || height < 8 {
             return Err(AsciiArtConverterError::SizeError(SizeError));
         }
 
-        let x_range = (0..width).step_by(2);
+        let x_range: Vec<u32> = (0..(width - 2)).step_by(2).collect();
         let y_range: Vec<u32> = (0..(height - 4)).step_by(4).collect();
 
         let width = x_range.clone().len() as u32;
@@ -265,11 +265,11 @@ impl BrailleArtConverter for image::GrayAlphaImage {
         let width = self.width();
         let height = self.height();
 
-        if width < 8 || height < 8 {
+        if width < 4 || height < 8 {
             return Err(AsciiArtConverterError::SizeError(SizeError));
         }
 
-        let x_range = (0..width).step_by(2);
+        let x_range: Vec<u32> = (0..(width - 2)).step_by(2).collect();
         let y_range: Vec<u32> = (0..(height - 4)).step_by(4).collect();
 
         let width = x_range.clone().len() as u32;
