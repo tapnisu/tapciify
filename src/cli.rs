@@ -32,7 +32,7 @@ pub struct Cli {
     /// Render, and then show
     #[clap(short, long, action)]
     pub pre_render: bool,
-    /// Loop frames
+    /// Play frames on repeat by looping it
     #[clap(short, long = "loop", action)]
     pub looped: bool,
 
