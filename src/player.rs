@@ -28,7 +28,7 @@ use crate::{
         DEFAULT_ASCII_STRING,
     },
     braille::BrailleArtConverter,
-    CustomRatioResize, DEFAULT_FONT_RATIO,
+    AsciiStringError, CustomRatioResize, SizeError, DEFAULT_FONT_RATIO,
 };
 use crossterm::{cursor::MoveUp, execute};
 use image::imageops::FilterType;
@@ -297,6 +297,18 @@ impl From<image::ImageError> for AsciiPlayerError {
 impl From<AsciiArtConverterError> for AsciiPlayerError {
     fn from(err: AsciiArtConverterError) -> AsciiPlayerError {
         AsciiPlayerError::AsciiConverter(err)
+    }
+}
+
+impl From<AsciiStringError> for AsciiPlayerError {
+    fn from(err: AsciiStringError) -> AsciiPlayerError {
+        AsciiPlayerError::AsciiConverter(AsciiArtConverterError::AsciiStringError(err))
+    }
+}
+
+impl From<SizeError> for AsciiPlayerError {
+    fn from(err: SizeError) -> AsciiPlayerError {
+        AsciiPlayerError::AsciiConverter(AsciiArtConverterError::SizeError(err))
     }
 }
 

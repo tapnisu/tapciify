@@ -1,6 +1,6 @@
 //! Converting images to ASCII art using Braille characters
 
-use crate::{AsciiArt, AsciiArtConverterError, AsciiArtPixel, SizeError};
+use crate::{AsciiArt, AsciiArtPixel, SizeError};
 use image::Pixel;
 
 #[cfg(feature = "rayon")]
@@ -76,22 +76,22 @@ pub trait BrailleArtConverter {
     /// # Ok(())
     /// # }
     /// ```
-    fn braille_art(&self, colored: bool) -> Result<AsciiArt, AsciiArtConverterError>;
+    fn braille_art(&self, colored: bool) -> Result<AsciiArt, SizeError>;
 }
 
 impl BrailleArtConverter for image::DynamicImage {
-    fn braille_art(&self, colored: bool) -> Result<AsciiArt, AsciiArtConverterError> {
+    fn braille_art(&self, colored: bool) -> Result<AsciiArt, SizeError> {
         self.to_rgba8().braille_art(colored)
     }
 }
 
 impl BrailleArtConverter for image::RgbImage {
-    fn braille_art(&self, colored: bool) -> Result<AsciiArt, AsciiArtConverterError> {
+    fn braille_art(&self, colored: bool) -> Result<AsciiArt, SizeError> {
         let width = self.width();
         let height = self.height();
 
         if width < 4 || height < 8 {
-            return Err(AsciiArtConverterError::SizeError(SizeError));
+            return Err(SizeError);
         }
 
         let x_range: Vec<u32> = (0..(width - 2)).step_by(2).collect();
@@ -144,12 +144,12 @@ impl BrailleArtConverter for image::RgbImage {
 }
 
 impl BrailleArtConverter for image::RgbaImage {
-    fn braille_art(&self, colored: bool) -> Result<AsciiArt, AsciiArtConverterError> {
+    fn braille_art(&self, colored: bool) -> Result<AsciiArt, SizeError> {
         let width = self.width();
         let height = self.height();
 
         if width < 4 || height < 8 {
-            return Err(AsciiArtConverterError::SizeError(SizeError));
+            return Err(SizeError);
         }
 
         let x_range: Vec<u32> = (0..(width - 2)).step_by(2).collect();
@@ -205,12 +205,12 @@ impl BrailleArtConverter for image::RgbaImage {
 }
 
 impl BrailleArtConverter for image::GrayImage {
-    fn braille_art(&self, colored: bool) -> Result<AsciiArt, AsciiArtConverterError> {
+    fn braille_art(&self, colored: bool) -> Result<AsciiArt, SizeError> {
         let width = self.width();
         let height = self.height();
 
         if width < 4 || height < 8 {
-            return Err(AsciiArtConverterError::SizeError(SizeError));
+            return Err(SizeError);
         }
 
         let x_range: Vec<u32> = (0..(width - 2)).step_by(2).collect();
@@ -263,12 +263,12 @@ impl BrailleArtConverter for image::GrayImage {
 }
 
 impl BrailleArtConverter for image::GrayAlphaImage {
-    fn braille_art(&self, colored: bool) -> Result<AsciiArt, AsciiArtConverterError> {
+    fn braille_art(&self, colored: bool) -> Result<AsciiArt, SizeError> {
         let width = self.width();
         let height = self.height();
 
         if width < 4 || height < 8 {
-            return Err(AsciiArtConverterError::SizeError(SizeError));
+            return Err(SizeError);
         }
 
         let x_range: Vec<u32> = (0..(width - 2)).step_by(2).collect();
