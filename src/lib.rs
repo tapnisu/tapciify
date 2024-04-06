@@ -94,10 +94,10 @@ pub mod player;
 #[cfg(feature = "braille")]
 pub mod braille;
 
-#[cfg(feature = "background_string")]
+#[cfg(feature = "background-string")]
 pub mod background_string;
 
-#[cfg(feature = "threshold_utils")]
+#[cfg(feature = "threshold-utils")]
 pub mod threshold_utils;
 
 #[cfg(feature = "player")]

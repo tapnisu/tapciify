@@ -40,12 +40,12 @@ rayon = { version = "1", optional = true }
 default = ["full"]
 full = ["rayon", "player"]
 
-braille = ["threshold_utils"]
-background_string = ["threshold_utils"]
-threshold_utils = []
+braille = ["threshold-utils"]
+background-string = ["threshold-utils"]
+threshold-utils = []
 player = [
     "braille",
-    "background_string",
+    "background-string",
     "dep:clap",
     "dep:crossterm",
     "dep:glob",
