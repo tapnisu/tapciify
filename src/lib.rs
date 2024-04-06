@@ -100,6 +100,8 @@ pub mod player;
 #[cfg(feature = "player")]
 pub mod cli;
 
+pub mod threshold_utils;
+
 #[allow(deprecated)]
 #[doc(inline)]
 pub use ascii::{

@@ -22,6 +22,7 @@
 //! # }
 //! ```
 
+use crate::background_string::BackgroundStringArtConverter;
 use crate::{
     ascii::{
         AsciiArt, AsciiArtConverter, AsciiArtConverterError, AsciiArtConverterOptions,
@@ -43,7 +44,6 @@ use rayon::prelude::*;
 use indicatif::ParallelProgressIterator;
 #[cfg(not(feature = "rayon"))]
 use indicatif::ProgressIterator;
-use crate::background_string::BackgroundStringArtConverter;
 
 /// Calculate frame time in millis (1 / framerate)
 ///
@@ -97,7 +97,9 @@ impl AsciiPlayer {
             );
 
         let ascii_art = match (options.clone().background_string, options.braille) {
-            (Some(background_string), _) => prepared_img.background_string_art(&background_string, options.colored)?,
+            (Some(background_string), _) => {
+                prepared_img.background_string_art(&background_string, options.colored)?
+            }
             (None, true) => prepared_img.braille_art(options.colored)?,
             (None, false) => prepared_img.ascii_art(converter_options)?,
         };
@@ -240,7 +242,7 @@ pub struct AsciiPlayerOptions {
     pub filter: FilterType,
     pub threshold: Option<u32>,
     pub braille: bool,
-    pub background_string: Option<String>
+    pub background_string: Option<String>,
 }
 
 impl Default for AsciiPlayerOptions {

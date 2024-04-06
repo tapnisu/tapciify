@@ -1,7 +1,9 @@
 //! Converting images to ASCII art using Braille characters
 
-use crate::{AsciiArt, AsciiArtPixel, SizeError};
-use image::Pixel;
+use crate::{
+    threshold_utils::{ThresholdPixel, DEFAULT_THRESHOLD},
+    AsciiArt, AsciiArtPixel, SizeError,
+};
 
 #[cfg(feature = "rayon")]
 use rayon::prelude::*;
@@ -126,7 +128,7 @@ impl BrailleArtConverter for image::RgbImage {
                         self.get_pixel(x, y + 3),
                         self.get_pixel(x + 1, y + 3),
                     ]
-                    .map(|p| p.to_luma()[0] > 255 / 2);
+                    .map(|p| p.threshold_pixel(DEFAULT_THRESHOLD));
 
                     AsciiArtPixel {
                         character: boolean_array_to_braille(braille_array),
@@ -184,10 +186,7 @@ impl BrailleArtConverter for image::RgbaImage {
                         self.get_pixel(x, y + 3),
                         self.get_pixel(x + 1, y + 3),
                     ]
-                    .map(|p| {
-                        let la_px = p.to_luma_alpha();
-                        la_px[0] as u16 * la_px[1] as u16 > ((255 / 2) * (255 / 2))
-                    });
+                    .map(|p| p.threshold_pixel(DEFAULT_THRESHOLD));
 
                     AsciiArtPixel {
                         character: boolean_array_to_braille(braille_array),
@@ -245,7 +244,7 @@ impl BrailleArtConverter for image::GrayImage {
                         self.get_pixel(x, y + 3),
                         self.get_pixel(x + 1, y + 3),
                     ]
-                    .map(|p| p[0] > 255 / 2);
+                    .map(|p| p.threshold_pixel(DEFAULT_THRESHOLD));
 
                     AsciiArtPixel {
                         character: boolean_array_to_braille(braille_array),
@@ -303,7 +302,7 @@ impl BrailleArtConverter for image::GrayAlphaImage {
                         self.get_pixel(x, y + 3),
                         self.get_pixel(x + 1, y + 3),
                     ]
-                    .map(|p| p[0] as u16 * p[1] as u16 > ((255 / 2) * (255 / 2)));
+                    .map(|p| p.threshold_pixel(DEFAULT_THRESHOLD));
 
                     AsciiArtPixel {
                         character: boolean_array_to_braille(braille_array),
