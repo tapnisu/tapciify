@@ -91,11 +91,16 @@ pub mod resize;
 #[cfg(feature = "braille")]
 pub mod braille;
 
+#[cfg(feature = "background_string")]
+pub mod background_string;
+
 #[cfg(feature = "player")]
 pub mod player;
 
 #[cfg(feature = "player")]
 pub mod cli;
+
+pub mod threshold_utils;
 
 #[allow(deprecated)]
 #[doc(inline)]

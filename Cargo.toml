@@ -41,8 +41,10 @@ default = ["full"]
 full = ["rayon", "player"]
 
 braille = []
+background_string = []
 player = [
     "braille",
+    "background_string",
     "dep:clap",
     "dep:crossterm",
     "dep:glob",

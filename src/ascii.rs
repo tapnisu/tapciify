@@ -66,6 +66,7 @@ pub const DEFAULT_ASCII_STRING: &str = " .,:;+*?%S#@";
 
 /// Converter of images to ASCII art
 pub trait AsciiArtConverter {
+    // TODO: Change error to [`SizeError`]
     /// Convert image to an ASCII art
     ///
     /// # Examples

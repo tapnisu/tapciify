@@ -41,6 +41,7 @@ fn main() {
         looped: cli.looped,
         threshold: cli.threshold,
         braille: cli.braille,
+        background_string: cli.background_string,
         ..Default::default()
     };
 
