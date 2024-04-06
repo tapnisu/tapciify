@@ -57,6 +57,9 @@ pub struct Cli {
     /// Use braille pattern for rendering images
     #[clap(short, long, action)]
     pub braille: bool,
+    /// Use text for background on light pixels
+    #[clap(short, long)]
+    pub background_string: Option<String>,
 }
 
 /// Add glob support for paths parsing on Windows
