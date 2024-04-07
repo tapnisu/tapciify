@@ -1,8 +1,8 @@
 #[cfg(feature = "rayon")]
 use rayon::prelude::*;
 
+use crate::threshold_utils::{ThresholdPixel, DEFAULT_THRESHOLD};
 use crate::{AsciiArt, AsciiArtPixel, SizeError};
-use crate::threshold_utils::{DEFAULT_THRESHOLD, ThresholdPixel};
 
 /// Convert image into ASCII art with text on the background
 pub trait BackgroundStringArtConverter {
@@ -17,7 +17,7 @@ pub trait BackgroundStringArtConverter {
     /// use tapciify::background_string::BackgroundStringArtConverter;
     ///
     /// # use image::imageops::FilterType;
-    /// 
+    ///
     /// # fn main() -> Result<(), Box<dyn Error>> {
     /// let img = image::open("./assets/examples/ferris.webp")?;
     ///
@@ -54,10 +54,9 @@ impl BackgroundStringArtConverter for image::RgbImage {
         let characters = iter
             .enumerate()
             .map(|(index, pixel)| AsciiArtPixel {
-                character: if pixel.threshold_pixel(DEFAULT_THRESHOLD) {
-                    string.chars().nth(index % string.len()).unwrap()
-                } else {
-                    ' '
+                character: match pixel.threshold_pixel(DEFAULT_THRESHOLD) {
+                    true => string.chars().nth(index % string.len()).unwrap(),
+                    false => ' ',
                 },
                 r: pixel.0[0],
                 g: pixel.0[1],
@@ -89,10 +88,9 @@ impl BackgroundStringArtConverter for image::RgbaImage {
         let characters = iter
             .enumerate()
             .map(|(index, pixel)| AsciiArtPixel {
-                character: if pixel.threshold_pixel(DEFAULT_THRESHOLD) {
-                    string.chars().nth(index % string.len()).unwrap()
-                } else {
-                    ' '
+                character: match pixel.threshold_pixel(DEFAULT_THRESHOLD) {
+                    true => string.chars().nth(index % string.len()).unwrap(),
+                    false => ' ',
                 },
                 r: pixel.0[0],
                 g: pixel.0[1],
@@ -124,10 +122,9 @@ impl BackgroundStringArtConverter for image::GrayImage {
         let characters = iter
             .enumerate()
             .map(|(index, pixel)| AsciiArtPixel {
-                character: if pixel.threshold_pixel(DEFAULT_THRESHOLD) {
-                    string.chars().nth(index % string.len()).unwrap()
-                } else {
-                    ' '
+                character: match pixel.threshold_pixel(DEFAULT_THRESHOLD) {
+                    true => string.chars().nth(index % string.len()).unwrap(),
+                    false => ' ',
                 },
                 r: pixel.0[0],
                 g: pixel.0[0],
@@ -159,10 +156,9 @@ impl BackgroundStringArtConverter for image::GrayAlphaImage {
         let characters = iter
             .enumerate()
             .map(|(index, pixel)| AsciiArtPixel {
-                character: if pixel.threshold_pixel(DEFAULT_THRESHOLD) {
-                    string.chars().nth(index % string.len()).unwrap()
-                } else {
-                    ' '
+                character: match pixel.threshold_pixel(DEFAULT_THRESHOLD) {
+                    true => string.chars().nth(index % string.len()).unwrap(),
+                    false => ' ',
                 },
                 r: pixel.0[0],
                 g: pixel.0[0],
