@@ -22,28 +22,28 @@
 //! # }
 //! ```
 
-use crate::background_string::BackgroundStringArtConverter;
+use std::{error, fmt, io::stdout, path::PathBuf, time::Instant};
+
+use crossterm::{cursor::MoveUp, execute};
+use image::imageops::FilterType;
+use imageproc::contrast::adaptive_threshold;
+#[cfg(feature = "rayon")]
+use indicatif::ParallelProgressIterator;
+#[cfg(not(feature = "rayon"))]
+use indicatif::ProgressIterator;
+use indicatif::ProgressStyle;
+#[cfg(feature = "rayon")]
+use rayon::prelude::*;
+
 use crate::{
     ascii::{
         AsciiArt, AsciiArtConverter, AsciiArtConverterError, AsciiArtConverterOptions,
         DEFAULT_ASCII_STRING,
     },
-    braille::BrailleArtConverter,
-    AsciiStringError, CustomRatioResize, SizeError, DEFAULT_FONT_RATIO,
+    AsciiStringError,
+    braille::BrailleArtConverter, CustomRatioResize, DEFAULT_FONT_RATIO, SizeError,
 };
-use crossterm::{cursor::MoveUp, execute};
-use image::imageops::FilterType;
-use imageproc::contrast::adaptive_threshold;
-use indicatif::ProgressStyle;
-use std::{error, fmt, io::stdout, path::PathBuf, time::Instant};
-
-#[cfg(feature = "rayon")]
-use rayon::prelude::*;
-
-#[cfg(feature = "rayon")]
-use indicatif::ParallelProgressIterator;
-#[cfg(not(feature = "rayon"))]
-use indicatif::ProgressIterator;
+use crate::background_string::BackgroundStringArtConverter;
 
 /// Calculate frame time in millis (1 / framerate)
 ///
@@ -81,20 +81,19 @@ impl AsciiPlayer {
         converter_options: &AsciiArtConverterOptions,
     ) -> Result<AsciiArt, AsciiPlayerError> {
         let img = image::open(path)?;
-        let prepared_img = options
-            .threshold
-            .map_or_else(
-                || img.clone(),
-                |threshold| {
-                    image::DynamicImage::from(adaptive_threshold(&img.to_luma8(), threshold))
-                },
-            )
-            .resize_custom_ratio(
-                options.width,
-                options.height,
-                options.font_ratio,
-                options.filter,
-            );
+        let processed_img = match options.threshold {
+            Some(threshold) => {
+                image::DynamicImage::from(adaptive_threshold(&img.to_luma8(), threshold))
+            }
+            None => img,
+        };
+
+        let prepared_img = processed_img.resize_custom_ratio(
+            options.width,
+            options.height,
+            options.font_ratio,
+            options.filter,
+        );
 
         let ascii_art = match (options.clone().background_string, options.braille) {
             (Some(background_string), _) => {
