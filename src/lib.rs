@@ -100,6 +100,7 @@ pub use resize::{CustomRatioResize, DEFAULT_FONT_RATIO};
 
 pub mod ascii;
 pub mod resize;
+pub mod macros;
 
 #[cfg(feature = "player")]
 pub mod player;

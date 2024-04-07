@@ -380,12 +380,15 @@ impl AsciiArtPixel {
     /// # fn main() -> Result<(), tapciify::AsciiStringError> {
     /// let ascii_string = " *#";
     ///
+    /// # #[allow(deprecated)]
     /// let result = AsciiArtPixel::new(255, 255, 255, 255, ascii_string)?;
     /// assert_eq!(result.character, '#');
     ///
+    /// # #[allow(deprecated)]
     /// let result = AsciiArtPixel::new(255, 255, 255, 0, ascii_string)?;
     /// assert_eq!(result.character, ' ');
     ///
+    /// # #[allow(deprecated)]
     /// let result = AsciiArtPixel::new(0, 0, 0, 255, ascii_string)?;
     /// assert_eq!(result.character, ' ');
     ///
@@ -538,17 +541,22 @@ impl error::Error for AsciiStringError {}
 /// # Examples
 ///
 /// ```
+/// # #[allow(deprecated)]
 /// use tapciify::ascii::get_lightness;
 ///
+/// # #[allow(deprecated)]
 /// let result = get_lightness(255, 255, 255, 255);
 /// assert_eq!(result, 1.0);
 ///
+/// # #[allow(deprecated)]
 /// let result = get_lightness(0, 0, 0, 255);
 /// assert_eq!(result, 0.0);
-///
+/// 
+/// # #[allow(deprecated)]
 /// let result = get_lightness(255, 255, 255, 0);
 /// assert_eq!(result, 0.0);
-///
+/// 
+/// # #[allow(deprecated)]
 /// let result = get_lightness(255, 255, 255, 51);
 /// assert_eq!(result, 0.2);
 /// ````
