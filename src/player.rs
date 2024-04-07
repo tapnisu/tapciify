@@ -27,7 +27,8 @@ use std::path::PathBuf;
 use std::time::Instant;
 use std::{error, fmt};
 
-use crossterm::{cursor::MoveUp, execute};
+use crossterm::cursor::MoveUp;
+use crossterm::execute;
 use image::imageops::FilterType;
 use imageproc::contrast::adaptive_threshold;
 #[cfg(feature = "rayon")]
@@ -153,7 +154,6 @@ impl AsciiPlayer {
         #[cfg(not(feature = "rayon"))]
         let iter = paths.iter();
 
-        // Moving this into the function argument breaks rustfmt
         let progress_bar_style = ProgressStyle::with_template(
             "{elapsed_precise} | {wide_bar} {percent}% | ETA: {eta} | FPS: {per_sec} | {pos}/{len}",
         )

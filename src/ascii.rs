@@ -25,7 +25,7 @@
 //!
 //! # Ok(())
 //! # }
-//! ````
+//! ```
 //!
 //! Colored:
 //!
@@ -49,12 +49,10 @@
 //! println!("{}", result);
 //! # Ok(())
 //! # }
-//! ````
+//! ```
 
-use std::{
-    cmp::{max, min},
-    error, fmt,
-};
+use std::{error, fmt};
+use std::cmp::{max, min};
 
 use colored::Colorize;
 use image::Pixel;
@@ -93,7 +91,7 @@ pub trait AsciiArtConverter {
     /// println!("{}", result);
     /// # Ok(())
     /// # }
-    /// ````
+    /// ```
     ///
     /// Colored:
     ///
@@ -118,7 +116,7 @@ pub trait AsciiArtConverter {
     /// println!("{}", result);
     /// # Ok(())
     /// # }
-    /// ````
+    /// ```
     fn ascii_art(
         &self,
         options: &AsciiArtConverterOptions,
@@ -375,26 +373,23 @@ impl AsciiArtPixel {
     /// # Examples
     ///
     /// ```
+    /// # #![allow(deprecated)]
     /// use tapciify::AsciiArtPixel;
     ///
     /// # fn main() -> Result<(), tapciify::AsciiStringError> {
     /// let ascii_string = " *#";
     ///
-    /// # #[allow(deprecated)]
     /// let result = AsciiArtPixel::new(255, 255, 255, 255, ascii_string)?;
     /// assert_eq!(result.character, '#');
     ///
-    /// # #[allow(deprecated)]
     /// let result = AsciiArtPixel::new(255, 255, 255, 0, ascii_string)?;
     /// assert_eq!(result.character, ' ');
     ///
-    /// # #[allow(deprecated)]
     /// let result = AsciiArtPixel::new(0, 0, 0, 255, ascii_string)?;
     /// assert_eq!(result.character, ' ');
-    ///
     /// # Ok(())
     /// # }
-    /// `````
+    /// ```
     #[deprecated(since = "3.1.0")]
     pub fn new(
         r: u8,
@@ -513,10 +508,9 @@ impl ToAsciiArtPixel for image::LumaA<u8> {
 ///
 /// let result = ascii_character(0.0, ascii_string)?;
 /// assert_eq!(result, ' ');
-///
 /// # Ok(())
 /// # }
-/// `````
+/// ```
 pub fn ascii_character(lightness: f32, ascii_string: &str) -> Result<char, AsciiStringError> {
     ascii_string
         .chars()
@@ -541,25 +535,21 @@ impl error::Error for AsciiStringError {}
 /// # Examples
 ///
 /// ```
-/// # #[allow(deprecated)]
+/// # #![allow(deprecated)]
 /// use tapciify::ascii::get_lightness;
 ///
-/// # #[allow(deprecated)]
 /// let result = get_lightness(255, 255, 255, 255);
 /// assert_eq!(result, 1.0);
 ///
-/// # #[allow(deprecated)]
 /// let result = get_lightness(0, 0, 0, 255);
 /// assert_eq!(result, 0.0);
-/// 
-/// # #[allow(deprecated)]
+///
 /// let result = get_lightness(255, 255, 255, 0);
 /// assert_eq!(result, 0.0);
-/// 
-/// # #[allow(deprecated)]
+///
 /// let result = get_lightness(255, 255, 255, 51);
 /// assert_eq!(result, 0.2);
-/// ````
+/// ```
 #[deprecated(since = "3.1.0", note = "Use `image::Pixel::to_luma` instead")]
 pub fn get_lightness(r: u8, g: u8, b: u8, a: u8) -> f32 {
     let max = max(max(r, g), b);

@@ -91,7 +91,7 @@ pub struct Cli {
 /// );
 /// # Ok(())
 /// # }
-/// `````
+/// ```
 #[cfg(target_family = "windows")]
 pub fn glob_to_paths(patterns: &[String]) -> Result<Vec<PathBuf>, GlobToPathsError> {
     #[cfg(feature = "rayon")]

@@ -3,7 +3,8 @@
 #[cfg(feature = "rayon")]
 use rayon::prelude::*;
 
-use crate::{AsciiArt, AsciiArtPixel, product, SizeError, threshold_utils::{DEFAULT_THRESHOLD, ThresholdPixel}};
+use crate::threshold_utils::{ThresholdPixel, DEFAULT_THRESHOLD};
+use crate::{product, AsciiArt, AsciiArtPixel, SizeError};
 
 /// Braille characters aspect ratio
 pub const DEFAULT_BRAILLE_FONT_RATIO: f64 = 21.0 / 24.0;

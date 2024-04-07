@@ -25,7 +25,7 @@
 //! 1. Make frames from video into dir:
 //!
 //!    ```bash
-//!    mkdir frames; ffmpeg -i badapple.mkv frames/%08d.jpeg
+//!    mkdir frames; ffmpeg -i bad_apple.mkv frames/%08d.jpeg
 //!    ```
 //!
 //! 2. Run:
@@ -58,7 +58,7 @@
 //! println!("{}", result);
 //! # Ok(())
 //! # }
-//! ````
+//! ```
 //!
 //! Colored:
 //!
@@ -83,7 +83,7 @@
 //! println!("{}", result);
 //! # Ok(())
 //! # }
-//! ````
+//! ```
 
 #[allow(deprecated)]
 #[doc(inline)]
