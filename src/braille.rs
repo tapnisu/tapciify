@@ -1,12 +1,12 @@
 //! Converting images to ASCII art using Braille characters
 
-use crate::{
-    threshold_utils::{ThresholdPixel, DEFAULT_THRESHOLD},
-    AsciiArt, AsciiArtPixel, SizeError,
-};
-
 #[cfg(feature = "rayon")]
 use rayon::prelude::*;
+
+use crate::{
+    AsciiArt,
+    AsciiArtPixel, SizeError, threshold_utils::{DEFAULT_THRESHOLD, ThresholdPixel},
+};
 
 /// Braille characters aspect ratio
 pub const DEFAULT_BRAILLE_FONT_RATIO: f64 = 21.0 / 24.0;

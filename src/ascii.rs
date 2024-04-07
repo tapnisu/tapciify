@@ -51,13 +51,13 @@
 //! # }
 //! ````
 
-use colored::Colorize;
-use image::Pixel;
 use std::{
     cmp::{max, min},
     error, fmt,
 };
 
+use colored::Colorize;
+use image::Pixel;
 #[cfg(feature = "rayon")]
 use rayon::prelude::*;
 

@@ -22,7 +22,10 @@
 //! # }
 //! ```
 
-use std::{error, fmt, io::stdout, path::PathBuf, time::Instant};
+use std::io::stdout;
+use std::path::PathBuf;
+use std::time::Instant;
+use std::{error, fmt};
 
 use crossterm::{cursor::MoveUp, execute};
 use image::imageops::FilterType;
@@ -35,15 +38,12 @@ use indicatif::ProgressStyle;
 #[cfg(feature = "rayon")]
 use rayon::prelude::*;
 
-use crate::{
-    ascii::{
-        AsciiArt, AsciiArtConverter, AsciiArtConverterError, AsciiArtConverterOptions,
-        DEFAULT_ASCII_STRING,
-    },
-    AsciiStringError,
-    braille::BrailleArtConverter, CustomRatioResize, DEFAULT_FONT_RATIO, SizeError,
-};
 use crate::background_string::BackgroundStringArtConverter;
+use crate::braille::BrailleArtConverter;
+use crate::{
+    AsciiArt, AsciiArtConverter, AsciiArtConverterError, AsciiArtConverterOptions,
+    AsciiStringError, CustomRatioResize, SizeError, DEFAULT_ASCII_STRING, DEFAULT_FONT_RATIO,
+};
 
 /// Calculate frame time in millis (1 / framerate)
 ///

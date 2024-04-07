@@ -1,16 +1,16 @@
 //! Utils used in tapciify CLI
 
-use crate::DEFAULT_ASCII_STRING;
-use clap::Parser;
-
-#[cfg(target_family = "windows")]
-use glob::glob;
 #[cfg(target_family = "windows")]
 use std::{error, fmt, path::PathBuf};
 
+use clap::Parser;
+#[cfg(target_family = "windows")]
+use glob::glob;
 #[cfg(target_family = "windows")]
 #[cfg(feature = "rayon")]
 use rayon::prelude::*;
+
+use crate::DEFAULT_ASCII_STRING;
 
 /// Parse command arguments for tapciify CLI
 #[derive(Parser, Debug, Clone)]

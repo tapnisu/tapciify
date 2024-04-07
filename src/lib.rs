@@ -85,6 +85,19 @@
 //! # }
 //! ````
 
+#[allow(deprecated)]
+#[doc(inline)]
+pub use ascii::{
+    ascii_character, AsciiArt, AsciiArtConverter, AsciiArtConverterError, AsciiArtConverterOptions,
+    AsciiArtPixel, AsciiStringError, DEFAULT_ASCII_STRING, ReverseString, SizeError,
+    ToAsciiArtPixel,
+};
+#[doc(inline)]
+#[cfg(feature = "player")]
+pub use player::{AsciiPlayer, AsciiPlayerError, AsciiPlayerOptions};
+#[doc(inline)]
+pub use resize::{CustomRatioResize, DEFAULT_FONT_RATIO};
+
 pub mod ascii;
 pub mod resize;
 
@@ -103,16 +116,3 @@ pub mod threshold_utils;
 #[cfg(feature = "player")]
 pub mod cli;
 
-#[allow(deprecated)]
-#[doc(inline)]
-pub use ascii::{
-    ascii_character, AsciiArt, AsciiArtConverter, AsciiArtConverterError, AsciiArtConverterOptions,
-    AsciiArtPixel, AsciiStringError, ReverseString, SizeError, ToAsciiArtPixel,
-    DEFAULT_ASCII_STRING,
-};
-#[doc(inline)]
-pub use resize::{CustomRatioResize, DEFAULT_FONT_RATIO};
-
-#[doc(inline)]
-#[cfg(feature = "player")]
-pub use player::{AsciiPlayer, AsciiPlayerError, AsciiPlayerOptions};

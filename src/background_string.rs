@@ -1,10 +1,10 @@
-use crate::{
-    threshold_utils::{ThresholdPixel, DEFAULT_THRESHOLD},
-    AsciiArt, AsciiArtPixel, SizeError,
-};
-
 #[cfg(feature = "rayon")]
 use rayon::prelude::*;
+
+use crate::{
+    AsciiArt,
+    AsciiArtPixel, SizeError, threshold_utils::{DEFAULT_THRESHOLD, ThresholdPixel},
+};
 
 /// Convert image into ASCII art with text on the background
 pub trait BackgroundStringArtConverter {
