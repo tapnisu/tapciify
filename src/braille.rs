@@ -52,12 +52,14 @@ pub trait BrailleArtConverter {
     /// # Examples
     ///
     /// ```
-    /// use image::imageops::FilterType;
-    /// # use std::error::Error;
+    /// use std::error::Error;
+    ///
     /// use tapciify::{
     ///     braille::{BrailleArtConverter, DEFAULT_BRAILLE_FONT_RATIO},
     ///     CustomRatioResize,
     /// };
+    /// 
+    /// # use image::imageops::FilterType;
     ///
     /// # fn main() -> Result<(), Box<dyn Error>> {
     /// let img = image::open("./assets/examples/rin-shima.webp")?;

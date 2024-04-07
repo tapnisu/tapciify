@@ -40,7 +40,9 @@
 //!
 //! ```
 //! use image::imageops::FilterType;
+//! 
 //! # use std::error::Error;
+//! 
 //! use tapciify::{
 //!     AsciiArtConverter, AsciiArtConverterOptions, CustomRatioResize, DEFAULT_FONT_RATIO,
 //! };
@@ -63,8 +65,10 @@
 //! Colored:
 //!
 //! ```
-//! use image::imageops::FilterType;
-//! # use std::error::Error;
+//! use std::error::Error;
+//! 
+//! # use image::imageops::FilterType;
+//!
 //! use tapciify::{
 //!     AsciiArtConverter, AsciiArtConverterOptions, CustomRatioResize, DEFAULT_FONT_RATIO,
 //! };
@@ -99,8 +103,8 @@ pub use player::{AsciiPlayer, AsciiPlayerError, AsciiPlayerOptions};
 pub use resize::{CustomRatioResize, DEFAULT_FONT_RATIO};
 
 pub mod ascii;
-pub mod resize;
 pub mod macros;
+pub mod resize;
 
 #[cfg(feature = "player")]
 pub mod player;
@@ -116,4 +120,3 @@ pub mod threshold_utils;
 
 #[cfg(feature = "player")]
 pub mod cli;
-

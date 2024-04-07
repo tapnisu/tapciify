@@ -4,8 +4,9 @@
 //! # Examples
 //!
 //! ```
-//! # use std::error::Error;
 //! use tapciify::{AsciiPlayer, AsciiPlayerOptions};
+//!
+//! # use std::error::Error;
 //!
 //! # fn main() -> Result<(), Box<dyn Error>> {
 //! let paths = ["./assets/examples/ferris.webp".into()];

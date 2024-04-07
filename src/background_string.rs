@@ -1,8 +1,8 @@
 #[cfg(feature = "rayon")]
 use rayon::prelude::*;
 
-use crate::threshold_utils::{ThresholdPixel, DEFAULT_THRESHOLD};
 use crate::{AsciiArt, AsciiArtPixel, SizeError};
+use crate::threshold_utils::{DEFAULT_THRESHOLD, ThresholdPixel};
 
 /// Convert image into ASCII art with text on the background
 pub trait BackgroundStringArtConverter {
@@ -11,11 +11,13 @@ pub trait BackgroundStringArtConverter {
     /// # Examples
     ///
     /// ```
-    /// use image::imageops::FilterType;
-    /// # use std::error::Error;
-    /// use tapciify::background_string::BackgroundStringArtConverter;
-    /// use tapciify::{CustomRatioResize, DEFAULT_FONT_RATIO};
+    /// use std::error::Error;
     ///
+    /// use tapciify::{CustomRatioResize, DEFAULT_FONT_RATIO};
+    /// use tapciify::background_string::BackgroundStringArtConverter;
+    ///
+    /// # use image::imageops::FilterType;
+    /// 
     /// # fn main() -> Result<(), Box<dyn Error>> {
     /// let img = image::open("./assets/examples/ferris.webp")?;
     ///

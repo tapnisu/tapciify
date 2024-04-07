@@ -5,8 +5,10 @@
 //! Demo:
 //!
 //! ```
-//! use image::imageops::FilterType;
-//! # use std::error::Error;
+//! use std::error::Error;
+//!
+//! # use image::imageops::FilterType;
+//!
 //! use tapciify::{
 //!     AsciiArtConverter, AsciiArtConverterOptions, CustomRatioResize, DEFAULT_FONT_RATIO,
 //! };
@@ -30,8 +32,10 @@
 //! Colored:
 //!
 //! ```
-//! use image::imageops::FilterType;
-//! # use std::error::Error;
+//! use std::error::Error;
+//!
+//! # use image::imageops::FilterType;
+//!
 //! use tapciify::{
 //!     AsciiArtConverter, AsciiArtConverterOptions, CustomRatioResize, DEFAULT_FONT_RATIO,
 //! };
@@ -72,11 +76,13 @@ pub trait AsciiArtConverter {
     /// Demo:
     ///
     /// ```
-    /// use image::imageops::FilterType;
-    /// # use std::error::Error;
+    /// use std::error::Error;
+    ///
     /// use tapciify::{
     ///     AsciiArtConverter, AsciiArtConverterOptions, CustomRatioResize, DEFAULT_FONT_RATIO,
     /// };
+    /// 
+    /// # use image::imageops::FilterType;
     ///
     /// # fn main() -> Result<(), Box<dyn Error>> {
     /// let img = image::open("./assets/examples/ferris.webp")?;
@@ -96,11 +102,13 @@ pub trait AsciiArtConverter {
     /// Colored:
     ///
     /// ```
-    /// use image::imageops::FilterType;
-    /// # use std::error::Error;
+    /// use std::error::Error;
+    ///
     /// use tapciify::{
     ///     AsciiArtConverter, AsciiArtConverterOptions, CustomRatioResize, DEFAULT_FONT_RATIO,
     /// };
+    /// 
+    /// # use image::imageops::FilterType;
     ///
     /// # fn main() -> Result<(), Box<dyn Error>> {
     /// let img = image::open("./assets/examples/ferris.webp")?;

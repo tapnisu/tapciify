@@ -67,8 +67,10 @@ pub struct Cli {
 /// # Examples
 ///
 /// ```
-/// use tapciify::cli::glob_to_paths;
 /// use std::path::PathBuf;
+///
+/// use tapciify::cli::glob_to_paths;
+///
 ///
 /// # fn main() -> Result<(), tapciify::cli::GlobToPathsError> {
 /// let paths = vec!["assets\\examples\\*.webp".to_owned()];
@@ -80,6 +82,7 @@ pub struct Cli {
 ///         "assets\\examples\\ascii-colored.webp",
 ///         "assets\\examples\\ascii-pixels.webp",
 ///         "assets\\examples\\ascii.webp",
+///         "assets\\examples\\background-string.webp",
 ///         "assets\\examples\\braille-colored.webp",
 ///         "assets\\examples\\braille.webp",
 ///         "assets\\examples\\ferris.webp",
