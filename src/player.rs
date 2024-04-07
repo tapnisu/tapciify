@@ -8,7 +8,7 @@
 //! use tapciify::{AsciiPlayer, AsciiPlayerOptions};
 //!
 //! # fn main() -> Result<(), Box<dyn Error>> {
-//! let paths = ["./assets/examples/original.webp".into()];
+//! let paths = ["./assets/examples/ferris.webp".into()];
 //!
 //! AsciiPlayer::play(
 //!     &paths,
@@ -209,7 +209,7 @@ impl AsciiPlayer {
     /// ```
     /// use tapciify::{AsciiPlayer, AsciiPlayerOptions};
     ///
-    /// let paths = vec!["./assets/examples/original.webp".into()];
+    /// let paths = vec!["./assets/examples/ferris.webp".into()];
     ///
     /// let options = AsciiPlayerOptions {
     ///     width: Some(128),

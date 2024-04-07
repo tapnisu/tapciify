@@ -3,7 +3,7 @@ use std::error::Error;
 use tapciify::{AsciiPlayer, AsciiPlayerOptions};
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let paths = ["./assets/examples/original.webp".into()];
+    let paths = ["./assets/examples/ferris.webp".into()];
 
     AsciiPlayer::play(
         &paths,

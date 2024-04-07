@@ -82,7 +82,7 @@ pub struct Cli {
 ///         "assets\\examples\\ascii.webp",
 ///         "assets\\examples\\braille-colored.webp",
 ///         "assets\\examples\\braille.webp",
-///         "assets\\examples\\original.webp",
+///         "assets\\examples\\ferris.webp",
 ///         "assets\\examples\\rin-shima.webp",
 ///     ]
 ///     .iter()

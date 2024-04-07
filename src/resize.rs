@@ -17,7 +17,7 @@ pub trait CustomRatioResize {
     /// use tapciify::{CustomRatioResize, DEFAULT_FONT_RATIO};
     ///
     /// # fn main() -> Result<(), image::ImageError> {
-    /// let img = image::open("./assets/examples/original.webp")?;
+    /// let img = image::open("./assets/examples/ferris.webp")?;
     ///
     /// let result = img.resize_custom_ratio(Some(64), None, DEFAULT_FONT_RATIO, FilterType::Triangle);
     /// # Ok(())
