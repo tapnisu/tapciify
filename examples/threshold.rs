@@ -1,6 +1,8 @@
+use std::error::Error;
+
 use image::imageops::FilterType;
 use imageproc::contrast::adaptive_threshold;
-use std::error::Error;
+
 use tapciify::{
     AsciiArtConverter, AsciiArtConverterOptions, CustomRatioResize, DEFAULT_FONT_RATIO,
 };
