@@ -81,7 +81,7 @@ pub trait AsciiArtConverter {
     /// use tapciify::{
     ///     AsciiArtConverter, AsciiArtConverterOptions, CustomRatioResize, DEFAULT_FONT_RATIO,
     /// };
-    /// 
+    ///
     /// # use image::imageops::FilterType;
     ///
     /// # fn main() -> Result<(), Box<dyn Error>> {
@@ -107,7 +107,7 @@ pub trait AsciiArtConverter {
     /// use tapciify::{
     ///     AsciiArtConverter, AsciiArtConverterOptions, CustomRatioResize, DEFAULT_FONT_RATIO,
     /// };
-    /// 
+    ///
     /// # use image::imageops::FilterType;
     ///
     /// # fn main() -> Result<(), Box<dyn Error>> {
@@ -251,14 +251,18 @@ impl AsciiArtConverter for image::GrayAlphaImage {
 /// Options for converter of images to ASCII art
 #[derive(Debug, Clone)]
 pub struct AsciiArtConverterOptions {
+    /// String to represent lightness of pixels
     pub ascii_string: String,
+    /// Make ASCII art colored
     pub colored: bool,
 }
 
 /// Error caused by [`AsciiArtConverter`]
 #[derive(Clone, Debug)]
 pub enum AsciiArtConverterError {
+    /// Error caused by lightness being out of ASCII string in [`ascii_character`]
     AsciiStringError(AsciiStringError),
+    /// Error caused by too small image sizes
     SizeError(SizeError),
 }
 
@@ -311,13 +315,18 @@ impl Default for AsciiArtConverterOptions {
 /// Raw ASCII art conversion result
 #[derive(Debug, Clone)]
 pub struct AsciiArt {
+    /// Content of ASCII art
     pub characters: Vec<AsciiArtPixel>,
+    /// Width of the image
     pub width: u32,
+    /// Height of the image
     pub height: u32,
+    /// Is ASCII art colored
     pub colored: bool,
 }
 
 impl AsciiArt {
+    /// Creates new instance of [`AsciiArt`]
     pub fn new(characters: Vec<AsciiArtPixel>, width: u32, height: u32, colored: bool) -> AsciiArt {
         AsciiArt {
             characters,
@@ -368,10 +377,15 @@ impl fmt::Display for AsciiArt {
 /// ASCII pixel of [`AsciiArt`]
 #[derive(Debug, Clone)]
 pub struct AsciiArtPixel {
+    /// Character representing lightness of pixel
     pub character: char,
+    /// Red
     pub r: u8,
+    /// Green
     pub g: u8,
+    /// Blue
     pub b: u8,
+    /// Alpha
     pub a: u8,
 }
 

@@ -1,5 +1,8 @@
+//! Just macros
+
 #![allow(unused_imports)]
 
+/// Macro for joining multiple iterators
 #[macro_export]
 macro_rules! product {
     ($first:ident, $($next:ident),*) => (

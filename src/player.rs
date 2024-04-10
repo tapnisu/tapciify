@@ -231,17 +231,29 @@ impl AsciiPlayer {
 /// Options of player to convert and play frames
 #[derive(Debug, Clone)]
 pub struct AsciiPlayerOptions {
+    /// Resize image into desired width
     pub width: Option<u32>,
+    /// Resize image into desired width
     pub height: Option<u32>,
+    /// String to represent lightness of pixels
     pub ascii_string: String,
+    /// Make ASCII art colored
     pub colored: bool,
+    /// Time to sleep after each frame
     pub frame_time: u64,
+    /// Render before starting slideshow
     pub pre_render: bool,
+    /// Ratio for ASCII characters. Used for auto-resizing
     pub font_ratio: f64,
+    /// Repeat after the end of slideshow
     pub looped: bool,
+    /// Filter used for resizing
     pub filter: FilterType,
+    /// Threshold block radius
     pub threshold: Option<u32>,
+    /// Use braille characters for displaying image
     pub braille: bool,
+    /// Text to show as background on light pixels
     pub background_string: Option<String>,
 }
 
@@ -276,8 +288,10 @@ impl From<AsciiPlayerOptions> for AsciiArtConverterOptions {
 /// Error caused by [`AsciiPlayer`]
 #[derive(Debug)]
 pub enum AsciiPlayerError {
+    /// Error caused by [`image`] ([`image::ImageError`])
     Image(image::ImageError),
     // TODO: Rename into AsciiArtConverter
+    /// Error caused by [`AsciiArtConverter`] ([`AsciiArtConverterError`])
     AsciiConverter(AsciiArtConverterError),
 }
 

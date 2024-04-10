@@ -1,3 +1,5 @@
+//! Utils used in [`tapciify::background_string`] and [`tapciify::braille`]
+
 use image::Pixel;
 
 /// 1/2 threshold

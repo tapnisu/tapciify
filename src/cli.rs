@@ -119,7 +119,9 @@ pub fn glob_to_paths(patterns: &[String]) -> Result<Vec<PathBuf>, GlobToPathsErr
 #[cfg(target_family = "windows")]
 #[derive(Debug)]
 pub enum GlobToPathsError {
+    /// Error caused by glob's pattern ([`lob::PatternError`])
     PatternError(glob::PatternError),
+    /// Error caused by glob ([`glob::GlobError`])
     GlobError(glob::GlobError),
 }
 

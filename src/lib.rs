@@ -40,9 +40,9 @@
 //!
 //! ```
 //! use image::imageops::FilterType;
-//! 
+//!
 //! # use std::error::Error;
-//! 
+//!
 //! use tapciify::{
 //!     AsciiArtConverter, AsciiArtConverterOptions, CustomRatioResize, DEFAULT_FONT_RATIO,
 //! };
@@ -66,7 +66,7 @@
 //!
 //! ```
 //! use std::error::Error;
-//! 
+//!
 //! # use image::imageops::FilterType;
 //!
 //! use tapciify::{
