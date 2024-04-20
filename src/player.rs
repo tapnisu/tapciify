@@ -63,7 +63,7 @@ pub fn calculate_frame_time(framerate: Option<f64>) -> u64 {
 }
 
 /// Player to convert and play frames
-#[derive(Debug, Clone)]
+#[derive(Debug, Default, Clone, PartialEq, Eq, Hash)]
 pub struct AsciiPlayer {}
 
 impl AsciiPlayer {
@@ -229,7 +229,7 @@ impl AsciiPlayer {
 }
 
 /// Options of player to convert and play frames
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct AsciiPlayerOptions {
     /// Resize image into desired width
     pub width: Option<u32>,
@@ -295,6 +295,8 @@ pub enum AsciiPlayerError {
     AsciiConverter(AsciiArtConverterError),
 }
 
+impl error::Error for AsciiPlayerError {}
+
 impl fmt::Display for AsciiPlayerError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
@@ -331,5 +333,3 @@ impl From<SizeError> for AsciiPlayerError {
         AsciiPlayerError::AsciiConverter(AsciiArtConverterError::SizeError(err))
     }
 }
-
-impl error::Error for AsciiPlayerError {}

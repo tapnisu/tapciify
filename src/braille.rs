@@ -58,7 +58,7 @@ pub trait BrailleArtConverter {
     ///     braille::{BrailleArtConverter, DEFAULT_BRAILLE_FONT_RATIO},
     ///     CustomRatioResize,
     /// };
-    /// 
+    ///
     /// # use image::imageops::FilterType;
     ///
     /// # fn main() -> Result<(), Box<dyn Error>> {

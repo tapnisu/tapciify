@@ -2,8 +2,8 @@ use std::error::Error;
 
 use image::imageops::FilterType;
 
-use tapciify::{CustomRatioResize, DEFAULT_FONT_RATIO};
 use tapciify::background_string::BackgroundStringArtConverter;
+use tapciify::{CustomRatioResize, DEFAULT_FONT_RATIO};
 
 fn main() -> Result<(), Box<dyn Error>> {
     let img = image::open("../assets/examples/ferris.webp")?;

@@ -55,8 +55,8 @@
 //! # }
 //! ```
 
-use std::{error, fmt};
 use std::cmp::{max, min};
+use std::{error, fmt};
 
 use colored::Colorize;
 use image::Pixel;
@@ -249,7 +249,7 @@ impl AsciiArtConverter for image::GrayAlphaImage {
 }
 
 /// Options for converter of images to ASCII art
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct AsciiArtConverterOptions {
     /// String to represent lightness of pixels
     pub ascii_string: String,
@@ -257,14 +257,25 @@ pub struct AsciiArtConverterOptions {
     pub colored: bool,
 }
 
+impl Default for AsciiArtConverterOptions {
+    fn default() -> AsciiArtConverterOptions {
+        AsciiArtConverterOptions {
+            ascii_string: DEFAULT_ASCII_STRING.to_owned(),
+            colored: false,
+        }
+    }
+}
+
 /// Error caused by [`AsciiArtConverter`]
-#[derive(Clone, Debug)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum AsciiArtConverterError {
     /// Error caused by lightness being out of ASCII string in [`ascii_character`]
     AsciiStringError(AsciiStringError),
     /// Error caused by too small image sizes
     SizeError(SizeError),
 }
+
+impl error::Error for AsciiArtConverterError {}
 
 impl fmt::Display for AsciiArtConverterError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -289,11 +300,11 @@ impl From<SizeError> for AsciiArtConverterError {
     }
 }
 
-impl error::Error for AsciiArtConverterError {}
-
 /// Error caused by too small image sizes
-#[derive(Clone, Debug)]
+#[derive(Debug, Default, Clone, PartialEq, Eq, Hash)]
 pub struct SizeError;
+
+impl error::Error for SizeError {}
 
 impl fmt::Display for SizeError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -301,19 +312,8 @@ impl fmt::Display for SizeError {
     }
 }
 
-impl error::Error for SizeError {}
-
-impl Default for AsciiArtConverterOptions {
-    fn default() -> AsciiArtConverterOptions {
-        AsciiArtConverterOptions {
-            ascii_string: DEFAULT_ASCII_STRING.to_owned(),
-            colored: false,
-        }
-    }
-}
-
 /// Raw ASCII art conversion result
-#[derive(Debug, Clone)]
+#[derive(Debug, Default, Clone, PartialEq, Eq, Hash)]
 pub struct AsciiArt {
     /// Content of ASCII art
     pub characters: Vec<AsciiArtPixel>,
@@ -375,7 +375,7 @@ impl fmt::Display for AsciiArt {
 }
 
 /// ASCII pixel of [`AsciiArt`]
-#[derive(Debug, Clone)]
+#[derive(Debug, Default, Clone, PartialEq, Eq, Hash)]
 pub struct AsciiArtPixel {
     /// Character representing lightness of pixel
     pub character: char,
@@ -541,16 +541,16 @@ pub fn ascii_character(lightness: f32, ascii_string: &str) -> Result<char, Ascii
 }
 
 /// Error caused by lightness being out of ASCII string in [`ascii_character`]
-#[derive(Clone, Debug)]
+#[derive(Debug, Default, Clone, PartialEq, Eq, Hash)]
 pub struct AsciiStringError;
+
+impl error::Error for AsciiStringError {}
 
 impl fmt::Display for AsciiStringError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "lightness is out of ASCII string")
     }
 }
-
-impl error::Error for AsciiStringError {}
 
 /// Calculate lightness (from 0.0 to 1.0)
 ///

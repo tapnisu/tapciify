@@ -93,8 +93,8 @@
 #[doc(inline)]
 pub use ascii::{
     ascii_character, AsciiArt, AsciiArtConverter, AsciiArtConverterError, AsciiArtConverterOptions,
-    AsciiArtPixel, AsciiStringError, DEFAULT_ASCII_STRING, ReverseString, SizeError,
-    ToAsciiArtPixel,
+    AsciiArtPixel, AsciiStringError, ReverseString, SizeError, ToAsciiArtPixel,
+    DEFAULT_ASCII_STRING,
 };
 #[doc(inline)]
 #[cfg(feature = "player")]

@@ -13,7 +13,7 @@ use rayon::prelude::*;
 use crate::DEFAULT_ASCII_STRING;
 
 /// Parse command arguments for tapciify CLI
-#[derive(Parser, Debug, Clone)]
+#[derive(Parser, Debug, Default, Clone, PartialEq)]
 #[clap(author, version, about, long_about = None)]
 pub struct Cli {
     /// Input files to convert to ASCII art
@@ -126,6 +126,9 @@ pub enum GlobToPathsError {
 }
 
 #[cfg(target_family = "windows")]
+impl error::Error for GlobToPathsError {}
+
+#[cfg(target_family = "windows")]
 impl fmt::Display for GlobToPathsError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
@@ -148,6 +151,3 @@ impl From<glob::GlobError> for GlobToPathsError {
         GlobToPathsError::GlobError(err)
     }
 }
-
-#[cfg(target_family = "windows")]
-impl error::Error for GlobToPathsError {}
