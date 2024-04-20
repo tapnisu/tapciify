@@ -1,4 +1,4 @@
-//! Utils used in [`tapciify::background_string`] and [`tapciify::braille`]
+//! Utils used in [`crate::background_string`] and [`crate::braille`]
 
 use image::Pixel;
 

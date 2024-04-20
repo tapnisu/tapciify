@@ -66,10 +66,10 @@ use rayon::prelude::*;
 /// Default ASCII string, feel free to use your one
 pub const DEFAULT_ASCII_STRING: &str = " .,:;+*?%S#@";
 
-/// Converter of images to ASCII art
+/// Convert image into [`AsciiArt`]
 pub trait AsciiArtConverter {
     // TODO: Change error to [`SizeError`]
-    /// Convert image to an ASCII art
+    /// Convert image into [`AsciiArt`]
     ///
     /// # Examples
     ///
@@ -248,12 +248,12 @@ impl AsciiArtConverter for image::GrayAlphaImage {
     }
 }
 
-/// Options for converter of images to ASCII art
+/// Options for [`AsciiArtConverter::ascii_art`]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct AsciiArtConverterOptions {
     /// String to represent lightness of pixels
     pub ascii_string: String,
-    /// Make ASCII art colored
+    /// Make [`AsciiArt`] colored
     pub colored: bool,
 }
 
@@ -312,7 +312,7 @@ impl fmt::Display for SizeError {
     }
 }
 
-/// Raw ASCII art conversion result
+/// Raw [`AsciiArtConverter`] result
 #[derive(Debug, Default, Clone, PartialEq, Eq, Hash)]
 pub struct AsciiArt {
     /// Content of ASCII art
@@ -577,11 +577,11 @@ pub fn get_lightness(r: u8, g: u8, b: u8, a: u8) -> f32 {
     let max = max(max(r, g), b);
     let min = min(min(r, g), b);
 
-    ((max as f32 + min as f32) * a as f32) / 130050.0 // 130050 - we need to divide by 512, and divide by 255 from alpha
+    ((max as f32 + min as f32) * a as f32) / (512.0 * 255.0) // 130050 - we need to divide by 512, and divide by 255 from alpha
 }
 
 /// Just a small util for reversing [`String`]
-#[deprecated(since = "3.2.1")]
+#[deprecated(since = "3.2.1", note = "Use `Iterator::rev` instead")]
 pub trait ReverseString {
     /// Reverse [`Self`]
     fn reverse(&self) -> Self;

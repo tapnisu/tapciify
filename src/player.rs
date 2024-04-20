@@ -69,7 +69,7 @@ pub struct AsciiPlayer {}
 impl AsciiPlayer {
     #[deprecated(
         since = "3.1.0",
-        note = "Use `tapciify::ascii::ReverseString::reverse` instead"
+        note = "Use `Iterator::rev` instead"
     )]
     /// Reverse ASCII string
     pub fn reverse_ascii_string(ascii_string: String) -> String {
