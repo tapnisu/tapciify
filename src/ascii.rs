@@ -396,18 +396,16 @@ impl AsciiArtPixel {
     ///
     /// ```
     /// # #![allow(deprecated)]
-    /// use tapciify::AsciiArtPixel;
+    /// use tapciify::{AsciiArtPixel, DEFAULT_ASCII_STRING};
     ///
     /// # fn main() -> Result<(), tapciify::AsciiStringError> {
-    /// let ascii_string = " *#";
+    /// let result = AsciiArtPixel::new(255, 255, 255, 255, DEFAULT_ASCII_STRING)?;
+    /// assert_eq!(result.character, '@');
     ///
-    /// let result = AsciiArtPixel::new(255, 255, 255, 255, ascii_string)?;
-    /// assert_eq!(result.character, '#');
-    ///
-    /// let result = AsciiArtPixel::new(255, 255, 255, 0, ascii_string)?;
+    /// let result = AsciiArtPixel::new(255, 255, 255, 0, DEFAULT_ASCII_STRING)?;
     /// assert_eq!(result.character, ' ');
     ///
-    /// let result = AsciiArtPixel::new(0, 0, 0, 255, ascii_string)?;
+    /// let result = AsciiArtPixel::new(0, 0, 0, 255, DEFAULT_ASCII_STRING)?;
     /// assert_eq!(result.character, ' ');
     /// # Ok(())
     /// # }
@@ -518,17 +516,16 @@ impl ToAsciiArtPixel for image::LumaA<u8> {
 ///
 /// ```
 /// use tapciify::ascii::ascii_character;
+/// use tapciify::DEFAULT_ASCII_STRING;
 ///
 /// # fn main() -> Result<(), tapciify::AsciiStringError> {
-/// let ascii_string = " *#";
+/// let result = ascii_character(1.0, DEFAULT_ASCII_STRING)?;
+/// assert_eq!(result, '@');
 ///
-/// let result = ascii_character(1.0, ascii_string)?;
-/// assert_eq!(result, '#');
+/// let result = ascii_character(0.5, DEFAULT_ASCII_STRING)?;
+/// assert_eq!(result, '+');
 ///
-/// let result = ascii_character(0.5, ascii_string)?;
-/// assert_eq!(result, '*');
-///
-/// let result = ascii_character(0.0, ascii_string)?;
+/// let result = ascii_character(0.0, DEFAULT_ASCII_STRING)?;
 /// assert_eq!(result, ' ');
 /// # Ok(())
 /// # }
@@ -577,7 +574,7 @@ pub fn get_lightness(r: u8, g: u8, b: u8, a: u8) -> f32 {
     let max = max(max(r, g), b);
     let min = min(min(r, g), b);
 
-    ((max as f32 + min as f32) * a as f32) / (512.0 * 255.0) // 130050 - we need to divide by 512, and divide by 255 from alpha
+    ((max as f32 + min as f32) * a as f32) / (510.0 * 255.0)
 }
 
 /// Just a small util for reversing [`String`]
