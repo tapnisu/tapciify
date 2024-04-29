@@ -58,7 +58,7 @@ pub struct Cli {
     #[clap(short, long, action)]
     pub braille: bool,
     /// Use text for background on light pixels
-    #[clap(short, long)]
+    #[clap(long)]
     pub background_string: Option<String>,
 }
 
