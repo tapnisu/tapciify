@@ -57,7 +57,7 @@ impl BackgroundStringArtConverter for image::RgbImage {
             .enumerate()
             .map(|(index, pixel)| AsciiArtPixel {
                 character: match pixel.threshold_pixel(DEFAULT_THRESHOLD) {
-                    true => string.chars().nth(index % string.len()).unwrap(),
+                    true => string.chars().nth(index % string.chars().count()).unwrap(),
                     false => ' ',
                 },
                 r: pixel.0[0],
@@ -91,7 +91,7 @@ impl BackgroundStringArtConverter for image::RgbaImage {
             .enumerate()
             .map(|(index, pixel)| AsciiArtPixel {
                 character: match pixel.threshold_pixel(DEFAULT_THRESHOLD) {
-                    true => string.chars().nth(index % string.len()).unwrap(),
+                    true => string.chars().nth(index % string.chars().count()).unwrap(),
                     false => ' ',
                 },
                 r: pixel.0[0],
@@ -125,7 +125,7 @@ impl BackgroundStringArtConverter for image::GrayImage {
             .enumerate()
             .map(|(index, pixel)| AsciiArtPixel {
                 character: match pixel.threshold_pixel(DEFAULT_THRESHOLD) {
-                    true => string.chars().nth(index % string.len()).unwrap(),
+                    true => string.chars().nth(index % string.chars().count()).unwrap(),
                     false => ' ',
                 },
                 r: pixel.0[0],
@@ -159,7 +159,7 @@ impl BackgroundStringArtConverter for image::GrayAlphaImage {
             .enumerate()
             .map(|(index, pixel)| AsciiArtPixel {
                 character: match pixel.threshold_pixel(DEFAULT_THRESHOLD) {
-                    true => string.chars().nth(index % string.len()).unwrap(),
+                    true => string.chars().nth(index % string.chars().count()).unwrap(),
                     false => ' ',
                 },
                 r: pixel.0[0],
