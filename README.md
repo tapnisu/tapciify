@@ -7,6 +7,8 @@
 1. CC linker (Windows - Microsoft Visual Studio with C++ Support) (Linux - gcc)
 
 2. [Rust](https://www.rust-lang.org/tools/install)
+   > **Important**:
+   > Current minimal Rust version is 1.74!
 
 ## Installation
 
@@ -41,6 +43,6 @@ In this example I set framerate to 24 (but you can use any another)
 ## Examples
 
 | Original                                       | ASCII                                             | ASCII colored                                            | Pixels                                                                  | Braille                                              | Braille colored                                          | Background string                                                                 |
-|------------------------------------------------|---------------------------------------------------|----------------------------------------------------------|-------------------------------------------------------------------------|------------------------------------------------------|----------------------------------------------------------|-----------------------------------------------------------------------------------|
+| ---------------------------------------------- | ------------------------------------------------- | -------------------------------------------------------- | ----------------------------------------------------------------------- | ---------------------------------------------------- | -------------------------------------------------------- | --------------------------------------------------------------------------------- |
 | ![Original Image](assets/examples/ferris.webp) | ![ASCII art](assets/examples/ascii.webp)          | ![ASCII colored art](assets/examples/ascii-colored.webp) | ![ASCII art using pixels (█ symbol)](assets/examples/ascii-pixels.webp) | ![Braille](assets/examples/braille.webp)             | ![Braille colored](assets/examples/braille-colored.webp) | ![Background string](assets/examples/background-string.webp)                      |
 | `Original image`                               | `tapciify -i ./assets/examples/ferris.webp -w 64` | `tapciify -i ./assets/examples/ferris.webp -w 64 -c`     | `tapciify -i ./assets/examples/ferris.webp -w 64 --pixels`              | `tapciify -i ./assets/examples/ferris.webp -w 64 -b` | `tapciify -i ./assets/examples/ferris.webp -w 64 -bc`    | `tapciify -i ./assets/examples/bad-apple.webp -w 64 --background-string badapple` |
