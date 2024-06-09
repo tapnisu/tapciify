@@ -113,21 +113,11 @@ impl BrailleArtConverter for image::RgbImage {
             .map(|(y, x)| {
                 // Top left pixel
                 let tlpx = self.get_pixel(x, y);
-
-                let braille_array = &[
-                    tlpx,
-                    self.get_pixel(x, y + 1),
-                    self.get_pixel(x, y + 2),
-                    self.get_pixel(x + 1, y),
-                    self.get_pixel(x, y + 1),
-                    self.get_pixel(x, y + 2),
-                    self.get_pixel(x, y + 3),
-                    self.get_pixel(x + 1, y + 3),
-                ]
-                .map(|p| p.threshold_pixel(DEFAULT_THRESHOLD));
+                let braille_array = calc_braille_pixels(x, y)
+                    .map(|p| self.get_pixel(p.0, p.1).threshold_pixel(DEFAULT_THRESHOLD));
 
                 AsciiArtPixel {
-                    character: boolean_array_to_braille(braille_array),
+                    character: boolean_array_to_braille(&braille_array),
                     r: tlpx.0[0],
                     g: tlpx.0[1],
                     b: tlpx.0[2],
@@ -166,21 +156,11 @@ impl BrailleArtConverter for image::RgbaImage {
             .map(|(y, x)| {
                 // Top left pixel
                 let tlpx = self.get_pixel(x, y);
-
-                let braille_array = &[
-                    tlpx,
-                    self.get_pixel(x, y + 1),
-                    self.get_pixel(x, y + 2),
-                    self.get_pixel(x + 1, y),
-                    self.get_pixel(x, y + 1),
-                    self.get_pixel(x, y + 2),
-                    self.get_pixel(x, y + 3),
-                    self.get_pixel(x + 1, y + 3),
-                ]
-                .map(|p| p.threshold_pixel(DEFAULT_THRESHOLD));
+                let braille_array = calc_braille_pixels(x, y)
+                    .map(|p| self.get_pixel(p.0, p.1).threshold_pixel(DEFAULT_THRESHOLD));
 
                 AsciiArtPixel {
-                    character: boolean_array_to_braille(braille_array),
+                    character: boolean_array_to_braille(&braille_array),
                     r: tlpx.0[0],
                     g: tlpx.0[1],
                     b: tlpx.0[2],
@@ -219,21 +199,11 @@ impl BrailleArtConverter for image::GrayImage {
             .map(|(y, x)| {
                 // Top left pixel
                 let tlpx = self.get_pixel(x, y);
-
-                let braille_array = &[
-                    tlpx,
-                    self.get_pixel(x, y + 1),
-                    self.get_pixel(x, y + 2),
-                    self.get_pixel(x + 1, y),
-                    self.get_pixel(x, y + 1),
-                    self.get_pixel(x, y + 2),
-                    self.get_pixel(x, y + 3),
-                    self.get_pixel(x + 1, y + 3),
-                ]
-                .map(|p| p.threshold_pixel(DEFAULT_THRESHOLD));
+                let braille_array = calc_braille_pixels(x, y)
+                    .map(|p| self.get_pixel(p.0, p.1).threshold_pixel(DEFAULT_THRESHOLD));
 
                 AsciiArtPixel {
-                    character: boolean_array_to_braille(braille_array),
+                    character: boolean_array_to_braille(&braille_array),
                     r: tlpx.0[0],
                     g: tlpx.0[0],
                     b: tlpx.0[0],
@@ -272,21 +242,11 @@ impl BrailleArtConverter for image::GrayAlphaImage {
             .map(|(y, x)| {
                 // Top left pixel
                 let tlpx = self.get_pixel(x, y);
-
-                let braille_array = &[
-                    tlpx,
-                    self.get_pixel(x, y + 1),
-                    self.get_pixel(x, y + 2),
-                    self.get_pixel(x + 1, y),
-                    self.get_pixel(x, y + 1),
-                    self.get_pixel(x, y + 2),
-                    self.get_pixel(x, y + 3),
-                    self.get_pixel(x + 1, y + 3),
-                ]
-                .map(|p| p.threshold_pixel(DEFAULT_THRESHOLD));
+                let braille_array = calc_braille_pixels(x, y)
+                    .map(|p| self.get_pixel(p.0, p.1).threshold_pixel(DEFAULT_THRESHOLD));
 
                 AsciiArtPixel {
-                    character: boolean_array_to_braille(braille_array),
+                    character: boolean_array_to_braille(&braille_array),
                     r: tlpx.0[0],
                     g: tlpx.0[0],
                     b: tlpx.0[0],
@@ -297,4 +257,18 @@ impl BrailleArtConverter for image::GrayAlphaImage {
 
         Ok(AsciiArt::new(characters, width, height, colored))
     }
+}
+
+/// Calculates braille pixels positions
+pub fn calc_braille_pixels(x: u32, y: u32) -> [(u32, u32); 8] {
+    [
+        (x, y),
+        (x, y + 1),
+        (x, y + 2),
+        (x + 1, y),
+        (x, y + 1),
+        (x, y + 2),
+        (x, y + 3),
+        (x + 1, y + 3),
+    ]
 }
