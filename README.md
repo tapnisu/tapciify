@@ -1,6 +1,6 @@
 <p align="center"><img alt="ASCII Rin Shima" width="300" src="assets/logo.webp"/></p>
 <h1 align="center">Tapciify</h1>
-<p align="center">CLI tool that can let you view images in terminal as ASCII art</p>
+<p align="center">CLI tool for converting your images into ASCII art</p>
 
 ## Requirements
 
@@ -12,8 +12,16 @@
 
 ## Installation
 
+Using cargo:
+
 ```bash
 cargo install tapciify --locked
+```
+
+Using cargo-binstall:
+
+```bash
+cargo binstall tapciify --locked -y
 ```
 
 ## Converting image

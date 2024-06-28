@@ -67,10 +67,7 @@ pub fn calculate_frame_time(framerate: Option<f64>) -> u64 {
 pub struct AsciiPlayer {}
 
 impl AsciiPlayer {
-    #[deprecated(
-        since = "3.1.0",
-        note = "Use `Iterator::rev` instead"
-    )]
+    #[deprecated(since = "3.1.0", note = "Use `Iterator::rev` instead")]
     /// Reverse ASCII string
     pub fn reverse_ascii_string(ascii_string: String) -> String {
         ascii_string.chars().rev().collect()
