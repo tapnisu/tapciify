@@ -12,8 +12,8 @@ license = "MIT"
 rust-version = "1.74"
 
 documentation = "https://docs.rs/tapciify"
-repository = "https://github.com/tapciify/tapciify"
-homepage = "https://github.com/tapciify/tapciify"
+repository = "https://github.com/tapnisu/tapciify"
+homepage = "https://github.com/tapnisu/tapciify"
 categories = [
     "command-line-utilities",
     "multimedia",
