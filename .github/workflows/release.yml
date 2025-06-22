@@ -38,7 +38,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get upgrade -y
 
       - name: Publish to crates.io
-        if: matrix.os == 'ubuntu-latest'
+        if: matrix.target == 'x86_64-unknown-linux-gnu'
         uses: katyo/publish-crates@v2
         with:
           registry-token: ${{ secrets.CARGO_REGISTRY_TOKEN }}
