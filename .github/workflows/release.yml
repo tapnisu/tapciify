@@ -37,6 +37,12 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: sudo apt-get update && sudo apt-get upgrade -y
 
+      - name: Publish to crates.io
+        if: matrix.os == 'ubuntu-latest'
+        uses: katyo/publish-crates@v2
+        with:
+          registry-token: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+
       - uses: taiki-e/upload-rust-binary-action@v1
         with:
           bin: tapciify
