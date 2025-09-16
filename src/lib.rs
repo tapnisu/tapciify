@@ -89,34 +89,46 @@
 //! # }
 //! ```
 
+pub mod renderers;
+pub mod utils;
+
+#[deprecated(since = "3.4.0")]
+pub use renderers::ascii;
+
 #[allow(deprecated)]
 #[doc(inline)]
-pub use ascii::{
-    ascii_character, AsciiArt, AsciiArtConverter, AsciiArtConverterError, AsciiArtConverterOptions,
-    AsciiArtPixel, AsciiStringError, ReverseString, SizeError, ToAsciiArtPixel,
-    DEFAULT_ASCII_STRING,
+#[deprecated(since = "3.4.0")]
+pub use renderers::ascii::{
+    AsciiArt, AsciiArtConverter, AsciiArtConverterError, AsciiArtConverterOptions, AsciiArtPixel,
+    AsciiStringError, DEFAULT_ASCII_STRING, ReverseString, SizeError, ToAsciiArtPixel,
+    ascii_character,
 };
+
+#[deprecated(since = "3.4.0")]
+pub use utils::resize;
+
 #[doc(inline)]
 #[cfg(feature = "player")]
-pub use player::{AsciiPlayer, AsciiPlayerError, AsciiPlayerOptions};
+#[deprecated(since = "3.4.0")]
+pub use utils::player::{self, AsciiPlayer, AsciiPlayerError, AsciiPlayerOptions};
+
 #[doc(inline)]
-pub use resize::{CustomRatioResize, DEFAULT_FONT_RATIO};
-
-pub mod ascii;
-pub mod macros;
-pub mod resize;
-
-#[cfg(feature = "player")]
-pub mod player;
+#[deprecated(since = "3.4.0")]
+pub use utils::resize::{CustomRatioResize, DEFAULT_FONT_RATIO};
 
 #[cfg(feature = "braille")]
-pub mod braille;
+#[deprecated(since = "3.4.0")]
+pub use crate::renderers::braille;
 
 #[cfg(feature = "background-string")]
-pub mod background_string;
+#[deprecated(since = "3.4.0")]
+pub use crate::renderers::background_string;
 
 #[cfg(feature = "threshold-utils")]
-pub mod threshold_utils;
+#[deprecated(since = "3.4.0")]
+pub use utils::threshold as threshold_utils;
 
 #[cfg(feature = "player")]
 pub mod cli;
+
+pub mod prelude;

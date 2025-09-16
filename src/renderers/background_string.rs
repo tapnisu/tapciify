@@ -3,7 +3,7 @@
 #[cfg(feature = "rayon")]
 use rayon::prelude::*;
 
-use crate::threshold_utils::{ThresholdPixel, DEFAULT_THRESHOLD};
+use crate::utils::threshold::{DEFAULT_THRESHOLD, ThresholdPixel};
 use crate::{AsciiArt, AsciiArtPixel, SizeError};
 
 /// Convert image into ASCII art with text on the background

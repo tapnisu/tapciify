@@ -1,7 +1,7 @@
 [package]
 name = "tapciify"
-version = "3.3.1"
-edition = "2021"
+version = "3.4.0"
+edition = "2024"
 readme = "README.md"
 authors = ["Aleksei Rybin <aleksei@tapni.su>"]
 description = "CLI tool for converting your images into ASCII art"
@@ -9,7 +9,7 @@ keywords = ["image", "ascii", "terminal", "cli"]
 license = "MIT"
 
 # Don't forget to update `.github/workflows/test.yml`
-rust-version = "1.74"
+rust-version = "1.85"
 
 documentation = "https://docs.rs/tapciify"
 repository = "https://github.com/tapnisu/tapciify"
@@ -27,13 +27,13 @@ exclude = ["assets/*", ".github/*", "examples/*"]
 image = { version = "0.25", features = [
     "default-formats",
 ], default-features = false }
-colored = "2"
+colored = "3"
 
 clap = { version = "4", features = ["derive"], optional = true }
-crossterm = { version = "0.27", optional = true }
+crossterm = { version = "0.29", optional = true }
 glob = { version = "0.3", optional = true }
 imageproc = { version = "0.25", optional = true, default-features = false }
-indicatif = { version = "0.17", optional = true }
+indicatif = { version = "0.18", optional = true }
 rayon = { version = "1", optional = true }
 
 [features]
