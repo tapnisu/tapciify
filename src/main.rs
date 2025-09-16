@@ -1,12 +1,16 @@
 #[cfg(not(target_family = "windows"))]
 use std::path::PathBuf;
 
-use clap::{error::ErrorKind, CommandFactory, Parser};
+use clap::{CommandFactory, Parser, error::ErrorKind};
 
-use tapciify::braille::DEFAULT_BRAILLE_FONT_RATIO;
-use tapciify::cli::Cli;
-use tapciify::player::{calculate_frame_time, AsciiPlayer, AsciiPlayerOptions};
-use tapciify::DEFAULT_FONT_RATIO;
+use tapciify::{
+    cli::Cli,
+    renderers::braille::DEFAULT_BRAILLE_FONT_RATIO,
+    utils::{
+        player::{AsciiPlayer, AsciiPlayerOptions, calculate_frame_time},
+        resize::DEFAULT_FONT_RATIO,
+    },
+};
 
 fn main() {
     let cli = Cli::parse();

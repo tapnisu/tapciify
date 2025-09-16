@@ -12,7 +12,7 @@ pub trait ThresholdPixel {
     /// # Examples
     ///
     /// ```
-    /// use tapciify::threshold_utils::ThresholdPixel;
+    /// use tapciify::utils::threshold::ThresholdPixel;
     ///
     /// # fn main() {
     /// let pixel = image::Luma::<u8>([0]);

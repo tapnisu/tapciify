@@ -9,9 +9,7 @@
 //!
 //! # use image::imageops::FilterType;
 //!
-//! use tapciify::{
-//!     AsciiArtConverter, AsciiArtConverterOptions, CustomRatioResize, DEFAULT_FONT_RATIO,
-//! };
+//! use tapciify::{prelude::*, utils::resize::DEFAULT_FONT_RATIO};
 //!
 //! # fn main() -> Result<(), Box<dyn Error>> {
 //! let img = image::open("./assets/examples/ferris.webp")?;
@@ -36,9 +34,7 @@
 //!
 //! # use image::imageops::FilterType;
 //!
-//! use tapciify::{
-//!     AsciiArtConverter, AsciiArtConverterOptions, CustomRatioResize, DEFAULT_FONT_RATIO,
-//! };
+//! use tapciify::{prelude::*, utils::resize::DEFAULT_FONT_RATIO};
 //!
 //! # fn main() -> Result<(), Box<dyn Error>> {
 //! let img = image::open("./assets/examples/ferris.webp")?;
@@ -78,9 +74,7 @@ pub trait AsciiArtConverter {
     /// ```
     /// use std::error::Error;
     ///
-    /// use tapciify::{
-    ///     AsciiArtConverter, AsciiArtConverterOptions, CustomRatioResize, DEFAULT_FONT_RATIO,
-    /// };
+    /// use tapciify::{prelude::*, utils::resize::DEFAULT_FONT_RATIO};
     ///
     /// # use image::imageops::FilterType;
     ///
@@ -104,9 +98,7 @@ pub trait AsciiArtConverter {
     /// ```
     /// use std::error::Error;
     ///
-    /// use tapciify::{
-    ///     AsciiArtConverter, AsciiArtConverterOptions, CustomRatioResize, DEFAULT_FONT_RATIO,
-    /// };
+    /// use tapciify::{prelude::*, utils::resize::DEFAULT_FONT_RATIO};
     ///
     /// # use image::imageops::FilterType;
     ///
@@ -396,9 +388,9 @@ impl AsciiArtPixel {
     ///
     /// ```
     /// # #![allow(deprecated)]
-    /// use tapciify::{AsciiArtPixel, DEFAULT_ASCII_STRING};
+    /// use tapciify::{prelude::*, renderers::ascii::{AsciiStringError, DEFAULT_ASCII_STRING}};
     ///
-    /// # fn main() -> Result<(), tapciify::AsciiStringError> {
+    /// # fn main() -> Result<(), AsciiStringError> {
     /// let result = AsciiArtPixel::new(255, 255, 255, 255, DEFAULT_ASCII_STRING)?;
     /// assert_eq!(result.character, '@');
     ///
@@ -515,10 +507,9 @@ impl ToAsciiArtPixel for image::LumaA<u8> {
 /// # Examples
 ///
 /// ```
-/// use tapciify::ascii::ascii_character;
-/// use tapciify::DEFAULT_ASCII_STRING;
+/// use tapciify::renderers::ascii::{ascii_character, DEFAULT_ASCII_STRING, AsciiStringError};
 ///
-/// # fn main() -> Result<(), tapciify::AsciiStringError> {
+/// # fn main() -> Result<(), AsciiStringError> {
 /// let result = ascii_character(1.0, DEFAULT_ASCII_STRING)?;
 /// assert_eq!(result, '@');
 ///
@@ -555,7 +546,7 @@ impl fmt::Display for AsciiStringError {
 ///
 /// ```
 /// # #![allow(deprecated)]
-/// use tapciify::ascii::get_lightness;
+/// use tapciify::renderers::ascii::get_lightness;
 ///
 /// let result = get_lightness(255, 255, 255, 255);
 /// assert_eq!(result, 1.0);

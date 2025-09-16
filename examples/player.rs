@@ -1,6 +1,6 @@
 use std::error::Error;
 
-use tapciify::{AsciiPlayer, AsciiPlayerOptions};
+use tapciify::utils::player::{AsciiPlayer, AsciiPlayerOptions};
 
 fn main() -> Result<(), Box<dyn Error>> {
     let paths = ["./assets/examples/ferris.webp".into()];

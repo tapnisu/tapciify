@@ -3,9 +3,7 @@ use std::error::Error;
 use image::imageops::FilterType;
 use imageproc::contrast::adaptive_threshold;
 
-use tapciify::{
-    AsciiArtConverter, AsciiArtConverterOptions, CustomRatioResize, DEFAULT_FONT_RATIO,
-};
+use tapciify::{prelude::*, utils::resize::DEFAULT_FONT_RATIO};
 
 fn main() -> Result<(), Box<dyn Error>> {
     let img = image::open("./assets/examples/rin-shima.webp")?;

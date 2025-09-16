@@ -3,8 +3,12 @@
 #[cfg(feature = "rayon")]
 use rayon::prelude::*;
 
-use crate::utils::threshold::{DEFAULT_THRESHOLD, ThresholdPixel};
-use crate::{AsciiArt, AsciiArtPixel, SizeError, product};
+use crate::{
+    prelude::*,
+    product,
+    renderers::ascii::SizeError,
+    utils::threshold::{DEFAULT_THRESHOLD, ThresholdPixel},
+};
 
 /// Braille characters aspect ratio
 pub const DEFAULT_BRAILLE_FONT_RATIO: f64 = 21.0 / 24.0;
@@ -22,7 +26,7 @@ pub const DEFAULT_BRAILLE_FONT_RATIO: f64 = 21.0 / 24.0;
 /// # Example
 ///
 /// ```
-/// use tapciify::braille::boolean_array_to_braille;
+/// use tapciify::renderers::braille::boolean_array_to_braille;
 ///
 /// # fn main() {
 /// let braille_char =
@@ -55,8 +59,8 @@ pub trait BrailleArtConverter {
     /// use std::error::Error;
     ///
     /// use tapciify::{
-    ///     braille::{BrailleArtConverter, DEFAULT_BRAILLE_FONT_RATIO},
-    ///     CustomRatioResize,
+    ///     prelude::*,
+    ///     renderers::braille::{BrailleArtConverter, DEFAULT_BRAILLE_FONT_RATIO},
     /// };
     ///
     /// # use image::imageops::FilterType;

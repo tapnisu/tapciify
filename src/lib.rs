@@ -43,9 +43,7 @@
 //!
 //! # use std::error::Error;
 //!
-//! use tapciify::{
-//!     AsciiArtConverter, AsciiArtConverterOptions, CustomRatioResize, DEFAULT_FONT_RATIO,
-//! };
+//! use tapciify::{prelude::*, utils::resize::DEFAULT_FONT_RATIO};
 //!
 //! # fn main() -> Result<(), Box<dyn Error>> {
 //! let img = image::open("./assets/examples/ferris.webp")?;
@@ -69,9 +67,7 @@
 //!
 //! # use image::imageops::FilterType;
 //!
-//! use tapciify::{
-//!     AsciiArtConverter, AsciiArtConverterOptions, CustomRatioResize, DEFAULT_FONT_RATIO,
-//! };
+//! use tapciify::{prelude::*, utils::resize::DEFAULT_FONT_RATIO};
 //!
 //! # fn main() -> Result<(), Box<dyn Error>> {
 //! let img = image::open("./assets/examples/ferris.webp")?;
@@ -92,41 +88,41 @@
 pub mod renderers;
 pub mod utils;
 
-#[deprecated(since = "3.4.0")]
-pub use renderers::ascii;
+// #[deprecated(since = "3.4.0")]
+// pub use renderers::ascii;
 
-#[allow(deprecated)]
-#[doc(inline)]
-#[deprecated(since = "3.4.0")]
-pub use renderers::ascii::{
-    AsciiArt, AsciiArtConverter, AsciiArtConverterError, AsciiArtConverterOptions, AsciiArtPixel,
-    AsciiStringError, DEFAULT_ASCII_STRING, ReverseString, SizeError, ToAsciiArtPixel,
-    ascii_character,
-};
+// #[allow(deprecated)]
+// #[doc(inline)]
+// #[deprecated(since = "3.4.0")]
+// pub use renderers::ascii::{
+//     AsciiArt, AsciiArtConverter, AsciiArtConverterError, AsciiArtConverterOptions, AsciiArtPixel,
+//     AsciiStringError, DEFAULT_ASCII_STRING, ReverseString, SizeError, ToAsciiArtPixel,
+//     ascii_character,
+// };
 
-#[deprecated(since = "3.4.0")]
-pub use utils::resize;
+// #[deprecated(since = "3.4.0")]
+// pub use utils::resize;
 
-#[doc(inline)]
-#[cfg(feature = "player")]
-#[deprecated(since = "3.4.0")]
-pub use utils::player::{self, AsciiPlayer, AsciiPlayerError, AsciiPlayerOptions};
+// #[doc(inline)]
+// #[cfg(feature = "player")]
+// #[deprecated(since = "3.4.0")]
+// pub use utils::player::{self, AsciiPlayer, AsciiPlayerError, AsciiPlayerOptions};
 
-#[doc(inline)]
-#[deprecated(since = "3.4.0")]
-pub use utils::resize::{CustomRatioResize, DEFAULT_FONT_RATIO};
+// #[doc(inline)]
+// #[deprecated(since = "3.4.0")]
+// pub use utils::resize::{CustomRatioResize, DEFAULT_FONT_RATIO};
 
-#[cfg(feature = "braille")]
-#[deprecated(since = "3.4.0")]
-pub use crate::renderers::braille;
+// #[cfg(feature = "braille")]
+// #[deprecated(since = "3.4.0")]
+// pub use crate::renderers::braille;
 
-#[cfg(feature = "background-string")]
-#[deprecated(since = "3.4.0")]
-pub use crate::renderers::background_string;
+// #[cfg(feature = "background-string")]
+// #[deprecated(since = "3.4.0")]
+// pub use crate::renderers::background_string;
 
-#[cfg(feature = "threshold-utils")]
-#[deprecated(since = "3.4.0")]
-pub use utils::threshold as threshold_utils;
+// #[cfg(feature = "threshold-utils")]
+// #[deprecated(since = "3.4.0")]
+// pub use utils::threshold as threshold_utils;
 
 #[cfg(feature = "player")]
 pub mod cli;

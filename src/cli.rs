@@ -10,7 +10,7 @@ use glob::glob;
 #[cfg(feature = "rayon")]
 use rayon::prelude::*;
 
-use crate::DEFAULT_ASCII_STRING;
+use crate::renderers::ascii::DEFAULT_ASCII_STRING;
 
 /// Parse command arguments for tapciify CLI
 #[derive(Parser, Debug, Default, Clone, PartialEq)]

@@ -3,8 +3,12 @@
 #[cfg(feature = "rayon")]
 use rayon::prelude::*;
 
-use crate::utils::threshold::{DEFAULT_THRESHOLD, ThresholdPixel};
-use crate::{AsciiArt, AsciiArtPixel, SizeError};
+use crate::prelude::*;
+
+use crate::{
+    renderers::ascii::SizeError,
+    utils::threshold::{DEFAULT_THRESHOLD, ThresholdPixel},
+};
 
 /// Convert image into ASCII art with text on the background
 pub trait BackgroundStringArtConverter {
@@ -15,8 +19,9 @@ pub trait BackgroundStringArtConverter {
     /// ```
     /// use std::error::Error;
     ///
-    /// use tapciify::{CustomRatioResize, DEFAULT_FONT_RATIO};
-    /// use tapciify::background_string::BackgroundStringArtConverter;
+    /// use tapciify::prelude::*;
+    /// use tapciify::utils::resize::DEFAULT_FONT_RATIO;
+    /// use tapciify::renderers::background_string::BackgroundStringArtConverter;
     ///
     /// # use image::imageops::FilterType;
     ///

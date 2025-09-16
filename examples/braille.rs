@@ -2,8 +2,10 @@ use std::error::Error;
 
 use image::imageops::FilterType;
 
-use tapciify::braille::{BrailleArtConverter, DEFAULT_BRAILLE_FONT_RATIO};
-use tapciify::CustomRatioResize;
+use tapciify::{
+    prelude::*,
+    renderers::braille::{BrailleArtConverter, DEFAULT_BRAILLE_FONT_RATIO},
+};
 
 fn main() -> Result<(), Box<dyn Error>> {
     let img = image::open("./assets/examples/rin-shima.webp")?;

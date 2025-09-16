@@ -4,7 +4,7 @@
 //! # Examples
 //!
 //! ```
-//! use tapciify::{AsciiPlayer, AsciiPlayerOptions};
+//! use tapciify::utils::player::{AsciiPlayer, AsciiPlayerOptions};
 //!
 //! # use std::error::Error;
 //!
@@ -40,19 +40,19 @@ use indicatif::ProgressStyle;
 #[cfg(feature = "rayon")]
 use rayon::prelude::*;
 
-use crate::background_string::BackgroundStringArtConverter;
-use crate::braille::BrailleArtConverter;
-use crate::{
-    AsciiArt, AsciiArtConverter, AsciiArtConverterError, AsciiArtConverterOptions,
-    AsciiStringError, CustomRatioResize, SizeError, DEFAULT_ASCII_STRING, DEFAULT_FONT_RATIO,
-};
+use crate::prelude::*;
+
+use crate::renderers::ascii::{AsciiStringError, DEFAULT_ASCII_STRING, SizeError};
+use crate::renderers::background_string::BackgroundStringArtConverter;
+use crate::renderers::braille::BrailleArtConverter;
+use crate::utils::resize::DEFAULT_FONT_RATIO;
 
 /// Calculate frame time in millis (1 / framerate)
 ///
 /// # Examples
 ///
 /// ```
-/// use tapciify::player::calculate_frame_time;
+/// use tapciify::utils::player::calculate_frame_time;
 ///
 /// let result = calculate_frame_time(Some(20.0));
 ///
@@ -205,7 +205,7 @@ impl AsciiPlayer {
     /// # Examples
     ///
     /// ```
-    /// use tapciify::{AsciiPlayer, AsciiPlayerOptions};
+    /// use tapciify::utils::player::{AsciiPlayer, AsciiPlayerOptions};
     ///
     /// let paths = vec!["./assets/examples/ferris.webp".into()];
     ///

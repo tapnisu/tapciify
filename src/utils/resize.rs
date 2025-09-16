@@ -14,7 +14,7 @@ pub trait CustomRatioResize {
     ///
     /// ```
     /// use image::imageops::FilterType;
-    /// use tapciify::{CustomRatioResize, DEFAULT_FONT_RATIO};
+    /// use tapciify::{prelude::*, utils::resize::DEFAULT_FONT_RATIO};
     ///
     /// # fn main() -> Result<(), image::ImageError> {
     /// let img = image::open("./assets/examples/ferris.webp")?;
