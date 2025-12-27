@@ -1,5 +1,6 @@
 //! Converting images to ASCII art using Braille characters
 
+use image::{ImageBuffer, Pixel};
 #[cfg(feature = "rayon")]
 use rayon::prelude::*;
 
@@ -91,7 +92,12 @@ impl BrailleArtConverter for image::DynamicImage {
     }
 }
 
-impl BrailleArtConverter for image::RgbImage {
+impl<P, Container> BrailleArtConverter for ImageBuffer<P, Container>
+where
+    P: Pixel + ToAsciiArtPixel + ThresholdPixel + Sync,
+    P::Subpixel: Sync,
+    Container: std::ops::Deref<Target = [P::Subpixel]> + Sync,
+{
     fn braille_art(&self, colored: bool) -> Result<AsciiArt, SizeError> {
         let width = self.width();
         let height = self.height();
@@ -115,147 +121,12 @@ impl BrailleArtConverter for image::RgbImage {
 
         let characters = iter
             .map(|(y, x)| {
-                // Top left pixel
-                let tlpx = self.get_pixel(x, y);
                 let braille_array = calc_braille_pixels(x, y)
                     .map(|p| self.get_pixel(p.0, p.1).threshold_pixel(DEFAULT_THRESHOLD));
 
-                AsciiArtPixel {
-                    character: boolean_array_to_braille(&braille_array),
-                    r: tlpx.0[0],
-                    g: tlpx.0[1],
-                    b: tlpx.0[2],
-                    a: 255,
-                }
-            })
-            .collect();
-
-        Ok(AsciiArt::new(characters, width, height, colored))
-    }
-}
-
-impl BrailleArtConverter for image::RgbaImage {
-    fn braille_art(&self, colored: bool) -> Result<AsciiArt, SizeError> {
-        let width = self.width();
-        let height = self.height();
-
-        if width < 4 || height < 8 {
-            return Err(SizeError);
-        }
-
-        let x_range: Vec<u32> = (0..(width - width % 2)).step_by(2).collect();
-        let y_range: Vec<u32> = (0..(height - height % 4)).step_by(4).collect();
-
-        let width = x_range.clone().len() as u32;
-        let height = y_range.clone().len() as u32;
-
-        let range: Vec<(u32, u32)> = product![y_range, x_range].map(|(y, x)| (*y, *x)).collect();
-
-        #[cfg(feature = "rayon")]
-        let iter = range.into_par_iter();
-        #[cfg(not(feature = "rayon"))]
-        let iter = range.into_iter();
-
-        let characters = iter
-            .map(|(y, x)| {
-                // Top left pixel
-                let tlpx = self.get_pixel(x, y);
-                let braille_array = calc_braille_pixels(x, y)
-                    .map(|p| self.get_pixel(p.0, p.1).threshold_pixel(DEFAULT_THRESHOLD));
-
-                AsciiArtPixel {
-                    character: boolean_array_to_braille(&braille_array),
-                    r: tlpx.0[0],
-                    g: tlpx.0[1],
-                    b: tlpx.0[2],
-                    a: tlpx.0[3],
-                }
-            })
-            .collect();
-
-        Ok(AsciiArt::new(characters, width, height, colored))
-    }
-}
-
-impl BrailleArtConverter for image::GrayImage {
-    fn braille_art(&self, colored: bool) -> Result<AsciiArt, SizeError> {
-        let width = self.width();
-        let height = self.height();
-
-        if width < 4 || height < 8 {
-            return Err(SizeError);
-        }
-
-        let x_range: Vec<u32> = (0..(width - width % 2)).step_by(2).collect();
-        let y_range: Vec<u32> = (0..(height - height % 4)).step_by(4).collect();
-
-        let width = x_range.clone().len() as u32;
-        let height = y_range.clone().len() as u32;
-
-        let range: Vec<(u32, u32)> = product![y_range, x_range].map(|(y, x)| (*y, *x)).collect();
-
-        #[cfg(feature = "rayon")]
-        let iter = range.into_par_iter();
-        #[cfg(not(feature = "rayon"))]
-        let iter = range.into_iter();
-
-        let characters = iter
-            .map(|(y, x)| {
-                // Top left pixel
-                let tlpx = self.get_pixel(x, y);
-                let braille_array = calc_braille_pixels(x, y)
-                    .map(|p| self.get_pixel(p.0, p.1).threshold_pixel(DEFAULT_THRESHOLD));
-
-                AsciiArtPixel {
-                    character: boolean_array_to_braille(&braille_array),
-                    r: tlpx.0[0],
-                    g: tlpx.0[0],
-                    b: tlpx.0[0],
-                    a: 255,
-                }
-            })
-            .collect();
-
-        Ok(AsciiArt::new(characters, width, height, colored))
-    }
-}
-
-impl BrailleArtConverter for image::GrayAlphaImage {
-    fn braille_art(&self, colored: bool) -> Result<AsciiArt, SizeError> {
-        let width = self.width();
-        let height = self.height();
-
-        if width < 4 || height < 8 {
-            return Err(SizeError);
-        }
-
-        let x_range: Vec<u32> = (0..(width - width % 2)).step_by(2).collect();
-        let y_range: Vec<u32> = (0..(height - height % 4)).step_by(4).collect();
-
-        let width = x_range.clone().len() as u32;
-        let height = y_range.clone().len() as u32;
-
-        let range: Vec<(u32, u32)> = product![y_range, x_range].map(|(y, x)| (*y, *x)).collect();
-
-        #[cfg(feature = "rayon")]
-        let iter = range.into_par_iter();
-        #[cfg(not(feature = "rayon"))]
-        let iter = range.into_iter();
-
-        let characters = iter
-            .map(|(y, x)| {
-                // Top left pixel
-                let tlpx = self.get_pixel(x, y);
-                let braille_array = calc_braille_pixels(x, y)
-                    .map(|p| self.get_pixel(p.0, p.1).threshold_pixel(DEFAULT_THRESHOLD));
-
-                AsciiArtPixel {
-                    character: boolean_array_to_braille(&braille_array),
-                    r: tlpx.0[0],
-                    g: tlpx.0[0],
-                    b: tlpx.0[0],
-                    a: tlpx.0[1],
-                }
+                // Top left pixel (used only for colors)
+                self.get_pixel(x, y)
+                    .to_raw_ascii_art_pixel(boolean_array_to_braille(&braille_array))
             })
             .collect();
 
