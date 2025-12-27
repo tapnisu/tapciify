@@ -1,5 +1,6 @@
 //! Use text for background on light pixels
 
+use image::{ImageBuffer, Pixel};
 #[cfg(feature = "rayon")]
 use rayon::prelude::*;
 
@@ -47,7 +48,12 @@ impl BackgroundStringArtConverter for image::DynamicImage {
     }
 }
 
-impl BackgroundStringArtConverter for image::RgbImage {
+impl<P, Container> BackgroundStringArtConverter for ImageBuffer<P, Container>
+where
+    P: Pixel + ToAsciiArtPixel + ThresholdPixel + Sync,
+    P::Subpixel: Sync,
+    Container: std::ops::Deref<Target = [P::Subpixel]>,
+{
     fn background_string_art(&self, string: &str, colored: bool) -> Result<AsciiArt, SizeError> {
         if self.width() == 0 || self.height() == 0 {
             return Err(SizeError);
@@ -60,118 +66,16 @@ impl BackgroundStringArtConverter for image::RgbImage {
 
         let characters = iter
             .enumerate()
-            .map(|(index, pixel)| AsciiArtPixel {
-                character: match pixel.threshold_pixel(DEFAULT_THRESHOLD) {
-                    true => string.chars().nth(index % string.chars().count()).unwrap(),
-                    false => ' ',
-                },
-                r: pixel.0[0],
-                g: pixel.0[1],
-                b: pixel.0[2],
-                a: 255,
+            .map(|(index, pixel)| {
+                (
+                    match pixel.threshold_pixel(DEFAULT_THRESHOLD) {
+                        true => string.chars().nth(index % string.chars().count()).unwrap(),
+                        false => ' ',
+                    },
+                    pixel,
+                )
             })
-            .collect::<Vec<AsciiArtPixel>>();
-
-        Ok(AsciiArt::new(
-            characters,
-            self.width(),
-            self.height(),
-            colored,
-        ))
-    }
-}
-
-impl BackgroundStringArtConverter for image::RgbaImage {
-    fn background_string_art(&self, string: &str, colored: bool) -> Result<AsciiArt, SizeError> {
-        if self.width() == 0 || self.height() == 0 {
-            return Err(SizeError);
-        }
-
-        #[cfg(feature = "rayon")]
-        let iter = self.par_pixels();
-        #[cfg(not(feature = "rayon"))]
-        let iter = self.pixels();
-
-        let characters = iter
-            .enumerate()
-            .map(|(index, pixel)| AsciiArtPixel {
-                character: match pixel.threshold_pixel(DEFAULT_THRESHOLD) {
-                    true => string.chars().nth(index % string.chars().count()).unwrap(),
-                    false => ' ',
-                },
-                r: pixel.0[0],
-                g: pixel.0[1],
-                b: pixel.0[2],
-                a: pixel.0[3],
-            })
-            .collect::<Vec<AsciiArtPixel>>();
-
-        Ok(AsciiArt::new(
-            characters,
-            self.width(),
-            self.height(),
-            colored,
-        ))
-    }
-}
-
-impl BackgroundStringArtConverter for image::GrayImage {
-    fn background_string_art(&self, string: &str, colored: bool) -> Result<AsciiArt, SizeError> {
-        if self.width() == 0 || self.height() == 0 {
-            return Err(SizeError);
-        }
-
-        #[cfg(feature = "rayon")]
-        let iter = self.par_pixels();
-        #[cfg(not(feature = "rayon"))]
-        let iter = self.pixels();
-
-        let characters = iter
-            .enumerate()
-            .map(|(index, pixel)| AsciiArtPixel {
-                character: match pixel.threshold_pixel(DEFAULT_THRESHOLD) {
-                    true => string.chars().nth(index % string.chars().count()).unwrap(),
-                    false => ' ',
-                },
-                r: pixel.0[0],
-                g: pixel.0[0],
-                b: pixel.0[0],
-                a: 255,
-            })
-            .collect::<Vec<AsciiArtPixel>>();
-
-        Ok(AsciiArt::new(
-            characters,
-            self.width(),
-            self.height(),
-            colored,
-        ))
-    }
-}
-
-impl BackgroundStringArtConverter for image::GrayAlphaImage {
-    fn background_string_art(&self, string: &str, colored: bool) -> Result<AsciiArt, SizeError> {
-        if self.width() == 0 || self.height() == 0 {
-            return Err(SizeError);
-        }
-
-        #[cfg(feature = "rayon")]
-        let iter = self.par_pixels();
-        #[cfg(not(feature = "rayon"))]
-        let iter = self.pixels();
-
-        let characters = iter
-            .enumerate()
-            .map(|(index, pixel)| AsciiArtPixel {
-                character: match pixel.threshold_pixel(DEFAULT_THRESHOLD) {
-                    true => string.chars().nth(index % string.chars().count()).unwrap(),
-                    false => ' ',
-                },
-                r: pixel.0[0],
-                g: pixel.0[0],
-                b: pixel.0[0],
-                a: pixel.0[1],
-            })
+            .map(|(character, pixel)| pixel.to_raw_ascii_art_pixel(character))
             .collect::<Vec<AsciiArtPixel>>();
 
         Ok(AsciiArt::new(
