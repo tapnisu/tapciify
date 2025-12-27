@@ -1,5 +1,4 @@
 use std::error::Error;
-
 use image::imageops::FilterType;
 
 use tapciify::{prelude::*, utils::resize::DEFAULT_FONT_RATIO};
