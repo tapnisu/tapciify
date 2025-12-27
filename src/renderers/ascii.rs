@@ -55,7 +55,7 @@ use std::cmp::{max, min};
 use std::{error, fmt};
 
 use colored::Colorize;
-use image::Pixel;
+use image::{ImageBuffer, Pixel};
 #[cfg(feature = "rayon")]
 use rayon::prelude::*;
 
@@ -132,88 +132,12 @@ impl AsciiArtConverter for image::DynamicImage {
     }
 }
 
-impl AsciiArtConverter for image::RgbImage {
-    fn ascii_art(
-        &self,
-        options: &AsciiArtConverterOptions,
-    ) -> Result<AsciiArt, AsciiArtConverterError> {
-        if self.width() == 0 || self.height() == 0 {
-            return Err(AsciiArtConverterError::SizeError(SizeError));
-        }
-
-        #[cfg(feature = "rayon")]
-        let iter = self.par_pixels();
-        #[cfg(not(feature = "rayon"))]
-        let iter = self.pixels();
-
-        let characters = iter
-            .map(|pixel| pixel.to_ascii_art_pixel(&options.ascii_string))
-            .collect::<Result<Vec<AsciiArtPixel>, AsciiStringError>>()?;
-
-        Ok(AsciiArt::new(
-            characters,
-            self.width(),
-            self.height(),
-            options.colored,
-        ))
-    }
-}
-
-impl AsciiArtConverter for image::RgbaImage {
-    fn ascii_art(
-        &self,
-        options: &AsciiArtConverterOptions,
-    ) -> Result<AsciiArt, AsciiArtConverterError> {
-        if self.width() == 0 || self.height() == 0 {
-            return Err(AsciiArtConverterError::SizeError(SizeError));
-        }
-
-        #[cfg(feature = "rayon")]
-        let iter = self.par_pixels();
-        #[cfg(not(feature = "rayon"))]
-        let iter = self.pixels();
-
-        let characters = iter
-            .map(|pixel| pixel.to_ascii_art_pixel(&options.ascii_string))
-            .collect::<Result<Vec<AsciiArtPixel>, AsciiStringError>>()?;
-
-        Ok(AsciiArt::new(
-            characters,
-            self.width(),
-            self.height(),
-            options.colored,
-        ))
-    }
-}
-
-impl AsciiArtConverter for image::GrayImage {
-    fn ascii_art(
-        &self,
-        options: &AsciiArtConverterOptions,
-    ) -> Result<AsciiArt, AsciiArtConverterError> {
-        if self.width() == 0 || self.height() == 0 {
-            return Err(AsciiArtConverterError::SizeError(SizeError));
-        }
-
-        #[cfg(feature = "rayon")]
-        let iter = self.par_pixels();
-        #[cfg(not(feature = "rayon"))]
-        let iter = self.pixels();
-
-        let characters = iter
-            .map(|pixel| pixel.to_ascii_art_pixel(&options.ascii_string))
-            .collect::<Result<Vec<AsciiArtPixel>, AsciiStringError>>()?;
-
-        Ok(AsciiArt::new(
-            characters,
-            self.width(),
-            self.height(),
-            options.colored,
-        ))
-    }
-}
-
-impl AsciiArtConverter for image::GrayAlphaImage {
+impl<P, Container> AsciiArtConverter for ImageBuffer<P, Container>
+where
+    P: Pixel + ToAsciiArtPixel + Sync,
+    P::Subpixel: Sync,
+    Container: std::ops::Deref<Target = [P::Subpixel]>,
+{
     fn ascii_art(
         &self,
         options: &AsciiArtConverterOptions,
