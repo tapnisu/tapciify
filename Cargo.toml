@@ -64,5 +64,5 @@ name = "tapciify"
 required-features = ["player"]
 
 [[bench]]
-name = "ascii_benchmark"
+name = "bench_main"
 harness = false
