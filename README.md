@@ -8,7 +8,7 @@
 
 2. [Rust](https://www.rust-lang.org/tools/install)
    > **Important**:
-   > Current minimal Rust version is 1.85!
+   > Current minimal Rust version is 1.87!
 
 ## Installation
 
