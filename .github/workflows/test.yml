@@ -29,6 +29,3 @@ jobs:
         run: cargo clippy --verbose
       - name: Clippy without rayon
         run: cargo clippy --no-default-features -F player --verbose
-      - name: Bench
-        if: matrix.os == 'ubuntu-latest'
-        run: cargo bench
