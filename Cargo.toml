@@ -27,7 +27,7 @@ exclude = ["assets/*", ".github/*", "examples/*"]
 image = { version = "0.25", features = [
     "default-formats",
 ], default-features = false }
-colored = "3"
+colored = "2.1"
 
 clap = { version = "4", features = ["derive"], optional = true }
 crossterm = { version = "0.29", optional = true }
