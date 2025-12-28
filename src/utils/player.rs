@@ -94,9 +94,9 @@ impl AsciiPlayer {
             options.filter,
         );
 
-        let ascii_art = match (options.clone().background_string, options.braille) {
+        let ascii_art = match (options.background_string.as_deref(), options.braille) {
             (Some(background_string), _) => {
-                prepared_img.background_string_art(&background_string, options.colored)?
+                prepared_img.background_string_art(background_string, options.colored)?
             }
             (None, true) => prepared_img.braille_art(options.colored)?,
             (None, false) => prepared_img.ascii_art(converter_options)?,

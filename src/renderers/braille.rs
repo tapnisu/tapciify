@@ -6,7 +6,6 @@ use rayon::prelude::*;
 
 use crate::{
     prelude::*,
-    product,
     renderers::ascii::SizeError,
     utils::threshold::{DEFAULT_THRESHOLD, ThresholdPixel},
 };
@@ -106,23 +105,24 @@ where
             return Err(SizeError);
         }
 
-        let x_range: Vec<u32> = (0..(width - width % 2)).step_by(2).collect();
-        let y_range: Vec<u32> = (0..(height - height % 4)).step_by(4).collect();
-
-        let width = x_range.clone().len() as u32;
-        let height = y_range.clone().len() as u32;
-
-        let range: Vec<(u32, u32)> = product![y_range, x_range].map(|(y, x)| (*y, *x)).collect();
+        let braille_width = width / 2;
+        let braille_height = height / 4;
+        let total_chars = braille_width * braille_height;
 
         #[cfg(feature = "rayon")]
-        let iter = range.into_par_iter();
+        let iter = (0..total_chars).into_par_iter();
         #[cfg(not(feature = "rayon"))]
-        let iter = range.into_iter();
+        let iter = (0..total_chars).into_iter();
 
         let characters = iter
-            .map(|(y, x)| {
+            .map(|i| {
+                let x = (i % braille_width) * 2;
+                let y = (i / braille_width) * 4;
+                (x, y)
+            })
+            .map(|(x, y)| {
                 let braille_array = calc_braille_pixels(x, y)
-                    .map(|p| self.get_pixel(p.0, p.1).threshold_pixel(DEFAULT_THRESHOLD));
+                    .map(|(x, y)| self.get_pixel(x, y).threshold_pixel(DEFAULT_THRESHOLD));
 
                 // Top left pixel (used only for colors)
                 self.get_pixel(x, y)
@@ -130,7 +130,12 @@ where
             })
             .collect();
 
-        Ok(AsciiArt::new(characters, width, height, colored))
+        Ok(AsciiArt::new(
+            characters,
+            braille_width,
+            braille_height,
+            colored,
+        ))
     }
 }
 

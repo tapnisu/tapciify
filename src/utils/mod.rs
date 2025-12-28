@@ -1,5 +1,3 @@
-pub(crate) mod macros;
-
 pub mod resize;
 
 #[cfg(feature = "player")]
