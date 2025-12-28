@@ -19,12 +19,17 @@ fn bench_main(c: &mut Criterion) {
         b.iter(|| img.ascii_art(&options).unwrap());
     });
 
-    c.bench_function("colored", |b| {
+    c.bench_function("ascii display", |b| {
+        let options = AsciiArtConverterOptions::default();
+        b.iter(|| img.ascii_art(&options).unwrap().to_string());
+    });
+
+    c.bench_function("ascii colored display", |b| {
         let options = AsciiArtConverterOptions {
             colored: true,
             ..Default::default()
         };
-        b.iter(|| img.ascii_art(&options).unwrap());
+        b.iter(|| img.ascii_art(&options).unwrap().to_string());
     });
 
     c.bench_function("background string", |b| {
@@ -34,10 +39,19 @@ fn bench_main(c: &mut Criterion) {
         });
     });
 
-    c.bench_function("colored background string", |b| {
+    c.bench_function("background string display", |b| {
+        b.iter(|| {
+            img.background_string_art(DEFAULT_ASCII_STRING, false)
+                .unwrap()
+                .to_string()
+        });
+    });
+
+    c.bench_function("background string colored display", |b| {
         b.iter(|| {
             img.background_string_art(DEFAULT_ASCII_STRING, true)
                 .unwrap()
+                .to_string()
         });
     });
 
@@ -45,8 +59,12 @@ fn bench_main(c: &mut Criterion) {
         b.iter(|| img.braille_art(false).unwrap());
     });
 
-    c.bench_function("colored braille", |b| {
-        b.iter(|| img.braille_art(true).unwrap());
+    c.bench_function("braille display", |b| {
+        b.iter(|| img.braille_art(false).unwrap().to_string());
+    });
+
+    c.bench_function("braille colored display", |b| {
+        b.iter(|| img.braille_art(true).unwrap().to_string());
     });
 }
 
