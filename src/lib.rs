@@ -7,7 +7,7 @@
 //! ## Installation
 //!
 //! ```bash
-//! cargo install tapciify
+//! cargo install tapciify --locked
 //! ```
 //!
 //! ## Converting image

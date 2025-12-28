@@ -15,13 +15,13 @@
 Using cargo:
 
 ```bash
-cargo install tapciify
+cargo install tapciify --locked
 ```
 
 Using cargo-binstall:
 
 ```bash
-cargo binstall tapciify -y
+cargo binstall tapciify --locked -y
 ```
 
 ## Converting image
