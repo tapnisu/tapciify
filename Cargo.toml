@@ -9,7 +9,7 @@ keywords = ["image", "ascii", "terminal", "cli"]
 license = "MIT"
 
 # Don't forget to update `.github/workflows/test.yml`
-rust-version = "1.85"
+rust-version = "1.87"
 
 documentation = "https://docs.rs/tapciify"
 repository = "https://github.com/tapnisu/tapciify"
@@ -27,7 +27,7 @@ exclude = ["assets/*", ".github/*", "examples/*"]
 image = { version = "0.25", features = [
     "default-formats",
 ], default-features = false }
-colored = "2.1"
+colored = "3"
 
 clap = { version = "4", features = ["derive"], optional = true }
 crossterm = { version = "0.29", optional = true }

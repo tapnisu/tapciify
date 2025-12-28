@@ -13,6 +13,14 @@ use tapciify::{
 };
 
 fn main() {
+    // https://github.com/colored-rs/colored/issues/180
+    #[cfg(target_family = "windows")]
+    unsafe {
+        if std::env::var("WT_SESSION").is_ok() {
+            std::env::set_var("COLORTERM", "truecolor");
+        }
+    }
+
     let cli = Cli::parse();
     let mut cmd = Cli::command();
 
