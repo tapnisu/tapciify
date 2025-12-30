@@ -15,8 +15,8 @@ use tapciify::{
 fn main() {
     // https://github.com/colored-rs/colored/issues/180
     #[cfg(target_family = "windows")]
-    unsafe {
-        if std::env::var("WT_SESSION").is_ok() {
+    if std::env::var("COLORTERM").is_err() && std::env::var("WT_SESSION").is_ok() {
+        unsafe {
             std::env::set_var("COLORTERM", "truecolor");
         }
     }
