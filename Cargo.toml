@@ -21,7 +21,16 @@ categories = [
     "multimedia::video",
     "visualization",
 ]
-exclude = ["assets/*", ".github/*", "examples/*"]
+exclude = [
+    "assets/*",
+    ".github/*",
+    "examples/*",
+    ".envrc",
+    "flake.lock",
+    "flake.nix",
+    "default.nix",
+    "shell.nix",
+]
 
 [dependencies]
 image = { version = "0.25", features = [
