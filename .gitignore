@@ -12,3 +12,9 @@ target/
 
 # MSVC Windows builds of rustc generate these, which store debugging information
 *.pdb
+
+# Direnv
+.direnv
+
+# nix build command create this folder
+result
