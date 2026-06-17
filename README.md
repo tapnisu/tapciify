@@ -50,7 +50,12 @@ In this example I set framerate to 24 (but you can use any another)
 
 ## Examples
 
-| Original                                       | ASCII                                             | ASCII colored                                            | Pixels                                                                  | Braille                                              | Braille colored                                          | Background string                                                                 |
-| ---------------------------------------------- | ------------------------------------------------- | -------------------------------------------------------- | ----------------------------------------------------------------------- | ---------------------------------------------------- | -------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| ![Original Image](assets/examples/ferris.webp) | ![ASCII art](assets/examples/ascii.webp)          | ![ASCII colored art](assets/examples/ascii-colored.webp) | ![ASCII art using pixels (█ symbol)](assets/examples/ascii-pixels.webp) | ![Braille](assets/examples/braille.webp)             | ![Braille colored](assets/examples/braille-colored.webp) | ![Background string](assets/examples/background-string.webp)                      |
-| `Original image`                               | `tapciify -i ./assets/examples/ferris.webp -w 64` | `tapciify -i ./assets/examples/ferris.webp -w 64 -c`     | `tapciify -i ./assets/examples/ferris.webp -w 64 --pixels`              | `tapciify -i ./assets/examples/ferris.webp -w 64 -b` | `tapciify -i ./assets/examples/ferris.webp -w 64 -bc`    | `tapciify -i ./assets/examples/bad-apple.webp -w 64 --background-string badapple` |
+| Type   | Image     | Command
+| ----------|-----------|------------
+| Original  | <img alt="Original Image" src="assets/examples/ferris.webp" width=150> | `Original Image` 
+| ASCII  | <img alt="ASCII art" src="assets/examples/ascii.webp" width=150> | `tapciify -i ./assets/examples/ferris.webp -w 64` 
+| ASCII colored  | <img alt="ASCII colored art" src="assets/examples/ascii-colored.webp" width=150> | `tapciify -i ./assets/examples/ferris.webp -w 64 -c` 
+| Pixels   |<img alt="ASCII art using pixels (█ symbol)" src="assets/examples/ascii-pixels.webp" width=150> | `tapciify -i ./assets/examples/ferris.webp -w 64 --pixels` 
+| Braille  | <img alt="Braille" src="assets/examples/braille.webp" width=150> | `tapciify -i ./assets/examples/ferris.webp -w 64 -b` 
+| Braille colored  | <img alt="Braille colored" src="assets/examples/braille-colored.webp" width=150> | `tapciify -i ./assets/examples/ferris.webp -w 64 -bc` 
+| Background string | <img alt="Background string" src="assets/examples/background-string.webp" width=150> | `tapciify -i ./assets/examples/bad-apple.webp -w 64 --background-string badapple` 
