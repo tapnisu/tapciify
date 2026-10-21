@@ -42,10 +42,24 @@ fn main() {
         (_, true) => ("█".to_owned(), true),
     };
 
+    let (width, height) = match (cli.fit, crossterm::terminal::size()) {
+        (tapciify::cli::FitMode::Width, Ok((terminal_width, _))) => {
+            (cli.width.or(Some(terminal_width as u32)), cli.height)
+        }
+        (tapciify::cli::FitMode::Height, Ok((_, terminal_height))) => {
+            (cli.width, cli.height.or(Some(terminal_height as u32)))
+        }
+        (tapciify::cli::FitMode::Stretch, Ok((terminal_width, terminal_height))) => (
+            cli.width.or(Some(terminal_width as u32)),
+            cli.height.or(Some(terminal_height as u32)),
+        ),
+        _ => (cli.width, cli.height),
+    };
+
     let frame_time = calculate_frame_time(cli.framerate);
     let options = AsciiPlayerOptions {
-        width: cli.width,
-        height: cli.height,
+        width,
+        height,
         ascii_string,
         colored,
         frame_time,

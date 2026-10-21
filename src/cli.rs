@@ -63,6 +63,18 @@ pub struct Cli {
     /// Center output in terminal
     #[clap(long, action)]
     pub centered: bool,
+    /// Scale the output in the terminal
+    #[clap(long, value_enum, default_value_t)]
+    pub fit: FitMode,
+}
+
+#[derive(clap::ValueEnum, Debug, Default, Clone, PartialEq)]
+pub enum FitMode {
+    #[default]
+    None,
+    Width,
+    Height,
+    Stretch,
 }
 
 /// Add glob support for paths parsing on Windows
