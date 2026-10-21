@@ -80,12 +80,11 @@ impl AsciiPlayer {
         converter_options: &AsciiArtConverterOptions,
     ) -> Result<AsciiArt, AsciiPlayerError> {
         let img = image::open(path)?;
-        let processed_img = match options.threshold {
-            Some(threshold) => {
-                image::DynamicImage::from(adaptive_threshold(&img.to_luma8(), threshold))
-            }
-            None => img,
-        };
+
+        let processed_img = options
+            .threshold
+            .map(|t| image::DynamicImage::from(adaptive_threshold(&img.to_luma8(), t)))
+            .unwrap_or(img);
 
         let prepared_img = processed_img.resize_custom_ratio(
             options.width,

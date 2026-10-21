@@ -4,7 +4,7 @@ use std::path::PathBuf;
 use clap::{CommandFactory, Parser, error::ErrorKind};
 
 use tapciify::{
-    cli::Cli,
+    cli::{Cli, FitMode},
     renderers::braille::DEFAULT_BRAILLE_FONT_RATIO,
     utils::{
         player::{AsciiPlayer, AsciiPlayerOptions, calculate_frame_time},
@@ -42,18 +42,17 @@ fn main() {
         (_, true) => ("█".to_owned(), true),
     };
 
-    let (width, height) = match (cli.fit, crossterm::terminal::size()) {
-        (tapciify::cli::FitMode::Width, Ok((terminal_width, _))) => {
-            (cli.width.or(Some(terminal_width as u32)), cli.height)
-        }
-        (tapciify::cli::FitMode::Height, Ok((_, terminal_height))) => {
-            (cli.width, cli.height.or(Some(terminal_height as u32)))
-        }
-        (tapciify::cli::FitMode::Stretch, Ok((terminal_width, terminal_height))) => (
-            cli.width.or(Some(terminal_width as u32)),
-            cli.height.or(Some(terminal_height as u32)),
-        ),
-        _ => (cli.width, cli.height),
+    let (term_width, term_height) = crossterm::terminal::size()
+        .map(|(w, h)| (Some(w as u32), Some(h as u32)))
+        .unwrap_or((None, None));
+
+    let width = match cli.fit {
+        FitMode::Width | FitMode::Stretch => cli.width.or(term_width),
+        _ => cli.width,
+    };
+    let height = match cli.fit {
+        FitMode::Height | FitMode::Stretch => cli.height.or(term_height),
+        _ => cli.height,
     };
 
     let frame_time = calculate_frame_time(cli.framerate);
