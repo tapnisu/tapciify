@@ -94,8 +94,16 @@ impl AsciiPlayer {
             options.filter,
         );
 
-        let (padding_left, padding_top) = match (options.centered, crossterm::terminal::size()) {
-            (true, Ok((terminal_width, terminal_height))) => (
+        let (padding_left, padding_top) = match (options.center, crossterm::terminal::size()) {
+            (CenterMode::X, Ok((terminal_width, _))) => (
+                (terminal_width as usize).saturating_sub(prepared_img.width() as usize) / 2,
+                0,
+            ),
+            (CenterMode::Y, Ok((_, terminal_height))) => (
+                0,
+                (terminal_height as usize).saturating_sub(prepared_img.height() as usize) / 2,
+            ),
+            (CenterMode::Both, Ok((terminal_width, terminal_height))) => (
                 (terminal_width as usize).saturating_sub(prepared_img.width() as usize) / 2,
                 (terminal_height as usize).saturating_sub(prepared_img.height() as usize) / 2,
             ),
@@ -263,7 +271,7 @@ pub struct AsciiPlayerOptions {
     /// Text to show as background on light pixels
     pub background_string: Option<String>,
     /// Center output in terminal
-    pub centered: bool,
+    pub center: CenterMode,
 }
 
 impl Default for AsciiPlayerOptions {
@@ -281,9 +289,18 @@ impl Default for AsciiPlayerOptions {
             threshold: None,
             braille: false,
             background_string: None,
-            centered: false,
+            center: CenterMode::None,
         }
     }
+}
+
+#[derive(Debug, Default, Copy, Clone, PartialEq)]
+pub enum CenterMode {
+    #[default]
+    None,
+    X,
+    Y,
+    Both,
 }
 
 impl From<AsciiPlayerOptions> for AsciiArtConverterOptions {

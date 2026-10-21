@@ -69,7 +69,7 @@ fn main() {
         threshold: cli.threshold,
         braille: cli.braille,
         background_string: cli.background_string,
-        centered: cli.centered,
+        center: cli.center.into(),
         ..Default::default()
     };
 
