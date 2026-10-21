@@ -25,6 +25,7 @@ exclude = [
     "assets/*",
     ".github/*",
     "examples/*",
+    "benches/*",
     ".envrc",
     "flake.lock",
     "flake.nix",
