@@ -55,6 +55,7 @@ fn main() {
         threshold: cli.threshold,
         braille: cli.braille,
         background_string: cli.background_string,
+        centered: cli.centered,
         ..Default::default()
     };
 

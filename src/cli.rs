@@ -60,6 +60,9 @@ pub struct Cli {
     /// Use text for background on light pixels
     #[clap(long)]
     pub background_string: Option<String>,
+    /// Center output in terminal
+    #[clap(long, action)]
+    pub centered: bool,
 }
 
 /// Add glob support for paths parsing on Windows

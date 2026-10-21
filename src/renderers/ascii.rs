@@ -291,7 +291,7 @@ impl fmt::Display for AsciiArt {
 }
 
 /// ASCII pixel of [`AsciiArt`]
-#[derive(Debug, Default, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct AsciiArtPixel {
     /// Character representing lightness of pixel
     pub character: char,
@@ -359,6 +359,19 @@ impl AsciiArtPixel {
         }
 
         self.character.to_string()
+    }
+}
+
+impl Default for AsciiArtPixel {
+    fn default() -> Self {
+        // Empty pixel
+        Self {
+            character: ' ',
+            r: 0,
+            g: 0,
+            b: 0,
+            a: 0,
+        }
     }
 }
 
@@ -523,5 +536,46 @@ pub trait ReverseString {
 impl ReverseString for String {
     fn reverse(&self) -> String {
         self.chars().rev().collect()
+    }
+}
+
+/// Trait for adding padding to [`AsciiArt`]
+pub trait AsciiArtPadding {
+    /// Add left padding to [`AsciiArt`]
+    fn padding_left(self, padding: usize) -> Self;
+    /// Add top padding to [`AsciiArt`]
+    fn padding_top(self, padding: usize) -> Self;
+}
+
+impl AsciiArtPadding for AsciiArt {
+    fn padding_left(mut self, padding: usize) -> AsciiArt {
+        if padding > 0 {
+            let padding_pixels = vec![AsciiArtPixel::default(); padding];
+
+            let width = self.width as usize;
+            let height = self.height as usize;
+
+            for row in (0..height).rev() {
+                let start_idx = row * width;
+
+                self.characters
+                    .splice(start_idx..start_idx, padding_pixels.clone());
+            }
+
+            self.width += padding as u32;
+        }
+
+        self
+    }
+
+    fn padding_top(mut self, padding: usize) -> AsciiArt {
+        if padding > 0 {
+            let padding_pixels = vec![AsciiArtPixel::default(); padding * self.width as usize];
+
+            self.characters.splice(0..0, padding_pixels.clone());
+            self.height += padding as u32;
+        }
+
+        self
     }
 }
