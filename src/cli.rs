@@ -11,6 +11,7 @@ use glob::glob;
 use rayon::prelude::*;
 
 use crate::renderers::ascii::DEFAULT_ASCII_STRING;
+use crate::utils::player::CenterMode as PlayerCenterMode;
 
 /// Parse command arguments for tapciify CLI
 #[derive(Parser, Debug, Default, Clone, PartialEq)]
@@ -60,6 +61,41 @@ pub struct Cli {
     /// Use text for background on light pixels
     #[clap(long)]
     pub background_string: Option<String>,
+    /// Center output in terminal
+    #[clap(long, action)]
+    pub center: CenterMode,
+    /// Scale the output in the terminal
+    #[clap(long, value_enum, default_value_t)]
+    pub fit: FitMode,
+}
+
+#[derive(clap::ValueEnum, Debug, Default, Copy, Clone, PartialEq)]
+pub enum FitMode {
+    #[default]
+    None,
+    Width,
+    Height,
+    Stretch,
+}
+
+#[derive(clap::ValueEnum, Debug, Default, Copy, Clone, PartialEq)]
+pub enum CenterMode {
+    #[default]
+    None,
+    X,
+    Y,
+    Both,
+}
+
+impl From<CenterMode> for PlayerCenterMode {
+    fn from(mode: CenterMode) -> Self {
+        match mode {
+            CenterMode::None => PlayerCenterMode::None,
+            CenterMode::X => PlayerCenterMode::X,
+            CenterMode::Y => PlayerCenterMode::Y,
+            CenterMode::Both => PlayerCenterMode::Both,
+        }
+    }
 }
 
 /// Add glob support for paths parsing on Windows

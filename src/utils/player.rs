@@ -42,7 +42,7 @@ use rayon::prelude::*;
 
 use crate::prelude::*;
 
-use crate::renderers::ascii::{AsciiStringError, DEFAULT_ASCII_STRING, SizeError};
+use crate::renderers::ascii::{AsciiArtPadding, AsciiStringError, DEFAULT_ASCII_STRING, SizeError};
 use crate::renderers::background_string::BackgroundStringArtConverter;
 use crate::renderers::braille::BrailleArtConverter;
 use crate::utils::resize::DEFAULT_FONT_RATIO;
@@ -80,12 +80,11 @@ impl AsciiPlayer {
         converter_options: &AsciiArtConverterOptions,
     ) -> Result<AsciiArt, AsciiPlayerError> {
         let img = image::open(path)?;
-        let processed_img = match options.threshold {
-            Some(threshold) => {
-                image::DynamicImage::from(adaptive_threshold(&img.to_luma8(), threshold))
-            }
-            None => img,
-        };
+
+        let processed_img = options
+            .threshold
+            .map(|t| image::DynamicImage::from(adaptive_threshold(&img.to_luma8(), t)))
+            .unwrap_or(img);
 
         let prepared_img = processed_img.resize_custom_ratio(
             options.width,
@@ -94,13 +93,31 @@ impl AsciiPlayer {
             options.filter,
         );
 
+        let (padding_left, padding_top) = match (options.center, crossterm::terminal::size()) {
+            (CenterMode::X, Ok((terminal_width, _))) => (
+                (terminal_width as usize).saturating_sub(prepared_img.width() as usize) / 2,
+                0,
+            ),
+            (CenterMode::Y, Ok((_, terminal_height))) => (
+                0,
+                (terminal_height as usize).saturating_sub(prepared_img.height() as usize) / 2,
+            ),
+            (CenterMode::Both, Ok((terminal_width, terminal_height))) => (
+                (terminal_width as usize).saturating_sub(prepared_img.width() as usize) / 2,
+                (terminal_height as usize).saturating_sub(prepared_img.height() as usize) / 2,
+            ),
+            _ => (0, 0),
+        };
+
         let ascii_art = match (options.background_string.as_deref(), options.braille) {
             (Some(background_string), _) => {
                 prepared_img.background_string_art(background_string, options.colored)?
             }
             (None, true) => prepared_img.braille_art(options.colored)?,
             (None, false) => prepared_img.ascii_art(converter_options)?,
-        };
+        }
+        .padding_left(padding_left)
+        .padding_top(padding_top);
 
         Ok(ascii_art)
     }
@@ -252,6 +269,8 @@ pub struct AsciiPlayerOptions {
     pub braille: bool,
     /// Text to show as background on light pixels
     pub background_string: Option<String>,
+    /// Center output in terminal
+    pub center: CenterMode,
 }
 
 impl Default for AsciiPlayerOptions {
@@ -269,8 +288,18 @@ impl Default for AsciiPlayerOptions {
             threshold: None,
             braille: false,
             background_string: None,
+            center: CenterMode::None,
         }
     }
+}
+
+#[derive(Debug, Default, Copy, Clone, PartialEq)]
+pub enum CenterMode {
+    #[default]
+    None,
+    X,
+    Y,
+    Both,
 }
 
 impl From<AsciiPlayerOptions> for AsciiArtConverterOptions {
@@ -287,6 +316,8 @@ impl From<AsciiPlayerOptions> for AsciiArtConverterOptions {
 pub enum AsciiPlayerError {
     /// Error caused by [`image`] ([`image::ImageError`])
     Image(image::ImageError),
+    /// Error caused by I/O
+    IO(std::io::Error),
     // TODO: Rename into AsciiArtConverter
     /// Error caused by [`AsciiArtConverter`] ([`AsciiArtConverterError`])
     AsciiConverter(AsciiArtConverterError),
@@ -300,6 +331,9 @@ impl fmt::Display for AsciiPlayerError {
             AsciiPlayerError::Image(err) => {
                 write!(f, "Image error: {}", err)
             }
+            AsciiPlayerError::IO(err) => {
+                write!(f, "IO error: {}", err)
+            }
             AsciiPlayerError::AsciiConverter(err) => {
                 write!(f, "ASCII art converter error: {}", err)
             }
@@ -310,6 +344,12 @@ impl fmt::Display for AsciiPlayerError {
 impl From<image::ImageError> for AsciiPlayerError {
     fn from(err: image::ImageError) -> AsciiPlayerError {
         AsciiPlayerError::Image(err)
+    }
+}
+
+impl From<std::io::Error> for AsciiPlayerError {
+    fn from(err: std::io::Error) -> AsciiPlayerError {
+        AsciiPlayerError::IO(err)
     }
 }
 
