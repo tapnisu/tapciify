@@ -93,33 +93,33 @@ impl AsciiPlayer {
             options.filter,
         );
 
-        let (padding_left, padding_top) = match (options.center, crossterm::terminal::size()) {
-            (CenterMode::X, Ok((terminal_width, _))) => (
-                (terminal_width as usize).saturating_sub(prepared_img.width() as usize) / 2,
-                0,
-            ),
-            (CenterMode::Y, Ok((_, terminal_height))) => (
-                0,
-                (terminal_height as usize).saturating_sub(prepared_img.height() as usize) / 2,
-            ),
-            (CenterMode::Both, Ok((terminal_width, terminal_height))) => (
-                (terminal_width as usize).saturating_sub(prepared_img.width() as usize) / 2,
-                (terminal_height as usize).saturating_sub(prepared_img.height() as usize) / 2,
-            ),
-            _ => (0, 0),
-        };
-
         let ascii_art = match (options.background_string.as_deref(), options.braille) {
             (Some(background_string), _) => {
                 prepared_img.background_string_art(background_string, options.colored)?
             }
             (None, true) => prepared_img.braille_art(options.colored)?,
             (None, false) => prepared_img.ascii_art(converter_options)?,
-        }
-        .padding_left(padding_left)
-        .padding_top(padding_top);
+        };
 
-        Ok(ascii_art)
+        let (padding_left, padding_top) = match (options.center, crossterm::terminal::size()) {
+            (CenterMode::X, Ok((terminal_width, _))) => (
+                (terminal_width as usize).saturating_sub(ascii_art.width as usize) / 2,
+                0,
+            ),
+            (CenterMode::Y, Ok((_, terminal_height))) => (
+                0,
+                (terminal_height as usize).saturating_sub(ascii_art.height as usize) / 2,
+            ),
+            (CenterMode::Both, Ok((terminal_width, terminal_height))) => (
+                (terminal_width as usize).saturating_sub(ascii_art.width as usize) / 2,
+                (terminal_height as usize).saturating_sub(ascii_art.height as usize) / 2,
+            ),
+            _ => (0, 0),
+        };
+
+        Ok(ascii_art
+            .padding_left(padding_left)
+            .padding_top(padding_top))
     }
 
     /// Play paths as ASCII arts
