@@ -28,7 +28,7 @@ use std::path::PathBuf;
 use std::time::Instant;
 use std::{error, fmt};
 
-use crossterm::cursor::MoveUp;
+use crossterm::cursor::{MoveLeft, MoveUp};
 use crossterm::execute;
 use image::imageops::FilterType;
 use imageproc::contrast::adaptive_threshold;
@@ -138,13 +138,14 @@ impl AsciiPlayer {
                 let ascii_art = AsciiPlayer::render_frame(path, options, &converter_options)?;
 
                 if !first_frame {
-                    execute!(stdout(), MoveUp(ascii_art.height.try_into().unwrap()))
-                        .unwrap_or_default();
+                    let move_height = ascii_art.height - 1;
+                    let _ = execute!(stdout(), MoveUp(move_height.try_into().unwrap()));
+                    let _ = execute!(stdout(), MoveLeft(ascii_art.width.try_into().unwrap()));
                 } else {
                     first_frame = false;
                 }
 
-                println!("{}", ascii_art);
+                print!("{}", ascii_art);
 
                 while options.frame_time > start.elapsed().as_millis().try_into().unwrap() {}
             }
@@ -196,13 +197,14 @@ impl AsciiPlayer {
                 let start = Instant::now();
 
                 if !first_frame {
-                    execute!(stdout(), MoveUp(ascii_art.height.try_into().unwrap()))
-                        .unwrap_or_default();
+                    let move_height = ascii_art.height - 1;
+                    let _ = execute!(stdout(), MoveUp(move_height.try_into().unwrap()));
+                    let _ = execute!(stdout(), MoveLeft(ascii_art.width.try_into().unwrap()));
                 } else {
                     first_frame = false;
                 }
 
-                println!("{}", ascii_art);
+                print!("{}", ascii_art);
 
                 while options.frame_time > start.elapsed().as_millis().try_into().unwrap() {}
             });

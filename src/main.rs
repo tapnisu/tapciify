@@ -82,4 +82,6 @@ fn main() {
     if let Err(err) = AsciiPlayer::play(&images_paths, &options) {
         cmd.error(ErrorKind::Io, err).exit()
     }
+
+    println!();
 }
