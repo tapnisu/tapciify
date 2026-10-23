@@ -15,7 +15,7 @@ use crate::utils::player::CenterMode as PlayerCenterMode;
 
 /// Parse command arguments for tapciify CLI
 #[derive(Parser, Debug, Default, Clone, PartialEq)]
-#[clap(author, version, about, long_about = None)]
+#[clap(author, version, about, long_about = None, arg_required_else_help = true)]
 pub struct Cli {
     /// Input files to convert to ASCII art
     #[clap(short, long, num_args = 1.., required=true)]
