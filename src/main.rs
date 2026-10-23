@@ -43,13 +43,7 @@ fn main() {
     };
 
     let (term_width, term_height) = crossterm::terminal::size()
-        .map(|(w, h)| {
-            if cli.braille {
-                (w * 2 - w % 2, h * 4 - h % 4)
-            } else {
-                (w, h)
-            }
-        })
+        .map(|(w, h)| if cli.braille { (w * 2, h * 4) } else { (w, h) })
         .map(|(w, h)| (Some(w as u32), Some(h as u32)))
         .unwrap_or((None, None));
 
