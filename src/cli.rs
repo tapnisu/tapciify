@@ -62,7 +62,7 @@ pub struct Cli {
     #[clap(long)]
     pub background_string: Option<String>,
     /// Center output in terminal
-    #[clap(long, action)]
+    #[clap(long, value_enum, default_value_t)]
     pub center: CenterMode,
     /// Scale the output in the terminal
     #[clap(long, value_enum, default_value_t)]
